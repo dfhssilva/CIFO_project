@@ -55,7 +55,7 @@ def initialize_randomly( problem, population_size ):
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
 # Remark: remember, you will need a neighborhood functin for each problem
-def initialize_using_hc( problem, population_size )
+def initialize_using_hc( problem, population_size ):
     pass
 
 # -------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ def initialize_using_hc( problem, population_size )
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
 # Remark: remember, you will need a neighborhood functin for each problem
-def initialize_using_sa( problem, population_size )
+def initialize_using_sa( problem, population_size ):
     pass
 
 ###################################################################################################

@@ -1,6 +1,6 @@
 # Personalized
-#/documents/*
-#/data/*
+/documents/*
+/data/*
 #/_env/*
 
 # Byte-compiled / optimized / DLL files
