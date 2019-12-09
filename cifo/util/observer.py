@@ -18,7 +18,7 @@ class LocalSearcObserver():
 
         message = ""
         if "message" in state: message = state["message"]
-
+        
         # started
         if message == LocalSearchMessage.Started:
             Terminal.clear()
@@ -66,3 +66,41 @@ class LocalSearchMessage:
     StoppedPrematurely      = "STOPPED PREMATURELY"
     Stopped                 = "STOPPED"
     StoppedTargetAchieved   = "STOPPED TARGET ACHIEVED"
+
+class GeneticAlgorithmObserver:
+    def __init__( self, genetic_algorithm ):
+        self._algorithm = genetic_algorithm
+
+    def update(self):
+
+        state = self._algorithm.get_state()
+
+        # self._state = {
+        #    "iteration" : self._generation,
+        #    "message"   : message,
+        #    "content"   : content,
+        #    "fittest"   : self._fittest
+        #}
+
+        # Parse
+        iteration = 0
+        if "iteration" in state: iteration = state["iteration"]
+        message = ""
+        if "message" in state: message = state["message"]
+        content = ""
+        if "content" in state: content = state["content"]
+        fittest = None
+        if "fittest" in state: fittest = state["fittest"]
+
+        if message == "Genetic Algorithm":
+            Terminal.print_box( messages = [ message ], font_color = FontColor.Green)
+        elif message == "Configuration":
+            print( message )
+            print( content )
+        elif message == "Fittest Solution":
+            if fittest :
+                Terminal.print_box( messages = [ message, f"fitness = {fittest.fitness}" ], font_color = FontColor.Green)
+        else:
+            if fittest :
+                print( f"Generation {iteration:7d} - fitness: {fittest.fitness}")
+
