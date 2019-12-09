@@ -1,7 +1,6 @@
 # Personalized
-/documents/*
 /data/*
-#/_env/*
+/cifo_proj/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

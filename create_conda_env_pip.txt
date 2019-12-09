@@ -1,0 +1,4 @@
+cd <path_to_proj>
+conda create --prefix ./cifo_proj python --no-default-packages
+conda activate .\cifo_proj
+pip install -r <path_to_proj>\requirements.txt
