@@ -46,7 +46,7 @@ class ProblemTemplate:
 
                 # parse the encoding rule # read the encoding rules
         # member variables
-        self._encoding = Encoding( encoding_rule )
+        self._encoding = Encoding(encoding_rule)
 
 
     @property
