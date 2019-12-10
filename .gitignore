@@ -7,6 +7,7 @@ data/*
 cifo_proj/*
 .vscode/*
 .idea/*
+/cifo/.idea/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
