@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": ".\\_env\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\TITA\\Anaconda3\\envs\\cifo_proj\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }
