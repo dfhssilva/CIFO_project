@@ -176,27 +176,34 @@ class TournamentSelection:
     def select(self, population, objective, params):
         tournament_size = 2
         if "Tournament-Size" in params:
-            self._tournament_size = tournament_size[ "Tournament-Size" ]
+            tournament_size = params[ "Tournament-Size" ]
 
-        index1 = self._select_index( population, tournament_size )    
+        index1 = self._select_index( objective, population, tournament_size )    
         index2 = index1
         
         while index2 == index1:
-            index2 = self._select_index( population, tournament_size )
+            index2 = self._select_index( objective, population, tournament_size )
 
-        return population[ index1 ], population[ index2 ]
+        return population.solutions[ index1 ], population.solutions[ index2 ]
 
 
-    def _select_index(self, population, tournament_size ): 
+    def _select_index(self, objective, population, tournament_size ): 
         
         index_temp      = -1
-        index_selected  = randint(0, len( population )-1 )
+        index_selected  = randint(0, population.size - 1)
 
-        for _ in range( 0, tournament_size ):
-            index_temp = randint(0, len( population )-1 )
+        if objective == ProblemObjective.Maximization: 
+            for _ in range( 0, tournament_size ):
+                index_temp = randint(0, population.size - 1 )
 
-            if population.get[ index_temp ].fitness > population.get[ index_selected ].fitness:
-                index_selected = index_temp
+                if population.solutions[ index_temp ].fitness > population.solutions[ index_selected ].fitness:
+                    index_selected = index_temp
+        elif objective == ProblemObjective.Minimization:
+            for _ in range( 0, tournament_size ):
+                index_temp = randint(0, population.size - 1 )
+
+                if population.solutions[ index_temp ].fitness < population.solutions[ index_selected ].fitness:
+                    index_selected = index_temp            
 
         return index_selected         
 
