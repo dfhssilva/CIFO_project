@@ -85,6 +85,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
             - 'Hill Climbing'
             - 'Simulated Annealing'
             - 'Random' (default method)
+            - 'Greedy'
         """
         if method == 'Random': # shuffles the list and then instanciates it as a Linear Solution
             encoding_data = self._encoding.encoding_data
@@ -108,6 +109,25 @@ class TravelSalesmanProblem( ProblemTemplate ):
 
         elif method == 'Simulated Annealing':
             
+            solution = LinearSolution(
+                representation = solution_representation, 
+                encoding_rule = self._encoding_rule
+            )
+
+            return solution
+        
+        elif method == 'Greedy':   #select one at random, select the closest one until all have been visited
+            distances = self._distances
+            city = random.randint(1, len(self._distances)) # select a random city
+            possibles = decision_variables["Item-Name"].remove(city)   #get the list of all cities except the random one               
+            solution=[city]                                            # and put it in the new list
+            min=possibles[0]                                           # set the first from possibles as min and the distance 
+            mindist=distances[rep[possibles[0],city]
+            for i in possibles:
+                if                                                          ################
+                min                                                         #ACABAR
+                mindist
+                
             solution = LinearSolution(
                 representation = solution_representation, 
                 encoding_rule = self._encoding_rule
@@ -158,7 +178,7 @@ class TravelSalesmanProblem( ProblemTemplate ):
             # distance from the last city to the departure point (position 0 in the solution)
 
         for i in range(0, len(rep)):
-            fitness += distances[rep[i],rep[i+1]]
+            fitness += distances[rep[i],rep[i+1]]           #Pedro: isto está ok?
 
         solution._fitness = fitness
         solution._is_fitness_calculated = True
@@ -170,4 +190,5 @@ class TravelSalesmanProblem( ProblemTemplate ):
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
 def tsp_bitflip_get_neighbors(solution, problem, neighborhood_size = 0):
+
     pass
