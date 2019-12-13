@@ -87,16 +87,16 @@ class RouletteWheelSelection:
         """
         select two different parents using roulette wheel
         """
-        index1 = self._select_index(population = population)
+        index1 = self._select_index_max(population = population)
         index2 = index1
         
         while index2 == index1:
-            index2 = self._select_index( population = population )
+            index2 = self._select_index_max(population = population)
 
         return population.get( index1 ), population.get( index2 )
 
 
-    def _select_index(self, population ):
+    def _select_index_max(self, population):
 
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
@@ -115,7 +115,28 @@ class RouletteWheelSelection:
                 break
             index += 1    
 
-        return index    
+        return index
+    def _select_index_min(self, population):
+
+        # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
+        total_fitness = 0
+        pop_size=population.size            #get the population size for the formula
+        for solution in population.solutions:       #ACABAr
+            total_fitness += solution.fitness
+
+        # spin the wheel
+        wheel_position = uniform( 0, 1 )
+
+        # calculate the position which wheel should stop
+        stop_position = 0
+        index = 0
+        for solution in population.solutions :
+            stop_position += (solution.fitness / total_fitness)  ####<<<<--------mudar aqui meter a formula
+            if stop_position > wheel_position :
+                break
+            index += 1
+
+        return index
         
 # -------------------------------------------------------------------------------------------------
 # class RankSelection
