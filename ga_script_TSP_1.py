@@ -8,8 +8,8 @@ from cifo.custom_problem.travel_salesman_problem import (
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
-    initialize_randomly,
-    RouletteWheelSelection, RankSelection, TournamentSelection, 
+    initialize_pop,
+    RouletteWheelSelection, RankSelection, TournamentSelection,
     singlepoint_crossover,
     single_point_mutation,
     elitism_replacement, standard_replacement 
@@ -134,7 +134,7 @@ params = {
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
-        "Initialization-Approach"   : initialize_randomly,
+        "Initialization-Approach"   : initialize_pop,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : singlepoint_crossover,

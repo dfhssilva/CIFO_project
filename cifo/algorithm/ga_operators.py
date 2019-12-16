@@ -1,4 +1,4 @@
-from random import uniform, randint, choices
+from random import uniform, randint, choices, sample
 from copy import deepcopy
 
 from cifo.problem.objective import ProblemObjective
@@ -14,39 +14,41 @@ from cifo.problem.population import Population
 # Initialization signature: <method_name>( problem, population_size ):
 
 # -------------------------------------------------------------------------------------------------
-# Random Initialization 
+# Initialization All Methods (Random, Hill Climbing, Simulated Annealing and Greedy)
 # -------------------------------------------------------------------------------------------------
-def initialize_randomly( problem, population_size ):
+def initialize_pop(problem, population_size, method = 'Random'):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm
+        - 'Hill Climbing'
+        - 'Simulated Annealing'
+        - 'Random' (default method)
+        - 'Greedy'
     
     Required:
-    
     @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
-    
-    @ population_size - to define the size of the population to be returned. 
+    @ population_size - to define the size of the population to be returned.
     """
     solution_list = []
 
-    i = 0
     # generate a population of admissible solutions (individuals)
-    for _ in range(0, population_size):
-        s = problem.build_solution()
+    for i in range(0, population_size):
+        s = problem.build_solution(method)
         
         # check if the solution is admissible
-        while not problem.is_admissible( s ):
-            s = problem.build_solution()
+        while not problem.is_admissible(s):
+            s = problem.build_solution(method)
         
         s.id = [0, i]
-        i += 1
-        problem.evaluate_solution ( s )
+
+        problem.evaluate_solution(s)
         
-        solution_list.append( s )
+        solution_list.append(s)
 
     population = Population( 
-        problem = problem , 
+        problem = problem,
         maximum_size = population_size, 
-        solution_list = solution_list )
+        solution_list = solution_list
+    )
     
     return population
 
@@ -54,17 +56,17 @@ def initialize_randomly( problem, population_size ):
 # Initialization using Hill Climbing
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
-# Remark: remember, you will need a neighborhood functin for each problem
-def initialize_using_hc( problem, population_size ):
-    pass
+# Remark: remember, you will need a neighborhood function for each problem
+#def initialize_using_hc(problem, population_size):
+#    pass
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Simulated Annealing
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
-# Remark: remember, you will need a neighborhood functin for each problem
-def initialize_using_sa( problem, population_size ):
-    pass
+# Remark: remember, you will need a neighborhood function for each problem
+#def initialize_using_sa(problem, population_size):
+#    pass
 
 ###################################################################################################
 # SELECTION APPROACHES
@@ -83,56 +85,66 @@ class RouletteWheelSelection:
 
     REMARK: This implementation does not consider minimization problem
     """
-    def select(self, population, objective, params):
+    def select(self, population, params, objective = 'Min'): # INVESTIGAR POSSIVEIS USOS, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
         """
         select two different parents using roulette wheel
         """
-        index1 = self._select_index_max(population = population)
-        index2 = index1
+        if objective == 'Max':
+            index1 = self._select_index_max(population = population)
+            index2 = index1
         
-        while index2 == index1:
-            index2 = self._select_index_max(population = population)
+            while index2 == index1:
+                index2 = self._select_index_max(population = population)
+        elif objective == 'Min':
+            index1 = self._select_index_min(population=population)
+            index2 = index1
 
-        return population.get( index1 ), population.get( index2 )
+            while index2 == index1:
+                index2 = self._select_index_min(population=population)
+        else:
+            print('Objective is not well defined, we will proceed with Minimization')
+            return self.select()
+
+        return population.get(index1), population.get(index2)
 
 
     def _select_index_max(self, population):
-
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
         for solution in population.solutions:
             total_fitness += solution.fitness
 
         # spin the wheel
-        wheel_position = uniform( 0, 1 )
+        wheel_position = uniform(0, 1)
 
         # calculate the position which wheel should stop
         stop_position = 0
         index = 0
-        for solution in population.solutions :
+        for solution in population.solutions:
             stop_position += (solution.fitness / total_fitness)
-            if stop_position > wheel_position :
+            if stop_position > wheel_position:
                 break
             index += 1    
 
         return index
-    def _select_index_min(self, population):
 
+    def _select_index_min(self, population):
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
-        pop_size=population.size            #get the population size for the formula
-        for solution in population.solutions:       #ACABAr
+        pop_size = population.size  # get the population size for the formula
+
+        for solution in population.solutions:
             total_fitness += solution.fitness
 
         # spin the wheel
-        wheel_position = uniform( 0, 1 )
+        wheel_position = uniform(0, 1)
 
         # calculate the position which wheel should stop
         stop_position = 0
         index = 0
-        for solution in population.solutions :
-            stop_position += (solution.fitness / total_fitness)  ####<<<<--------mudar aqui meter a formula
-            if stop_position > wheel_position :
+        for solution in population.solutions:
+            stop_position += (1 - (solution.fitness / total_fitness))/(pop_size - 1)
+            if stop_position > wheel_position:
                 break
             index += 1
 
@@ -143,7 +155,9 @@ class RouletteWheelSelection:
 # -------------------------------------------------------------------------------------------------
 class RankSelection:
     """
-    Rank Selection sorts the population first according to fitness value and ranks them. Then every chromosome is allocated selection probability with respect to its rank. Individuals are selected as per their selection probability. Rank selection is an exploration technique of selection.
+    Rank Selection sorts the population first according to fitness value and ranks them. Then every chromosome is
+    allocated selection probability with respect to its rank. Individuals are selected as per their selection
+    probability. Rank selection is an exploration technique of selection.
     """
     def select(self, population, objective, params):
         # Step 1: Sort / Rank
@@ -251,14 +265,14 @@ def singlepoint_crossover( problem, solution1, solution2):
 # Partially Mapped Crossover
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Partially Mapped Crossover
-def pmx_crossover( problem, solution1, solution2):
+def pmx_crossover(problem, solution1, solution2):
     pass
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Cycle Crossover
-def cycle_crossover( problem, solution1, solution2):
+def cycle_crossover(problem, solution1, solution2):
     pass
 
 ###################################################################################################
@@ -293,17 +307,21 @@ def single_point_mutation( problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
-#TODO: Implement Swap mutation
-def swap_mutation( problem, solution):
-    pass
+def swap_mutation(problem, solution):
+    index = sample(range(0,len(solution.representation)), 2)
 
+    solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], solution.representation[index[0]]
+
+    return solution
+
+#TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
 ###################################################################################################
 # REPLACEMENT APPROACHES
 ###################################################################################################
 # -------------------------------------------------------------------------------------------------
 # Standard replacement
 # -----------------------------------------------------------------------------------------------
-def standard_replacement(problem, current_population, new_population ):
+def standard_replacement(problem, current_population, new_population):
     return deepcopy(new_population)
 
 # -------------------------------------------------------------------------------------------------

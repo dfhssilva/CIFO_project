@@ -20,12 +20,12 @@ Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 from random import random
 from copy import deepcopy
 
-from cifo.algorithm.ga_operators import (initialize_randomly, 
-    RankSelection, RouletteWheelSelection, TournamentSelection, 
-    singlepoint_crossover,
-    single_point_mutation,
-    standard_replacement, elitism_replacement
-)
+from cifo.algorithm.ga_operators import (initialize_pop,
+                                         RankSelection, RouletteWheelSelection, TournamentSelection,
+                                         singlepoint_crossover,
+                                         single_point_mutation,
+                                         standard_replacement, elitism_replacement
+                                         )
 
 from cifo.problem.population import Population
 
@@ -43,7 +43,7 @@ default_params = {
     "Crossover-Probability"     : 0.8,
     "Mutation-Probability"      : 0.5,
     
-    "Initialization-Approach"   : initialize_randomly,
+    "Initialization-Approach"   : initialize_pop,
     "Selection-Approach"        : RouletteWheelSelection,
     "Tournament-Size"           : 5,
     "Crossover-Approach"        : singlepoint_crossover,
@@ -90,9 +90,9 @@ class GeneticAlgorithm:
         self._population        = None
         self._observers         = []
 
-        self._parse_params( params )
+        self._parse_params(params)
 
-        self._logger = GeneticAlgorithmLogger( log_name, run )
+        self._logger = GeneticAlgorithmLogger(log_name, run)
 
         self._observers  = []  
 
@@ -225,7 +225,7 @@ class GeneticAlgorithm:
             self._initialize = params[ "Initialization-Approach" ]
         else:
             print("Undefined Initialization approach. The default will be used.")
-            self._initialize = initialize_randomly
+            self._initialize = initialize_pop
         
         # Selection
         self._selection_approach = None

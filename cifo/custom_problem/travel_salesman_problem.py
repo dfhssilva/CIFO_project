@@ -33,7 +33,8 @@ input = [
 
 tsp_decision_variables_example = {
     "Distances"    : np.array(input), #<< Number, Mandatory
-    "Item-Name" : [i for i in range(1,len(input[0]))] # << String, Optional, The names of the items, can be used to present the solution.
+    "Item-Name" : [i for i in range(1,len(input[0]))] # << String, Optional, The names of the items, can be used to
+                                                        # present the solution.
         # It starts at 1 reserving the 0 for the static city
         # We are setting the departure point, so we only have to arrange the 12 remaining cities
 }
@@ -45,12 +46,14 @@ tsp_decision_variables_example = {
 # -------------------------------------------------------------------------------------------------
 class TravelSalesmanProblem(ProblemTemplate):
     """
-    Travel Salesman Problem: Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city and returns to the origin city?
+    Travel Salesman Problem: Given a list of cities and the distances between each pair of cities, what is the shortest
+    possible route that visits each city and returns to the origin city?
     """
 
     # Constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables = tsp_decision_variables_example, constraints = None , encoding_rule = tsp_encoding_rule):
+    def __init__(self, decision_variables = tsp_decision_variables_example, constraints = None ,
+                 encoding_rule = tsp_encoding_rule):
         """
         - Defines:
             - the Size and the enconding characters (Data) according to the input distances matrix
@@ -66,7 +69,8 @@ class TravelSalesmanProblem(ProblemTemplate):
         encoding_rule["Size"] = len(self._distances) - 1
         encoding_rule["Data"] = decision_variables["Item-Name"]
 
-        # Call the Parent-class constructor to store these values and to execute any other logic to be implemented by the constructor of the super-class
+        # Call the Parent-class constructor to store these values and to execute any other logic to be implemented by
+        # the constructor of the super-class
         super().__init__(
             decision_variables = decision_variables, 
             constraints = constraints, 
@@ -83,7 +87,8 @@ class TravelSalesmanProblem(ProblemTemplate):
     #----------------------------------------------------------------------------------------------
     def build_solution(self, method = 'Random'):
         """
-        Creates a initial solution and returns it according to the enconding rule and the chosen method from the following available methods: 
+        Creates a initial solution and returns it according to the enconding rule and the chosen method from the
+        following available methods:
             - 'Hill Climbing'
             - 'Simulated Annealing'
             - 'Random' (default method)
@@ -99,47 +104,48 @@ class TravelSalesmanProblem(ProblemTemplate):
             )
 
             return solution
-            
+
         '''elif method == 'Hill Climbing':                               A FAZER!!!!!!!!
 
-            solution = LinearSolution(
-                representation = solution_representation, 
-                encoding_rule = self._encoding_rule
-            )
+                    solution = LinearSolution(
+                        representation = solution_representation, 
+                        encoding_rule = self._encoding_rule
+                    )
 
-            return solution
+                    return solution
 
-        elif method == 'Simulated Annealing':
-            
-            solution = LinearSolution(
-                representation = solution_representation, 
-                encoding_rule = self._encoding_rule
-            )
+                elif method == 'Simulated Annealing':
 
-            return solution
-        
-        elif method == 'Greedy':   #select one at random, select the closest one until all have been visited
-            distances = self._distances
-            city = random.randint(1, len(self._distances)) # select a random city
-            possibles = decision_variables["Item-Name"].remove(city)   #get the list of all cities except the random one               
-            solution=[city]                                            # and put it in the new list
-            min=possibles[0]                                           # set the first from possibles as min and the distance 
-            mindist=distances[rep[possibles[0],city]
-            for i in possibles:
-                if                                                          ################
-                min                                                         #ACABAR
-                mindist
-                
-            solution = LinearSolution(
-                representation = solution_representation, 
-                encoding_rule = self._encoding_rule
-            )
+                    solution = LinearSolution(
+                        representation = solution_representation, 
+                        encoding_rule = self._encoding_rule
+                    )
 
-            return solution'''
+                    return solution
 
-        else: 
-            print('Please choose one of these methods: Hill Climbing, Simulated Annealing or Random. It will use the Random method')
-            return build_solution()
+                elif method == 'Greedy':   #select one at random, select the closest one until all have been visited
+                    distances = self._distances
+                    city = random.randint(1, len(self._distances)) # select a random city
+                    possibles = decision_variables["Item-Name"].remove(city)   #get the list of all cities except the random one               
+                    solution=[city]                                            # and put it in the new list
+                    min=possibles[0]                                           # set the first from possibles as min and the distance 
+                    mindist=distances[rep[possibles[0],city]
+                    for i in possibles:
+                        if                                                          ################
+                        min                                                         #ACABAR
+                        mindist
+
+                    solution = LinearSolution(
+                        representation = solution_representation, 
+                        encoding_rule = self._encoding_rule
+                    )
+
+                    return solution'''
+
+        else:
+            print('Please choose one of these methods: Hill Climbing, Simulated Annealing or Random. It will use the '
+                  'Random method')
+            return self.build_solution()
 
     
     # Solution Admissibility Function - is_admissible()
@@ -155,7 +161,8 @@ class TravelSalesmanProblem(ProblemTemplate):
         if debug:
             result = False
 
-            if (len(set(solution)) == encoding_rule["Size"]) & (len(solution) == encoding_rule["Size"]) & all([True if i in range(1,(encoding_rule["Size"]+1)) else False for i in solution]):
+            if (len(set(solution)) == self.encoding_rule["Size"]) & (len(solution) == self.encoding_rule["Size"]) & \
+                    all([True if i in range(1,(self.encoding_rule["Size"]+1)) else False for i in solution]):
                 result = True
 
             print(solution, result)
@@ -167,7 +174,8 @@ class TravelSalesmanProblem(ProblemTemplate):
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------
     # It should be seen as an abstract method 
-    def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
+    def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already
+                                        # automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
         Calculates the total distance of the defined route
         """
@@ -175,12 +183,12 @@ class TravelSalesmanProblem(ProblemTemplate):
         rep = solution._representation
 
         fitness = distances[0,rep[0]] + distances[rep[-1],0] # the distances are assymmetric
-            # distance from the departure point (position 0 in the matrix) to the first city (position 0 in the solution)
+            # distance from the departure point (position 0 in the matrix) to the first city(position 0 in the solution)
             # plus
             # distance from the last city to the departure point (position 0 in the solution)
 
         for i in range(0, len(rep)):
-            fitness += distances[rep[i],rep[i+1]]           #Pedro: isto está ok?
+            fitness += distances[rep[i],rep[i+1]]
 
         solution._fitness = fitness
         solution._is_fitness_calculated = True
