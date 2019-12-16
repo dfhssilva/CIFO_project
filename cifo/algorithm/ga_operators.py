@@ -271,9 +271,49 @@ def pmx_crossover(problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Cycle Crossover
 def cycle_crossover(problem, solution1, solution2):
-    pass
+    cycle = 1   # number of cycles
+
+    # only changes when the cycle is even (considering it starts at 1)
+    offspring1 = deepcopy(solution1)  # solution1.clone()
+    offspring2 = deepcopy(solution2)  # .clone()
+
+    index_visited = [] # list of visited indexes during the cycles
+
+    while len(index_visited) < len(solution1.representation): # the loop only ends when all the indexes were visited
+        for i in range(0, len(solution1.representation)): # Get the smallest index of the solution not visited
+            if i not in index_visited:
+                idx = i
+                index_visited.append(idx)
+                break
+
+        if cycle % 2 == 0:    # when the cycle is even
+            while True:
+                offspring1.representation[idx] = solution2.representation[idx]    # save de swaped elements
+                offspring2.representation[idx] = solution1.representation[idx]
+
+                # get the respective index of the solution 1 for the element in solution 2
+                idx = solution1.representation.index(solution2.representation[idx])
+
+                if idx not in index_visited:    # if the index was already visited, the cycle ends
+                    index_visited.append(idx)   # if not, append to the list of visited indexes
+                else:
+                    cycle += 1      # go to the next cycle
+                    break
+
+        else:       # when the cycle is odd
+            while True:
+                # get the respective index of the solution 1 for the element in solution 2
+                idx = solution1.representation.index(solution2.representation[idx])
+
+                if idx not in index_visited:    # if the index was already visited, the cycle ends
+                    index_visited.append(idx)   # if not, append to the list of visited indexes
+                else:
+                    cycle += 1      # go to the next cycle
+                    break
+
+
+    return offspring1, offspring2
 
 ###################################################################################################
 # MUTATION APPROACHES
@@ -328,7 +368,6 @@ def standard_replacement(problem, current_population, new_population):
 # Elitism replacement
 # -----------------------------------------------------------------------------------------------
 def elitism_replacement(problem, current_population, new_population ):
-    
 
     if problem.objective == ProblemObjective.Minimization :
         if current_population.fittest.fitness < new_population.fittest.fitness :

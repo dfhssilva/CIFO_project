@@ -1,7 +1,7 @@
 from cifo.util.terminal import Terminal, FontColor
 import sys
 
-class LocalSearcObserver():
+class LocalSearchObserver():
     def __init__(self, local_search_algorithm):
         self._algorithm = local_search_algorithm
     

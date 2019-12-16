@@ -4,18 +4,18 @@
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
 from cifo.algorithm.hill_climbing import HillClimbing
 from cifo.custom_problem.travel_salesman_problem import (
-    TravelSalesmanProblem, tsp_decision_variables_example, knapsack_bitflip_get_neighbors # MUDAAAAAAAAAARR !!!!!!!!!!!!!
+    TravelSalesmanProblem, tsp_decision_variables_example, tsp_bitflip_get_neighbors # MUDAAAAAAAAAARR !!!!!!!!!!!!!
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_pop,
     RouletteWheelSelection, RankSelection, TournamentSelection,
-    singlepoint_crossover,
-    single_point_mutation,
+    singlepoint_crossover, cycle_crossover,
+    single_point_mutation, swap_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
-from cifo.util.observer import GeneticAlgorithmObserver
+from cifo.util.observer import LocalSearchObserver
 from random import randint
 import numpy as np
 
@@ -29,8 +29,6 @@ def plot_performance_chart( df ):
     y1 = df["Fitness_Mean"] 
     y1_upper = df["Fitness_Lower"]
     y1_lower = df["Fitness_Upper"]
-
-
 
     # line
     trace1 = go.Scatter(
@@ -124,8 +122,8 @@ tsp_problem_instance = TravelSalesmanProblem(
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
-parent_selection = TournamentSelection()
-#parent_selection = RouletteWheelSelection()
+#parent_selection = TournamentSelection()
+parent_selection = RouletteWheelSelection()
 
 params = {
         # params
@@ -137,8 +135,8 @@ params = {
         "Initialization-Approach"   : initialize_pop,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : singlepoint_crossover,
-        "Mutation-Aproach"          : single_point_mutation,
+        "Crossover-Approach"        : cycle_crossover,
+        "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
@@ -151,13 +149,13 @@ number_of_runs = 30
 for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
-        problem_instance = knapsack_problem_instance,
+        problem_instance = tsp_problem_instance,
         params =  params,
         run = run,
         log_name = log_name )
 
-    ga_observer = GeneticAlgorithmObserver( ga )
-    ga.register_observer( ga_observer )
+    ga_observer = LocalSearchObserver(ga)
+    ga.register_observer(ga_observer)
     ga.search()    
     ga.save_log()
 
