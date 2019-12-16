@@ -31,7 +31,7 @@ from cifo.problem.population import Population
 
 from cifo.util.terminal import Terminal, FontColor
 
-from cifo.util.logger import GeneticAlgorithmLogger
+#from cifo.util.logger import GeneticAlgorithmLogger
 
 
 
@@ -92,7 +92,7 @@ class GeneticAlgorithm:
 
         self._parse_params(params)
 
-        self._logger = GeneticAlgorithmLogger(log_name, run)
+        #self._logger = GeneticAlgorithmLogger(log_name, run)
 
         self._observers  = []  
 
@@ -124,10 +124,10 @@ class GeneticAlgorithm:
         is_admissible   = self._problem_instance.is_admissible
 
         self._generation = 0
-        self._notify( message = "Genetic Algorithm" )
+        self._notify(message = "Genetic Algorithm")
 
         # 1. Initial population
-        self._population = self._initialize( problem, self._population_size )
+        self._population = self._initialize(problem, self._population_size)
         self._fittest = self._population.fittest
 
         self._notify()
@@ -177,7 +177,7 @@ class GeneticAlgorithm:
             self._fittest = self._population.fittest
             self._notify()
 
-        self._notify( message = "Fittest Solution" )
+        self._notify(message = "Fittest Solution")
         return self._fittest    
 
     def __str__(self):
