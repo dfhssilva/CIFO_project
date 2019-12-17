@@ -68,7 +68,6 @@ class TravelSalesmanProblem(ProblemTemplate):
 
         encoding_rule["Size"] = len(self._distances) - 1
         encoding_rule["Data"] = decision_variables["Item-Name"]
-        print('encoding_rule["Data"] ' + str(encoding_rule["Data"]))
 
         # Call the Parent-class constructor to store these values and to execute any other logic to be implemented by
         # the constructor of the super-class
@@ -101,14 +100,12 @@ class TravelSalesmanProblem(ProblemTemplate):
             solution_representation = encoding_data.copy()
             np.random.shuffle(solution_representation) # inplace suffle
 
-
             solution = LinearSolution(
                 representation = solution_representation,
                 encoding_rule = self._encoding_rule
             )
 
             return solution
-
         else:
             print('Please choose one of these methods: Hill Climbing, Simulated Annealing or Random. It will use the '
                   'Random method')
@@ -148,9 +145,7 @@ class TravelSalesmanProblem(ProblemTemplate):
         """
         distances = self._distances
         rep = solution.representation
-        print(rep)
-        print(distances[0, rep[0]])
-        print(distances[rep[-1], 0])
+
         fitness = distances[0, rep[0]] + distances[rep[-1], 0]  # the distances are assymmetric
             # distance from the departure point (position 0 in the matrix) to the first city(position 0 in the solution)
             # plus

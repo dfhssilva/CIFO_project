@@ -43,7 +43,7 @@ class GeneticAlgorithmLogger:
             columns =['Run', 'Generation', 'Fitness']
         )
 
-        if not os.path.exists( log_dir ):
-            os.mkdir( log_dir )
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir)
 
-        df.to_excel( log_dir + file_name, index = False, encoding = 'utf-8' )
+        df.to_excel(log_dir + file_name, index = False, encoding = 'utf-8')

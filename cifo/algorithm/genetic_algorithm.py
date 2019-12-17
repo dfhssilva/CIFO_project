@@ -92,7 +92,7 @@ class GeneticAlgorithm:
 
         self._parse_params(params)
 
-        self._logger = ga_script_TSP_1(log_name, run)
+        self._logger = GeneticAlgorithmLogger(log_name, run)
 
         self._observers  = []  
 
@@ -196,20 +196,19 @@ class GeneticAlgorithm:
 
     # initialize
     # ---------------------------------------------------------------------------------------------
-    def _parse_params( self, params ):
+    def _parse_params(self, params):
         self._params = params
         self._text = ""
 
         self._population_size = 10
         if "Population-Size" in params:
-            self._population_size = params[ "Population-Size" ]
+            self._population_size = params["Population-Size"]
         self._text += "\nPopulation-Size " + str(self._population_size)
 
         self._crossover_probability = 0.8
         if "Crossover-Probability" in params:
-            self._crossover_probability = params[ "Crossover-Probability" ]
+            self._crossover_probability = params["Crossover-Probability"]
         self._text += "\nCrossover-Probability " + str(self._crossover_probability)
-
 
         self._mutation_probability = 0.5
         if "Mutation-Probability" in params:

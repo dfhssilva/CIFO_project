@@ -85,25 +85,26 @@ class RouletteWheelSelection:
 
     REMARK: This implementation does not consider minimization problem
     """
-    def select(self, population, params, objective = 'Min'): # INVESTIGAR POSSIVEIS USOS, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
+    def select(self, population, objective, params): # INVESTIGAR POSSIVEIS USOS para os params, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
         """
         select two different parents using roulette wheel
         """
-        if objective == 'Max':
+        print('Params: ' + str(params))
+        if objective == 'Maximization':
             index1 = self._select_index_max(population = population)
             index2 = index1
         
             while index2 == index1:
                 index2 = self._select_index_max(population = population)
-        elif objective == 'Min':
-            index1 = self._select_index_min(population=population)
+        elif objective == 'Minimization':
+            index1 = self._select_index_min(population = population)
             index2 = index1
 
             while index2 == index1:
                 index2 = self._select_index_min(population=population)
         else:
             print('Objective is not well defined, we will proceed with Minimization')
-            return self.select()
+            return self.select(population=population, objective='Minimization')
 
         return population.get(index1), population.get(index2)
 
@@ -179,26 +180,26 @@ class RankSelection:
         while index2 == index1:
             index2 = randint(0, len( rank_list )-1)
 
-        return population.get( rank_list [index1] ), population.get( rank_list[index2] )
+        return population.get(rank_list[index1]), population.get(rank_list[index2])
 
     
-    def _sort( self, population, objective ):
+    def _sort(self, population, objective):
 
         if objective == ProblemObjective.Maximization:
-            for i in range (0, len( population )):
-                for j in range (i, len (population )):
-                    if population.solutions[ i ].fitness > population.solutions[ j ].fitness:
-                        swap = population.solutions[ j ]
-                        population.solutions[ j ] = population.solutions[ i ]
-                        population.solutions[ i ] = swap
+            for i in range (0, len(population)):
+                for j in range (i, len (population)):
+                    if population.solutions[i].fitness > population.solutions[j].fitness:
+                        swap = population.solutions[j]
+                        population.solutions[j] = population.solutions[i]
+                        population.solutions[i] = swap
                         
         else:    
-            for i in range (0, len( population )):
-                for j in range (i, len (population )):
-                    if population.solutions[ i ].fitness < population.solutions[ j ].fitness:
-                        swap = population.solutions[ j ]
-                        population.solutions[ j ] = population.solutions[ i ]
-                        population.solutions[ i ] = swap
+            for i in range (0, len(population)):
+                for j in range (i, len (population)):
+                    if population.solutions[i].fitness < population.solutions[j].fitness:
+                        swap = population.solutions[j]
+                        population.solutions[j] = population.solutions[i]
+                        population.solutions[i] = swap
 
         return population
 
@@ -248,7 +249,7 @@ class TournamentSelection:
 # -------------------------------------------------------------------------------------------------
 # Singlepoint crossover
 # -------------------------------------------------------------------------------------------------
-def singlepoint_crossover( problem, solution1, solution2):
+def singlepoint_crossover(problem, solution1, solution2):
     singlepoint = randint(0, len(solution1.representation)-1)
     #print(f" >> singlepoint: {singlepoint}")
 
@@ -266,7 +267,40 @@ def singlepoint_crossover( problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # TODO: implement Partially Mapped Crossover
 def pmx_crossover(problem, solution1, solution2):
-    pass
+    # copy the parents to the children because we only need to change the middle part and the repeated elements
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    # choose the random crossover points
+    crosspoint1 = randint(0, (len(solution1.representation)-1))
+    crosspoint2 = randint(0, (len(solution2.representation)-1))
+
+    # make sure they are different
+    while crosspoint1 == crosspoint2:
+        crosspoint1 = randint(0, (len(solution1.representation) - 1))
+        crosspoint2 = randint(0, (len(solution2.representation) - 1))
+
+    # make sure that crosspoint1 is smaller than crosspoint2
+    if crosspoint1 > crosspoint2:
+        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
+
+    # change the middle part of the children
+    offspring2.representation[crosspoint1:crosspoint2] = solution1.representation[crosspoint1:crosspoint2]
+    offspring1.representation[crosspoint1:crosspoint2] = solution2.representation[crosspoint1:crosspoint2]
+
+    # indexes of the elements out of the middle part (they will be equal for both solutions)
+    out_index = [item for item in list(range(0, (len(solution1.representation) - 1))) if
+                 item not in list(range(crosspoint1, (crosspoint2 + 1)))]
+
+    repetead_index1 = []            # indexes of the repeated elements solution1
+    repetead_index2 = []            # indexes of the repeated elements solution2
+    for i in out_index:             # get the indexes of the repeated elements
+        if solution1.representation[i] in solution1.representation[crosspoint1:crosspoint2]:  # repeated elements
+            repetead_index1.append(i)                                                         # solution 1
+        if solution2.representation[i] in solution2.representation[crosspoint1:crosspoint2]:  # repeated elements
+            repetead_index2.append(i)                                                         # solution 2
+
+    # ACABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR !!!!!!!!!!!!!!!!!!!!!!
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
