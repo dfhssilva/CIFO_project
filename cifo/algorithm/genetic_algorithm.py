@@ -31,7 +31,7 @@ from cifo.problem.population import Population
 
 from cifo.util.terminal import Terminal, FontColor
 
-#from cifo.util.logger import GeneticAlgorithmLogger
+from cifo.util.logger import GeneticAlgorithmLogger
 
 
 
@@ -92,7 +92,7 @@ class GeneticAlgorithm:
 
         self._parse_params(params)
 
-        #self._logger = GeneticAlgorithmLogger(log_name, run)
+        self._logger = ga_script_TSP_1(log_name, run)
 
         self._observers  = []  
 

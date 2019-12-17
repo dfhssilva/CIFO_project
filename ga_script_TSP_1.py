@@ -152,7 +152,8 @@ for run in range(1,number_of_runs + 1):
         problem_instance = tsp_problem_instance,
         params =  params,
         run = run,
-        log_name = log_name )
+        log_name = log_name
+        )
 
     ga_observer = LocalSearchObserver(ga)
     ga.register_observer(ga_observer)
@@ -182,9 +183,9 @@ generations = []
 
 for log_name in log_files:
     if log_name.startswith('run_'):
-        df = pd.read_excel( log_dir + "/" + log_name)
-        fitness_runs.append( list ( df.Fitness ) )
-        columns_name.append( log_name.strip(".xslx") )
+        df = pd.read_excel(log_dir + "/" + log_name)
+        fitness_runs.append(list ( df.Fitness ))
+        columns_name.append(log_name.strip(".xslx"))
         counter += 1
 
         if not generations:

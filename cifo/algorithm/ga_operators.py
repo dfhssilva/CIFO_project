@@ -329,18 +329,18 @@ def single_point_mutation( problem, solution):
 
     if encoding.encoding_type == EncodingDataType.choices :
         try:
-            temp = deepcopy( encoding.encoding_data )
+            temp = deepcopy(encoding.encoding_data)
 
-            temp.pop( solution.representation[ singlepoint ] )
+            temp.pop(solution.representation[singlepoint])
 
             gene = temp[0]
-            if len(temp) > 1 : gene = choices( temp )  
+            if len(temp) > 1 : gene = choices(temp)
 
-            solution.representation[ singlepoint ] = gene
+            solution.representation[singlepoint] = gene
 
             return solution
         except:
-            print('(!) Error: singlepoint mutation encoding.data issues)' )     
+            print('(!) Error: singlepoint mutation encoding.data issues)')
 
     # return solution           
 

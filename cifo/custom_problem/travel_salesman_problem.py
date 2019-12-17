@@ -32,7 +32,7 @@ input = [
     ]
 
 tsp_decision_variables_example = {
-    "Distances"    : np.array(input), #<< Number, Mandatory
+    "Distances" : np.array(input), #<< Number, Mandatory
     "Item-Name" : [i for i in range(1,len(input[0]))] # << String, Optional, The names of the items, can be used to
                                                         # present the solution.
         # It starts at 1 reserving the 0 for the static city
@@ -68,6 +68,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
         encoding_rule["Size"] = len(self._distances) - 1
         encoding_rule["Data"] = decision_variables["Item-Name"]
+        print('encoding_rule["Data"] ' + str(encoding_rule["Data"]))
 
         # Call the Parent-class constructor to store these values and to execute any other logic to be implemented by
         # the constructor of the super-class
@@ -96,10 +97,13 @@ class TravelSalesmanProblem(ProblemTemplate):
         """
         if method == 'Random': # shuffles the list and then instanciates it as a Linear Solution
             encoding_data = self._encoding.encoding_data
-            solution_representation = shuffle(encoding_data)
+
+            solution_representation = encoding_data.copy()
+            np.random.shuffle(solution_representation) # inplace suffle
+
 
             solution = LinearSolution(
-                representation = solution_representation, 
+                representation = solution_representation,
                 encoding_rule = self._encoding_rule
             )
 
@@ -144,13 +148,15 @@ class TravelSalesmanProblem(ProblemTemplate):
         """
         distances = self._distances
         rep = solution.representation
-
+        print(rep)
+        print(distances[0, rep[0]])
+        print(distances[rep[-1], 0])
         fitness = distances[0, rep[0]] + distances[rep[-1], 0]  # the distances are assymmetric
             # distance from the departure point (position 0 in the matrix) to the first city(position 0 in the solution)
             # plus
             # distance from the last city to the departure point (position 0 in the solution)
 
-        for i in range(0, len(rep)):
+        for i in range(0, (len(rep)-1)):
             fitness += distances[rep[i], rep[i+1]]
 
         solution._fitness = fitness
