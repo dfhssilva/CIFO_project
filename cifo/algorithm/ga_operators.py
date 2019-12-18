@@ -265,7 +265,6 @@ def singlepoint_crossover(problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Partially Mapped Crossover
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Partially Mapped Crossover
 def pmx_crossover(problem, solution1, solution2):
     # copy the parents to the children because we only need to change the middle part and the repeated elements
     offspring1 = deepcopy(solution1)
@@ -299,7 +298,6 @@ def pmx_crossover(problem, solution1, solution2):
         if solution2.representation[i] in solution2.representation[crosspoint1:crosspoint2]:  # repeated elements
             repetead_index2.append(i)                                                         # solution 2
 
-    mapping =
 
     for i in repetead_index1:
         if solution2.representation[i] not in offspring1.representation[crosspoint1:crosspoint2]:
@@ -324,6 +322,8 @@ def pmx_crossover(problem, solution1, solution2):
                 if solution1.representation[idx] not in offspring2.representation:
                     offspring2.representation[i] = solution1.representation[idx]
                     break
+
+    return offspring1, offspring2
 
 
 # -------------------------------------------------------------------------------------------------
@@ -372,6 +372,45 @@ def cycle_crossover(problem, solution1, solution2):
 
 
     return offspring1, offspring2
+
+
+# -------------------------------------------------------------------------------------------------
+# Order Crossover
+# -------------------------------------------------------------------------------------------------
+
+def order_crossover(problem, solution1, solution2):
+
+    # copy the parents to the children because we only need to change the middle part and the repeated elements
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    # choose the random crossover points
+    crosspoint1 = randint(0, (len(solution1.representation) - 1))
+    crosspoint2 = randint(0, (len(solution2.representation) - 1))
+
+    # make sure they are different
+    while crosspoint1 == crosspoint2:
+        crosspoint2 = randint(0, (len(solution2.representation) - 1))
+
+    # make sure that crosspoint1 is smaller than crosspoint2
+    if crosspoint1 > crosspoint2:
+        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
+
+    sub=[*range((crosspoint2+1),len(offspring1.representation))]+[*range(0, crosspoint1)] #indexes of the elements not in the middle
+    j=0
+    k=0
+    for i in [*range((crosspoint2+1),len(offspring1.representation))]+[*range(0, (crosspoint2+1))]: #order by which elements must be considered
+        if solution2.representation[i] not in solution1.representation[crosspoint1:(crosspoint2+1)]: #replace offspring1 if element is not in the middle
+            offspring1.representation[sub[j]] = solution2.representation[i]
+            j+=1
+        if solution1.representation[i] not in solution2.representation[crosspoint1:(crosspoint2+1)]: #replace offspring2 if element is not in the middle
+            offspring2.representation[sub[k]] = solution1.representation[i]
+            k+=1
+            if k==len(sub):
+                break
+
+    return offspring1, offspring2
+
 
 ###################################################################################################
 # MUTATION APPROACHES
