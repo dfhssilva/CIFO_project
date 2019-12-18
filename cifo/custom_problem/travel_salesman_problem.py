@@ -11,7 +11,7 @@ tsp_encoding_rule = {
     "Is ordered"   : True,
     "Can repeat"   : False,
     "Data"         : [0,0], # must be defined by the data
-    "Data Type"    : "Choices"
+    "Data Type"    : "Pattern"
 }
 
 # Default Matrix

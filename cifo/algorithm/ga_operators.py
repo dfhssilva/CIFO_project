@@ -277,7 +277,6 @@ def pmx_crossover(problem, solution1, solution2):
 
     # make sure they are different
     while crosspoint1 == crosspoint2:
-        crosspoint1 = randint(0, (len(solution1.representation) - 1))
         crosspoint2 = randint(0, (len(solution2.representation) - 1))
 
     # make sure that crosspoint1 is smaller than crosspoint2
@@ -300,7 +299,32 @@ def pmx_crossover(problem, solution1, solution2):
         if solution2.representation[i] in solution2.representation[crosspoint1:crosspoint2]:  # repeated elements
             repetead_index2.append(i)                                                         # solution 2
 
-    # ACABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR !!!!!!!!!!!!!!!!!!!!!!
+    mapping =
+
+    for i in repetead_index1:
+        if solution2.representation[i] not in offspring1.representation[crosspoint1:crosspoint2]:
+            offspring1.representation[i] = solution2.representation[i]
+        else:
+            idx = i
+            while True:
+                idx = solution1.representation.index(solution2.representation[idx])
+
+                if solution2.representation[idx] not in offspring1.representation:
+                    offspring1.representation[i]=solution2.representation[idx]
+                    break
+
+    for i in repetead_index2:
+        if solution1.representation[i] not in offspring2.representation[crosspoint1:crosspoint2]:
+            offspring2.representation[i] = solution1.representation[i]
+        else:
+            idx = i
+            while True:
+                idx = solution2.representation.index(solution1.representation[idx])
+
+                if solution1.representation[idx] not in offspring2.representation:
+                    offspring2.representation[i] = solution1.representation[idx]
+                    break
+
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
