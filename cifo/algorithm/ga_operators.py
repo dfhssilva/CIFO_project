@@ -451,6 +451,26 @@ def swap_mutation(problem, solution):
 
     return solution
 
+def insert_mutation(problem, solution):
+    solution2 = deepcopy(solution)
+
+    mutpoint1 = randint(0, (len(solution.representation) - 1))
+    mutpoint2 = randint(0, (len(solution.representation) - 1))
+
+    while mutpoint1 == mutpoint2:
+        mutpoint2 = randint(0, (len(solution.representation) - 1))
+
+    if mutpoint1 > mutpoint2:
+        mutpoint2, mutpoint1 = mutpoint1, mutpoint2
+
+    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2] #inserting the seconding value in the index after 1st mutation point
+
+    for i in range((mutpoint1 + 2), (mutpoint2 + 1)): #passing the rest of the elements by their original order to after the number inserted
+        solution2.representation[i] = solution.representation[(i - 1)]
+
+    return solution2
+
+
 #TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
 ###################################################################################################
 # REPLACEMENT APPROACHES
