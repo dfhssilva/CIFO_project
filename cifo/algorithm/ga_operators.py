@@ -271,16 +271,7 @@ def pmx_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)
 
     # choose the random crossover points
-    crosspoint1 = randint(0, (len(solution1.representation)-1))
-    crosspoint2 = randint(0, (len(solution2.representation)-1))
-
-    # make sure they are different
-    while crosspoint1 == crosspoint2:
-        crosspoint2 = randint(0, (len(solution2.representation) - 1))
-
-    # make sure that crosspoint1 is smaller than crosspoint2
-    if crosspoint1 > crosspoint2:
-        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))  # get two different, ordered, indexes
 
     # change the middle part of the children
     offspring2.representation[crosspoint1:crosspoint2] = solution1.representation[crosspoint1:crosspoint2]
@@ -385,16 +376,8 @@ def order_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)
 
     # choose the random crossover points
-    crosspoint1 = randint(0, (len(solution1.representation) - 1))
-    crosspoint2 = randint(0, (len(solution2.representation) - 1))
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1)) #get two different, ordered, indexes
 
-    # make sure they are different
-    while crosspoint1 == crosspoint2:
-        crosspoint2 = randint(0, (len(solution2.representation) - 1))
-
-    # make sure that crosspoint1 is smaller than crosspoint2
-    if crosspoint1 > crosspoint2:
-        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
 
     sub=[*range((crosspoint2+1),len(offspring1.representation))]+[*range(0, crosspoint1)] #indexes of the elements not in the middle
     j=0
@@ -454,16 +437,9 @@ def swap_mutation(problem, solution):
 def insert_mutation(problem, solution):
     solution2 = deepcopy(solution)
 
-    mutpoint1 = randint(0, (len(solution.representation) - 1))
-    mutpoint2 = randint(0, (len(solution.representation) - 1))
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
 
-    while mutpoint1 == mutpoint2:
-        mutpoint2 = randint(0, (len(solution.representation) - 1))
-
-    if mutpoint1 > mutpoint2:
-        mutpoint2, mutpoint1 = mutpoint1, mutpoint2
-
-    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2] #inserting the seconding value in the index after 1st mutation point
+    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2] #inserting the second value in the index after 1st mutation point
 
     for i in range((mutpoint1 + 2), (mutpoint2 + 1)): #passing the rest of the elements by their original order to after the number inserted
         solution2.representation[i] = solution.representation[(i - 1)]
@@ -495,3 +471,28 @@ def elitism_replacement(problem, current_population, new_population ):
            new_population.solutions[0] = current_population.solutions[-1]
 
     return deepcopy(new_population)
+
+###################################################################################################
+# HELPER FUNCTIONS
+####################################################################################################
+
+def get_two_diff_order_index(start=0, stop=1,order=True, diff=True):
+    """
+    Returns two integers from a range, they can be:
+        put in order (default) or unordered
+        always different(default) or can be repated
+    start - integer (default = 0)
+    stop - integer (default= 1)
+    order - boolean ( default= True)
+    """
+    first = randint(start, stop)
+    second = randint(start, stop)
+
+    if diff:
+        while first == second:
+            second = randint(start, stop)
+    if order:
+        if first > second:
+            second, first = first, second
+
+    return first, second
