@@ -89,7 +89,7 @@ class RouletteWheelSelection:
         """
         select two different parents using roulette wheel
         """
-        print('Params: ' + str(params))
+
         if objective == 'Maximization':
             index1 = self._select_index_max(population = population)
             index2 = index1
