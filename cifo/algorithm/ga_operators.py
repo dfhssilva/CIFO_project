@@ -1,4 +1,4 @@
-from random import uniform, randint, choices, sample
+from random import uniform, randint, choices, sample, shuffle
 from copy import deepcopy
 
 from cifo.problem.objective import ProblemObjective
@@ -434,6 +434,10 @@ def swap_mutation(problem, solution):
 
     return solution
 
+# -------------------------------------------------------------------------------------------------
+# Insert mutation
+# -----------------------------------------------------------------------------------------------
+
 def insert_mutation(problem, solution):
     solution2 = deepcopy(solution)
 
@@ -445,6 +449,38 @@ def insert_mutation(problem, solution):
         solution2.representation[i] = solution.representation[(i - 1)]
 
     return solution2
+
+# -------------------------------------------------------------------------------------------------
+# Inversion mutation
+# -----------------------------------------------------------------------------------------------
+
+def inversion_mutation(problem, solution):
+    solution2 = deepcopy(solution) #create a copy that we will edit and return
+
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
+
+    for i in range(mutpoint1, (mutpoint2 + 1)): #replace the indexes by inverse order
+        solution2.representation[i] = solution.representation[mutpoint2]
+        mutpoint2 -= 1
+
+    return solution2
+
+# -------------------------------------------------------------------------------------------------
+# Scramble mutation
+# -----------------------------------------------------------------------------------------------
+
+def scramble_mutation(problem, solution):
+
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0, (len(solution.representation) - 1))  # get two indexes
+
+    shuffle_part = solution.representation[mutpoint1: (mutpoint2+1)] #store the part of the solution to be shuffled in separate list
+
+    shuffle(shuffle_part) #shuffle the middle part (shuffle works inplace)
+
+    solution.representation[mutpoint1: (mutpoint2 + 1)] = shuffle_part #replace the segment with shuffled part
+
+    return solution
+
 
 
 #TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
