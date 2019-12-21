@@ -11,7 +11,7 @@ from cifo.problem.population import Population
 ###################################################################################################
 
 # (!) REMARK:
-# Initialization signature: <method_name>( problem, population_size ):
+# Initialization signature: <method_name>(problem, population_size):
 
 # -------------------------------------------------------------------------------------------------
 # Initialization All Methods (Random, Hill Climbing, Simulated Annealing and Greedy)
@@ -91,13 +91,13 @@ class RouletteWheelSelection:
         """
         print('Params: ' + str(params))
         if objective == 'Maximization':
-            index1 = self._select_index_max(population = population)
+            index1 = self._select_index_max(population=population)
             index2 = index1
         
             while index2 == index1:
-                index2 = self._select_index_max(population = population)
+                index2 = self._select_index_max(population=population)
         elif objective == 'Minimization':
-            index1 = self._select_index_min(population = population)
+            index1 = self._select_index_min(population=population)
             index2 = index1
 
             while index2 == index1:
@@ -162,7 +162,7 @@ class RankSelection:
     """
     def select(self, population, objective, params):
         # Step 1: Sort / Rank
-        population = self._sort( population, objective )
+        population = self._sort(population, objective)
 
         # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
         rank_list = []
@@ -206,39 +206,38 @@ class RankSelection:
 # -------------------------------------------------------------------------------------------------
 # class TournamentSelection
 # -------------------------------------------------------------------------------------------------
-class TournamentSelection:  
+class TournamentSelection:
     """
     """
     def select(self, population, objective, params):
         tournament_size = 2
         if "Tournament-Size" in params:
-            tournament_size = params[ "Tournament-Size" ]
+            tournament_size = params["Tournament-Size"]
 
-        index1 = self._select_index( objective, population, tournament_size )    
+        index1 = self._select_index(objective, population, tournament_size)
         index2 = index1
         
         while index2 == index1:
-            index2 = self._select_index( objective, population, tournament_size )
+            index2 = self._select_index(objective, population, tournament_size)
 
-        return population.solutions[ index1 ], population.solutions[ index2 ]
+        return population.solutions[index1], population.solutions[index2]
 
 
-    def _select_index(self, objective, population, tournament_size ): 
-        
+    def _select_index(self, objective, population, tournament_size):
         index_temp      = -1
         index_selected  = randint(0, population.size - 1)
 
         if objective == ProblemObjective.Maximization: 
-            for _ in range( 0, tournament_size ):
-                index_temp = randint(0, population.size - 1 )
+            for _ in range(0, tournament_size):
+                index_temp = randint(0, population.size - 1)
 
-                if population.solutions[ index_temp ].fitness > population.solutions[ index_selected ].fitness:
+                if population.solutions[index_temp].fitness > population.solutions[index_selected].fitness:
                     index_selected = index_temp
         elif objective == ProblemObjective.Minimization:
-            for _ in range( 0, tournament_size ):
-                index_temp = randint(0, population.size - 1 )
+            for _ in range(0, tournament_size):
+                index_temp = randint(0, population.size - 1)
 
-                if population.solutions[ index_temp ].fitness < population.solutions[ index_selected ].fitness:
+                if population.solutions[index_temp].fitness < population.solutions[index_selected].fitness:
                     index_selected = index_temp            
 
         return index_selected         
@@ -263,13 +262,13 @@ def singlepoint_crossover(problem, solution1, solution2):
     return offspring1, offspring2    
 
 # -------------------------------------------------------------------------------------------------
-# Partially Mapped Crossover
+# Partially Mapped Crossover (PMX)
 # -------------------------------------------------------------------------------------------------
 def pmx_crossover(problem, solution1, solution2):
     # copy the parents to the children because we only need to change the middle part and the repeated elements
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
-
+    ''' WHAT IS THE PROBLEEEEM PARAMETER? '''
     # choose the random crossover points
     crosspoint1 = randint(0, (len(solution1.representation)-1))
     crosspoint2 = randint(0, (len(solution2.representation)-1))
@@ -287,44 +286,49 @@ def pmx_crossover(problem, solution1, solution2):
     offspring1.representation[crosspoint1:crosspoint2] = solution2.representation[crosspoint1:crosspoint2]
 
     # indexes of the elements out of the middle part (they will be equal for both solutions)
-    out_index = [item for item in list(range(0, (len(solution1.representation) - 1))) if
-                 item not in list(range(crosspoint1, (crosspoint2 + 1)))]
+    out_index = [item for item in list(range(0, len(solution1.representation))) if
+                 item not in list(range(crosspoint1, crosspoint2))]
 
-    repetead_index1 = []            # indexes of the repeated elements solution1
-    repetead_index2 = []            # indexes of the repeated elements solution2
+    repeated_index1 = []            # indexes of the repeated elements solution1
+    repeated_index2 = []            # indexes of the repeated elements solution2
     for i in out_index:             # get the indexes of the repeated elements
-        if solution1.representation[i] in solution1.representation[crosspoint1:crosspoint2]:  # repeated elements
-            repetead_index1.append(i)                                                         # solution 1
-        if solution2.representation[i] in solution2.representation[crosspoint1:crosspoint2]:  # repeated elements
-            repetead_index2.append(i)                                                         # solution 2
+        if offspring1.representation[i] in offspring1.representation[crosspoint1:crosspoint2]:  # repeated elements
+            repeated_index1.append(i)                                                           # solution 1
+        if offspring2.representation[i] in offspring2.representation[crosspoint1:crosspoint2]:  # repeated elements
+            repeated_index2.append(i)                                                           # solution 2
 
 
-    for i in repetead_index1:
-        if solution2.representation[i] not in offspring1.representation[crosspoint1:crosspoint2]:
+    for i in repeated_index1: # for each repeated element in offspring1
+        # replace i if the element in i of the opposite solution is not in offspring1
+        if solution2.representation[i] not in offspring1.representation:
             offspring1.representation[i] = solution2.representation[i]
         else:
             idx = i
             while True:
+                # get the index of solution1 of the element in i of solution2
                 idx = solution1.representation.index(solution2.representation[idx])
 
+                # replace i if the element in i of the opposite solution is not in offspring1
                 if solution2.representation[idx] not in offspring1.representation:
-                    offspring1.representation[i]=solution2.representation[idx]
+                    offspring1.representation[i] = solution2.representation[idx]
                     break
 
-    for i in repetead_index2:
-        if solution1.representation[i] not in offspring2.representation[crosspoint1:crosspoint2]:
+    for i in repeated_index2:   # for each repeated element in offspring2
+        # replace i if the element in i of the opposite solution is not in offspring2
+        if solution1.representation[i] not in offspring2.representation:
             offspring2.representation[i] = solution1.representation[i]
         else:
             idx = i
             while True:
+                # get the index of solution2 of the element in i of solution1
                 idx = solution2.representation.index(solution1.representation[idx])
 
+                # replace i if the element in i of the opposite solution is not in offspring2
                 if solution1.representation[idx] not in offspring2.representation:
                     offspring2.representation[i] = solution1.representation[idx]
-                    break
+                    break   # break the while cycle because we already finished the cycle finding the element
 
     return offspring1, offspring2
-
 
 # -------------------------------------------------------------------------------------------------
 # Cycle Crossover
@@ -370,16 +374,12 @@ def cycle_crossover(problem, solution1, solution2):
                     cycle += 1      # go to the next cycle
                     break
 
-
     return offspring1, offspring2
 
-
 # -------------------------------------------------------------------------------------------------
-# Order Crossover
+# Order1 Crossover
 # -------------------------------------------------------------------------------------------------
-
-def order_crossover(problem, solution1, solution2):
-
+def order1_crossover(problem, solution1, solution2):
     # copy the parents to the children because we only need to change the middle part and the repeated elements
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
@@ -396,18 +396,15 @@ def order_crossover(problem, solution1, solution2):
     if crosspoint1 > crosspoint2:
         crosspoint2, crosspoint1 = crosspoint1, crosspoint2
 
-    sub=[*range((crosspoint2+1),len(offspring1.representation))]+[*range(0, crosspoint1)] #indexes of the elements not in the middle
-    j=0
-    k=0
-    for i in [*range((crosspoint2+1),len(offspring1.representation))]+[*range(0, (crosspoint2+1))]: #order by which elements must be considered
-        if solution2.representation[i] not in solution1.representation[crosspoint1:(crosspoint2+1)]: #replace offspring1 if element is not in the middle
-            offspring1.representation[sub[j]] = solution2.representation[i]
-            j+=1
-        if solution1.representation[i] not in solution2.representation[crosspoint1:(crosspoint2+1)]: #replace offspring2 if element is not in the middle
-            offspring2.representation[sub[k]] = solution1.representation[i]
-            k+=1
-            if k==len(sub):
-                break
+                # order by which elements must be considered
+    for i in [*range(crosspoint2, len(offspring1.representation))]+[*range(0, crosspoint1)]:
+        # replace index of offspring1 if element is not in the middle
+        if solution2.representation[i] not in solution1.representation[crosspoint1:crosspoint2]:
+            offspring1.representation[i] = solution2.representation[i]
+
+        # replace index of offspring2 if element is not in the middle
+        if solution1.representation[i] not in solution2.representation[crosspoint1:crosspoint2]:
+            offspring2.representation[i] = solution1.representation[i]
 
     return offspring1, offspring2
 
@@ -464,14 +461,13 @@ def standard_replacement(problem, current_population, new_population):
 # -------------------------------------------------------------------------------------------------
 # Elitism replacement
 # -----------------------------------------------------------------------------------------------
-def elitism_replacement(problem, current_population, new_population ):
-
-    if problem.objective == ProblemObjective.Minimization :
-        if current_population.fittest.fitness < new_population.fittest.fitness :
+def elitism_replacement(problem, current_population, new_population):
+    if problem.objective == ProblemObjective.Minimization:
+        if current_population.fittest.fitness < new_population.fittest.fitness:
            new_population.solutions[0] = current_population.solutions[-1]
     
-    elif problem.objective == ProblemObjective.Maximization : 
-        if current_population.fittest.fitness > new_population.fittest.fitness :
+    elif problem.objective == ProblemObjective.Maximization:
+        if current_population.fittest.fitness > new_population.fittest.fitness:
            new_population.solutions[0] = current_population.solutions[-1]
 
     return deepcopy(new_population)
