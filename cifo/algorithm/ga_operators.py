@@ -268,9 +268,9 @@ def pmx_crossover(problem, solution1, solution2):
     # copy the parents to the children because we only need to change the middle part and the repeated elements
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
-    ''' WHAT IS THE PROBLEEEEM PARAMETER? '''
-    # choose the random crossover points
-    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))  # get two different, ordered, indexes
+
+    # choose the random crossover points - get two different and ordered indexes
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))
 
     # change the middle part of the children
     offspring2.representation[crosspoint1:crosspoint2] = solution1.representation[crosspoint1:crosspoint2]
@@ -378,7 +378,6 @@ def order1_crossover(problem, solution1, solution2):
     # choose the random crossover points
     crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1)) #get two different, ordered, indexes
 
-
                 # order by which elements must be considered
     for i in [*range(crosspoint2, len(offspring1.representation))]+[*range(0, crosspoint1)]:
         # replace index of offspring1 if element is not in the middle
@@ -434,15 +433,16 @@ def swap_mutation(problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Insert mutation
 # -----------------------------------------------------------------------------------------------
-
 def insert_mutation(problem, solution):
     solution2 = deepcopy(solution)
 
-    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) # get two indexes
 
-    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2] #inserting the second value in the index after 1st mutation point
+    # inserting the second value in the index after 1st mutation point
+    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2]
 
-    for i in range((mutpoint1 + 2), (mutpoint2 + 1)): #passing the rest of the elements by their original order to after the number inserted
+    # passing the rest of the elements by their original order to after the number inserted
+    for i in range((mutpoint1 + 2), (mutpoint2 + 1)):
         solution2.representation[i] = solution.representation[(i - 1)]
 
     return solution2
@@ -450,13 +450,12 @@ def insert_mutation(problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Inversion mutation
 # -----------------------------------------------------------------------------------------------
-
 def inversion_mutation(problem, solution):
-    solution2 = deepcopy(solution) #create a copy that we will edit and return
+    solution2 = deepcopy(solution) # create a copy that we will edit and return
 
-    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) # get two indexes
 
-    for i in range(mutpoint1, (mutpoint2 + 1)): #replace the indexes by inverse order
+    for i in range(mutpoint1, (mutpoint2 + 1)): # replace the indexes by inverse order
         solution2.representation[i] = solution.representation[mutpoint2]
         mutpoint2 -= 1
 
@@ -465,7 +464,6 @@ def inversion_mutation(problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Scramble mutation
 # -----------------------------------------------------------------------------------------------
-
 def scramble_mutation(problem, solution):
 
     mutpoint1, mutpoint2 = get_two_diff_order_index(0, (len(solution.representation) - 1))  # get two indexes
@@ -477,7 +475,6 @@ def scramble_mutation(problem, solution):
     solution.representation[mutpoint1: (mutpoint2 + 1)] = shuffle_part #replace the segment with shuffled part
 
     return solution
-
 
 
 #TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
@@ -507,12 +504,11 @@ def elitism_replacement(problem, current_population, new_population):
 ###################################################################################################
 # HELPER FUNCTIONS
 ####################################################################################################
-
-def get_two_diff_order_index(start=0, stop=1,order=True, diff=True):
+def get_two_diff_order_index(start=0, stop=1, order=True, diff=True):
     """
     Returns two integers from a range, they can be:
         put in order (default) or unordered
-        always different(default) or can be repated
+        always different(default) or can be repeated
     start - integer (default = 0)
     stop - integer (default= 1)
     order - boolean ( default= True)
