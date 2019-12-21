@@ -202,10 +202,34 @@ tsp_problem_instance = TravelSalesmanProblem(
 #parent_selection = TournamentSelection()
 parent_selection = RouletteWheelSelection()
 
+# dictionaries to create test directories
+
+valid_Init = {initialize_pop: "std", initialize_hc: "hc" ,initialize_simA: "simA"}
+
+valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
+
+
+valid_Xover = {singlepoint_crossover: "singP", cycle_crossover: "cycle", pmx_crossover: "pmx",
+                order1_crossover:"order1"}
+valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP", insert_mutation: "insert",
+                  inversion_mutation: "invert", scramble_mutation: "scramble", }
+
+valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
+
+test_init = [initialize_pop]
+test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
+test_xover = [singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover]
+test_mutation = [swap_mutation, single_point_mutation, insert_mutation, inversion_mutation, scramble_mutation]
+test_replacement = [elitism_replacement, standard_replacement]
+test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_tournament_size = [2, 5, 10]
+#TODO: criar nested FOR para testar várias coisas ao mesmo tempo
+
 params = {
         # params
-        "Population-Size"           : 50,
-        "Number-of-Generations"     : 100000,
+        "Population-Size"           : 20,
+        "Number-of-Generations"     : 1000,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
@@ -213,11 +237,23 @@ params = {
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Aproach"          : swap_mutation,
+        "Mutation-Aproach"          : swap_mutation,            #TODO: corrigir nome nos vários ficheiros  Approach
         "Replacement-Approach"      : elitism_replacement
     }
 
-log_name = "mp0-teste"
+
+
+log_name = "Init-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
+            " _Sel-"    + str(valid_Select.get(params.get("Selection-Approach"))) +
+            " _Cross-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
+            " _Mut-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
+            " _Rep-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
+            " _CrossP-" + str((params.get("Crossover-Probability")) +
+            " _MutP-"   + str((params.get("Mutation-Probability")) +
+            " _PopS-"   + str((params.get("Population-Size")) +
+            " _Tsize-"  + str((params.get("Population-Size")) +
+            " _Gen-"    + str((params.get("Number-of-Generations"))
+
 
 number_of_runs = 3
 
@@ -227,7 +263,7 @@ for run in range(1,number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
         problem_instance = tsp_problem_instance,
-        params =  params,
+        params = params,
         run = run,
         log_name = log_name
         )
