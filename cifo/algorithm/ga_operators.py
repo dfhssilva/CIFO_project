@@ -1,4 +1,4 @@
-from random import uniform, randint, choices, sample
+from random import uniform, randint, choices, sample, shuffle
 from copy import deepcopy
 
 from cifo.problem.objective import ProblemObjective
@@ -89,7 +89,7 @@ class RouletteWheelSelection:
         """
         select two different parents using roulette wheel
         """
-        print('Params: ' + str(params))
+
         if objective == 'Maximization':
             index1 = self._select_index_max(population=population)
             index2 = index1
@@ -270,16 +270,7 @@ def pmx_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)
     ''' WHAT IS THE PROBLEEEEM PARAMETER? '''
     # choose the random crossover points
-    crosspoint1 = randint(0, (len(solution1.representation)-1))
-    crosspoint2 = randint(0, (len(solution2.representation)-1))
-
-    # make sure they are different
-    while crosspoint1 == crosspoint2:
-        crosspoint2 = randint(0, (len(solution2.representation) - 1))
-
-    # make sure that crosspoint1 is smaller than crosspoint2
-    if crosspoint1 > crosspoint2:
-        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))  # get two different, ordered, indexes
 
     # change the middle part of the children
     offspring2.representation[crosspoint1:crosspoint2] = solution1.representation[crosspoint1:crosspoint2]
@@ -385,16 +376,8 @@ def order1_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)
 
     # choose the random crossover points
-    crosspoint1 = randint(0, (len(solution1.representation) - 1))
-    crosspoint2 = randint(0, (len(solution2.representation) - 1))
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1)) #get two different, ordered, indexes
 
-    # make sure they are different
-    while crosspoint1 == crosspoint2:
-        crosspoint2 = randint(0, (len(solution2.representation) - 1))
-
-    # make sure that crosspoint1 is smaller than crosspoint2
-    if crosspoint1 > crosspoint2:
-        crosspoint2, crosspoint1 = crosspoint1, crosspoint2
 
                 # order by which elements must be considered
     for i in [*range(crosspoint2, len(offspring1.representation))]+[*range(0, crosspoint1)]:
@@ -448,6 +431,55 @@ def swap_mutation(problem, solution):
 
     return solution
 
+# -------------------------------------------------------------------------------------------------
+# Insert mutation
+# -----------------------------------------------------------------------------------------------
+
+def insert_mutation(problem, solution):
+    solution2 = deepcopy(solution)
+
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
+
+    solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2] #inserting the second value in the index after 1st mutation point
+
+    for i in range((mutpoint1 + 2), (mutpoint2 + 1)): #passing the rest of the elements by their original order to after the number inserted
+        solution2.representation[i] = solution.representation[(i - 1)]
+
+    return solution2
+
+# -------------------------------------------------------------------------------------------------
+# Inversion mutation
+# -----------------------------------------------------------------------------------------------
+
+def inversion_mutation(problem, solution):
+    solution2 = deepcopy(solution) #create a copy that we will edit and return
+
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) #get two indexes
+
+    for i in range(mutpoint1, (mutpoint2 + 1)): #replace the indexes by inverse order
+        solution2.representation[i] = solution.representation[mutpoint2]
+        mutpoint2 -= 1
+
+    return solution2
+
+# -------------------------------------------------------------------------------------------------
+# Scramble mutation
+# -----------------------------------------------------------------------------------------------
+
+def scramble_mutation(problem, solution):
+
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0, (len(solution.representation) - 1))  # get two indexes
+
+    shuffle_part = solution.representation[mutpoint1: (mutpoint2+1)] #store the part of the solution to be shuffled in separate list
+
+    shuffle(shuffle_part) #shuffle the middle part (shuffle works inplace)
+
+    solution.representation[mutpoint1: (mutpoint2 + 1)] = shuffle_part #replace the segment with shuffled part
+
+    return solution
+
+
+
 #TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
 ###################################################################################################
 # REPLACEMENT APPROACHES
@@ -471,3 +503,28 @@ def elitism_replacement(problem, current_population, new_population):
            new_population.solutions[0] = current_population.solutions[-1]
 
     return deepcopy(new_population)
+
+###################################################################################################
+# HELPER FUNCTIONS
+####################################################################################################
+
+def get_two_diff_order_index(start=0, stop=1,order=True, diff=True):
+    """
+    Returns two integers from a range, they can be:
+        put in order (default) or unordered
+        always different(default) or can be repated
+    start - integer (default = 0)
+    stop - integer (default= 1)
+    order - boolean ( default= True)
+    """
+    first = randint(start, stop)
+    second = randint(start, stop)
+
+    if diff:
+        while first == second:
+            second = randint(start, stop)
+    if order:
+        if first > second:
+            second, first = first, second
+
+    return first, second
