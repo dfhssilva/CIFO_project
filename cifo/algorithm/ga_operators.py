@@ -28,11 +28,11 @@ def initialize_using_random(problem, population_size):
 
     # generate a population of admissible solutions (individuals)
     for i in range(0, population_size):
-        s = problem.build_solution(method = 'Random')
+        s = problem.build_solution(method='Random')
         
         # check if the solution is admissible
         while not problem.is_admissible(s):
-            s = problem.build_solution(method = 'Random')
+            s = problem.build_solution(method='Random')
         
         s.id = [0, i]
 
@@ -384,20 +384,26 @@ def order1_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)
 
     # choose the random crossover points
-    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1)) #get two different, ordered, indexes
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))  # get two different, ordered, indexes
 
+    # indexes of the elements not in the middle
+    sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
+    j = 0
+    k = 0
                 # order by which elements must be considered
-    for i in [*range(crosspoint2, len(offspring1.representation))]+[*range(0, crosspoint1)]:
-        # replace index of offspring1 if element is not in the middle
-        if solution2.representation[i] not in solution1.representation[crosspoint1:crosspoint2]:
-            offspring1.representation[i] = solution2.representation[i]
-
-        # replace index of offspring2 if element is not in the middle
-        if solution1.representation[i] not in solution2.representation[crosspoint1:crosspoint2]:
-            offspring2.representation[i] = solution1.representation[i]
+    for i in [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, (crosspoint2+1))]:
+        # replace offspring1 if element is not in the middle
+        if solution2.representation[i] not in solution1.representation[crosspoint1:(crosspoint2+1)]:
+            offspring1.representation[sub[j]] = solution2.representation[i]
+            j += 1
+        # replace offspring2 if element is not in the middle
+        if solution1.representation[i] not in solution2.representation[crosspoint1:(crosspoint2+1)]:
+            offspring2.representation[sub[k]] = solution1.representation[i]
+            k += 1
+            if k == len(sub):
+                break
 
     return offspring1, offspring2
-
 
 ###################################################################################################
 # MUTATION APPROACHES

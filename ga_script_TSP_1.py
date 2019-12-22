@@ -123,7 +123,7 @@ tsp_problem_instance = TravelSalesmanProblem(
 #--------------------------------------------------------------------------------------------------
 # parent selection object
 #parent_selection = TournamentSelection()
-parent_selection = RouletteWheelSelection()
+parent_selection = RankSelection()
 
 params = {
         # params
