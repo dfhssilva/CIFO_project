@@ -8,10 +8,10 @@ from cifo.custom_problem.travel_salesman_problem import (
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
-    initialize_pop,
+    initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy,
     RouletteWheelSelection, RankSelection, TournamentSelection,
-    singlepoint_crossover, cycle_crossover,
-    single_point_mutation, swap_mutation, insert_mutation,
+    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover,
+    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
@@ -219,28 +219,29 @@ parent_selection = RouletteWheelSelection()
 
 # dictionaries to create test directories
 
-valid_Init = {initialize_pop: "std"}#, initialize_hc: "hc" ,initialize_simA: "simA"}
+valid_Init = {initialize_using_random: "std"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
 
 valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
 
-
-valid_Xover = {singlepoint_crossover: "singP", cycle_crossover: "cycle"}#, pmx_crossover: "pmx", order1_crossover:"order1"}
-valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP", insert_mutation: "insert"}#}, insert_mutation: "insert",
-                  #inversion_mutation: "invert", scramble_mutation: "scramble", }
+valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
+                # singlepoint_crossover: "singP" should not be used
+valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
+                  scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-test_init = [initialize_pop]
-test_select = [RouletteWheelSelection().select, TournamentSelection().select]#, RankSelection().select]
-test_xover = [singlepoint_crossover, cycle_crossover]#, pmx_crossover, order1_crossover]
-test_mutation = [swap_mutation]#, single_point_mutation]#, insert_mutation, inversion_mutation, scramble_mutation]
+
+test_init = [initialize_using_random]
+test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
+test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
+test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
 test_replacement = [elitism_replacement, standard_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.75]#simples
+test_xover_prob = [0.75] # simples
 #test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_mut_prob = [0.75]#simples
-#test_tournament_size = [2,5,10]#simples
-test_tournament_size = [2]#simples
+test_mut_prob = [0.75] # simples
+#test_tournament_size = [2,5,10] # simples
+test_tournament_size = [2] # simples
 
 #initial params
 params = {
@@ -250,7 +251,7 @@ params = {
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
-        "Initialization-Approach"   : initialize_pop,
+        "Initialization-Approach"   : initialize_using_random,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : cycle_crossover,

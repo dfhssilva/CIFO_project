@@ -20,7 +20,7 @@ Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 from random import random
 from copy import deepcopy
 
-from cifo.algorithm.ga_operators import (initialize_pop,
+from cifo.algorithm.ga_operators import (initialize_using_random,
                                          RankSelection, RouletteWheelSelection, TournamentSelection,
                                          singlepoint_crossover,
                                          single_point_mutation,
@@ -43,7 +43,7 @@ default_params = {
     "Crossover-Probability"     : 0.8,
     "Mutation-Probability"      : 0.5,
     
-    "Initialization-Approach"   : initialize_pop,
+    "Initialization-Approach"   : initialize_using_random,
     "Selection-Approach"        : RouletteWheelSelection,
     "Tournament-Size"           : 5,
     "Crossover-Approach"        : singlepoint_crossover,
@@ -224,7 +224,7 @@ class GeneticAlgorithm:
             self._initialize = params[ "Initialization-Approach" ]
         else:
             print("Undefined Initialization approach. The default will be used.")
-            self._initialize = initialize_pop
+            self._initialize = initialize_using_random
         
         # Selection
         self._selection_approach = None
