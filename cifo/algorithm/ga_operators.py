@@ -180,7 +180,7 @@ class RankSelection:
         # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
         rank_list = []
 
-        for index in range(0, len(population)):
+        for index in range(0, population.size):
             for _ in range(0, index + 1):
                 rank_list.append(index)
 
@@ -198,14 +198,14 @@ class RankSelection:
 
     def _sort(self, population, objective):
         if objective == ProblemObjective.Maximization: # in maximization, the solution with higher fitness is at the end
-            for i in range(0, len(population)):
-                for j in range(i, len(population)):
+            for i in range(0, population.size):
+                for j in range(i, population.size):
                     if population.solutions[i].fitness > population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
 
         else:    # in minimization, the solution with smaller fitness is at the end
-            for i in range(0, len(population)):
-                for j in range(i, len(population)):
+            for i in range(0, population.size):
+                for j in range(i, population.size):
                     if population.solutions[i].fitness < population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
 
