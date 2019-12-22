@@ -1,4 +1,5 @@
 # Personalized
+/log/*
 /data/*
 /cifo_proj/*
 /.vscode/*
