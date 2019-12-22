@@ -11,7 +11,7 @@ from cifo.algorithm.ga_operators import (
     initialize_pop,
     RouletteWheelSelection, RankSelection, TournamentSelection,
     singlepoint_crossover, cycle_crossover,
-    single_point_mutation, swap_mutation,
+    single_point_mutation, swap_mutation, insert_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
@@ -225,7 +225,7 @@ valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn",
 
 
 valid_Xover = {singlepoint_crossover: "singP", cycle_crossover: "cycle"}#, pmx_crossover: "pmx", order1_crossover:"order1"}
-valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP"}#}, insert_mutation: "insert",
+valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP", insert_mutation: "insert"}#}, insert_mutation: "insert",
                   #inversion_mutation: "invert", scramble_mutation: "scramble", }
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
