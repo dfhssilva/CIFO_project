@@ -14,16 +14,12 @@ from cifo.problem.population import Population
 # Initialization signature: <method_name>(problem, population_size):
 
 # -------------------------------------------------------------------------------------------------
-# Initialization All Methods (Random, Hill Climbing, Simulated Annealing and Greedy)
+# Initialization Random
 # -------------------------------------------------------------------------------------------------
-def initialize_pop(problem, population_size, method = 'Random'):
+def initialize_using_random(problem, population_size):
     """
-    Initialize a population of solutions (feasible solution) for an evolutionary algorithm
-        - 'Hill Climbing'
-        - 'Simulated Annealing'
-        - 'Random' (default method)
-        - 'Greedy'
-    
+    Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Random method
+
     Required:
     @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
     @ population_size - to define the size of the population to be returned.
@@ -32,11 +28,11 @@ def initialize_pop(problem, population_size, method = 'Random'):
 
     # generate a population of admissible solutions (individuals)
     for i in range(0, population_size):
-        s = problem.build_solution(method)
+        s = problem.build_solution(method = 'Random')
         
         # check if the solution is admissible
         while not problem.is_admissible(s):
-            s = problem.build_solution(method)
+            s = problem.build_solution(method = 'Random')
         
         s.id = [0, i]
 
@@ -57,16 +53,34 @@ def initialize_pop(problem, population_size, method = 'Random'):
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
 # Remark: remember, you will need a neighborhood function for each problem
-#def initialize_using_hc(problem, population_size):
-#    pass
+def initialize_using_hc(problem, population_size):
+    """
+    Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Hill Climbing
+    """
+
+    pass
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Simulated Annealing
 # -------------------------------------------------------------------------------------------------
 #TODO: OPTIONAL, implement a initialization based on Hill Climbing
 # Remark: remember, you will need a neighborhood function for each problem
-#def initialize_using_sa(problem, population_size):
-#    pass
+def initialize_using_sa(problem, population_size):
+    """
+    Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Simulated Annealing
+    """
+    pass
+
+# -------------------------------------------------------------------------------------------------
+# Initialization using Greedy Method
+# -------------------------------------------------------------------------------------------------
+#TODO: OPTIONAL, implement a initialization based on Greedy Method
+# Remark: remember, you will need a neighborhood function for each problem
+def initialize_using_greedy(problem, population_size):
+    """
+    Initialize a population of solutions (feasible solution) for an evolutionary algorithm using a Greedy Algorithm
+    """
+    pass
 
 ###################################################################################################
 # SELECTION APPROACHES
@@ -89,14 +103,13 @@ class RouletteWheelSelection:
         """
         select two different parents using roulette wheel
         """
-
-        if objective == 'Maximization':
+        if objective == ProblemObjective.Maximization:
             index1 = self._select_index_max(population=population)
             index2 = index1
         
             while index2 == index1:
                 index2 = self._select_index_max(population=population)
-        elif objective == 'Minimization':
+        elif objective == ProblemObjective.Minimization:
             index1 = self._select_index_min(population=population)
             index2 = index1
 
@@ -169,37 +182,32 @@ class RankSelection:
 
         for index in range(0, len(population)):
             for _ in range(0, index + 1):
-                rank_list.append( index )
+                rank_list.append(index)
 
         print(f" >> rank_list: {rank_list}")       
 
         # Step 3: Select solution index
-        index1 = randint(0, len( rank_list )-1)
+        index1 = randint(0, len(rank_list)-1)
         index2 = index1
         
         while index2 == index1:
-            index2 = randint(0, len( rank_list )-1)
+            index2 = randint(0, len(rank_list)-1)
 
         return population.get(rank_list[index1]), population.get(rank_list[index2])
 
-    
-    def _sort(self, population, objective):
 
-        if objective == ProblemObjective.Maximization:
-            for i in range (0, len(population)):
-                for j in range (i, len (population)):
+    def _sort(self, population, objective):
+        if objective == ProblemObjective.Maximization: # in maximization, the solution with higher fitness is at the end
+            for i in range(0, len(population)):
+                for j in range(i, len(population)):
                     if population.solutions[i].fitness > population.solutions[j].fitness:
-                        swap = population.solutions[j]
-                        population.solutions[j] = population.solutions[i]
-                        population.solutions[i] = swap
-                        
-        else:    
-            for i in range (0, len(population)):
-                for j in range (i, len (population)):
+                        population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
+
+        else:    # in minimization, the solution with smaller fitness is at the end
+            for i in range(0, len(population)):
+                for j in range(i, len(population)):
                     if population.solutions[i].fitness < population.solutions[j].fitness:
-                        swap = population.solutions[j]
-                        population.solutions[j] = population.solutions[i]
-                        population.solutions[i] = swap
+                        population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
 
         return population
 
@@ -494,7 +502,7 @@ def elitism_replacement(problem, current_population, new_population):
     if problem.objective == ProblemObjective.Minimization:
         if current_population.fittest.fitness < new_population.fittest.fitness:
            new_population.solutions[0] = current_population.solutions[-1]
-    
+
     elif problem.objective == ProblemObjective.Maximization:
         if current_population.fittest.fitness > new_population.fittest.fitness:
            new_population.solutions[0] = current_population.solutions[-1]
