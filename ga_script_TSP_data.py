@@ -231,7 +231,7 @@ valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP"}#}, inse
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 test_init = [initialize_pop]
-test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
+test_select = [RouletteWheelSelection().select, TournamentSelection().select]#, RankSelection().select]
 test_xover = [singlepoint_crossover, cycle_crossover]#, pmx_crossover, order1_crossover]
 test_mutation = [swap_mutation]#, single_point_mutation]#, insert_mutation, inversion_mutation, scramble_mutation]
 test_replacement = [elitism_replacement, standard_replacement]
@@ -306,7 +306,7 @@ def one_combination():
     log_dir = f"C:/Users/Pedro/Runs/{log_name}"
     if not path.exists(log_dir):
         mkdir(log_dir)
-        
+
     log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
     print(log_files)
 
