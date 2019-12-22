@@ -90,7 +90,22 @@ def plot_performance_chart( df ):
 # Problem
 #--------------------------------------------------------------------------------------------------
 # Decision Variables
-input = [
+input =[
+        [0, 2451, 713, 1018, 1631, 1374, 2408, 213, 2571, 875, 1420, 2145, 1972],
+        [2451, 0, 1745, 1524, 831, 1240, 959, 2596, 403, 1589, 1374, 357, 579],
+        [713, 1745, 0, 355, 920, 803, 1737, 851, 1858, 262, 940, 1453, 1260],
+        [1018, 1524, 355, 0, 700, 862, 1395, 1123, 1584, 466, 1056, 1280, 987],
+        [1631, 831, 920, 700, 0, 663, 1021, 1769, 949, 796, 879, 586, 371],
+        [1374, 1240, 803, 862, 663, 0, 1681, 1551, 1765, 547, 225, 887, 999],
+        [2408, 959, 1737, 1395, 1021, 1681, 0, 2493, 678, 1724, 1891, 1114, 701],
+        [213, 2596, 851, 1123, 1769, 1551, 2493, 0, 2699, 1038, 1605, 2300, 2099],
+        [2571, 403, 1858, 1584, 949, 1765, 678, 2699, 0, 1744, 1645, 653, 600],
+        [875, 1589, 262, 466, 796, 547, 1724, 1038, 1744, 0, 679, 1272, 1162],
+        [1420, 1374, 940, 1056, 879, 225, 1891, 1605, 1645, 679, 0, 1017, 1200],
+        [2145, 357, 1453, 1280, 586, 887, 1114, 2300, 653, 1272, 1017, 0, 504],
+        [1972, 579, 1260, 987, 371, 999, 701, 2099, 600, 1162, 1200, 504, 0],
+    ]
+input1 = [
     [0,36.96584005,51.47535512,81.37883643,67.09706382,96.25912034,33.37095504,49.05139087,82.42814829,17.53944615,28.60425589,51.23577205,81.61379496,51.51224221,49.22279957,42.77989519,52.41229411,8.559339301,29.73906448,81.02061035,47.6395033,57.71653277,58.75682446,62.03784071,31.25151882,50.1453012,24.63358841,18.94551955,30.25790504,85.21792873,36.85186187,56.53666255,62.03497797,37.68030795,16.01323158,63.58061167,63.59738826,62.15986186,23.10591688,37.37057763,8.517827435,58.29133094,69.49677904,87.08357383,34.45822295,25.69816455,34.67118709,66.44842139,85.07076451,23.63220219,17.29653852,32.6772139,71.67238993,31.40561027,74.5859657,13.37462792,74.65274849,68.78350664,28.32893632,16.45723427,40.79505789,32.14446993,22.8157847,61.17311404,67.85584464,50.50121842,17.32224642,69.64537022,8.58156977,67.23338249,38.25387274,72.79577656,45.89074932,62.00721071,21.98649411,45.34735754,23.43343436,64.20771523,40.49933354,33.55673111,49.24624472,80.86344475,47.42370856,61.25720927,57.6628477,77.27561713,51.02315985,74.39466341,48.992992,55.93722702],
     [36.96584005,0,61.91619178,85.79358509,56.34475438,68.71598221,4.09671684,36.54433609,93.72104677,44.14412909,26.24710648,19.03207804,64.5753318,27.03707842,25.97304705,6.288581842,24.73396593,45.43488009,16.97199729,53.72595597,62.78665591,62.66049676,29.58502223,68.28070695,61.67825794,38.42329848,60.23006801,37.50720546,54.44740046,55.15306618,73.80628982,47.35539658,66.44844157,73.28046004,52.53609876,42.98509658,56.44437672,45.2803504,59.30269394,31.97786358,45.30930669,27.20468134,63.6108007,55.78010425,70.4261779,15.74337821,47.21292078,74.88684535,92.9748268,16.96133125,31.60291136,5.074596635,85.38521764,54.70583033,61.30430838,47.80276173,69.84275638,76.85850099,65.22136526,46.8267315,22.40937611,57.95619821,14.16705865,38.74170375,47.70704542,62.00538466,43.02981561,36.79869334,36.12941277,45.68338293,28.53063986,47.58183111,67.32112581,65.51898315,56.29357404,67.25267976,59.14111513,28.71109276,28.38619482,36.2971628,12.36567547,89.48057197,69.15888966,32.97194384,70.14129461,88.05203116,67.93350969,78.96061085,46.92748861,30.70635332],
     [51.47535512,61.91619178,0,30.12739296,34.32168728,77.5059462,61.5682967,34.02388454,32.4626629,34.82777207,35.89770585,80.87587171,50.98237406,88.0571181,47.40236359,67.33435037,53.43310071,51.21862313,69.14400337,66.21221522,7.704441461,9.593636341,57.4876327,11.33612019,35.13486982,32.84725272,48.04081167,33.01855188,25.45017471,74.07837052,63.69004377,29.24684645,12.77136775,52.8532566,58.65344852,46.76357494,28.00948541,41.06769324,50.23083385,30.7481669,54.3915391,89.01432619,29.07080451,77.90618437,53.2270194,47.57798198,17.18198031,14.99119164,33.78825151,62.82597756,37.2387574,57.39802441,23.46906511,23.96565857,41.55026146,61.56812262,31.04718986,17.31950789,57.5602719,66.80842471,43.10727162,26.88431343,55.80029958,48.55206336,47.82748521,1.756097224,34.63436043,69.43283815,59.80526894,49.58840516,82.08238552,57.8575155,18.53404505,13.64674759,43.58962278,19.35438187,65.47198371,72.36893294,36.32124112,25.65451483,70.73797899,29.68527208,19.45055536,57.1279573,8.299614076,26.8990232,11.25378185,23.36537322,20.04259069,50.95819548],
@@ -204,32 +219,34 @@ parent_selection = RouletteWheelSelection()
 
 # dictionaries to create test directories
 
-valid_Init = {initialize_pop: "std", initialize_hc: "hc" ,initialize_simA: "simA"}
+valid_Init = {initialize_pop: "std"}#, initialize_hc: "hc" ,initialize_simA: "simA"}
 
 valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
 
 
-valid_Xover = {singlepoint_crossover: "singP", cycle_crossover: "cycle", pmx_crossover: "pmx",
-                order1_crossover:"order1"}
-valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP", insert_mutation: "insert",
-                  inversion_mutation: "invert", scramble_mutation: "scramble", }
+valid_Xover = {singlepoint_crossover: "singP", cycle_crossover: "cycle"}#, pmx_crossover: "pmx", order1_crossover:"order1"}
+valid_Mutation = {swap_mutation: "swap", single_point_mutation: "singP"}#}, insert_mutation: "insert",
+                  #inversion_mutation: "invert", scramble_mutation: "scramble", }
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 test_init = [initialize_pop]
 test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
-test_xover = [singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover]
-test_mutation = [swap_mutation, single_point_mutation, insert_mutation, inversion_mutation, scramble_mutation]
+test_xover = [singlepoint_crossover, cycle_crossover]#, pmx_crossover, order1_crossover]
+test_mutation = [swap_mutation]#, single_point_mutation]#, insert_mutation, inversion_mutation, scramble_mutation]
 test_replacement = [elitism_replacement, standard_replacement]
-test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_tournament_size = [2, 5, 10]
-#TODO: criar nested FOR para testar várias coisas ao mesmo tempo
+#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_xover_prob = [0.75]#simples
+#test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_mut_prob = [0.75]#simples
+#test_tournament_size = [2,5,10]#simples
+test_tournament_size = [2]#simples
 
+#initial params
 params = {
         # params
-        "Population-Size"           : 20,
-        "Number-of-Generations"     : 1000,
+        "Population-Size"           : 10,
+        "Number-of-Generations"     : 10,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
@@ -241,92 +258,115 @@ params = {
         "Replacement-Approach"      : elitism_replacement
     }
 
+def one_combination():
+    log_name =  (  "I-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
+                "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) +
+                "_C-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
+                "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
+                "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
+                "_CP-" + str((params.get("Crossover-Probability"))) +
+                "_MP-"   + str((params.get("Mutation-Probability")))+
+                "_PS-"   + str((params.get("Population-Size"))) +
+                "_Ts-"  + str((params.get("Tournament-Size"))) +
+                "_G-"    + str((params.get("Number-of-Generations")))
+                )
 
 
-log_name = "Init-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
-            " _Sel-"    + str(valid_Select.get(params.get("Selection-Approach"))) +
-            " _Cross-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
-            " _Mut-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
-            " _Rep-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
-            " _CrossP-" + str((params.get("Crossover-Probability")) +
-            " _MutP-"   + str((params.get("Mutation-Probability")) +
-            " _PopS-"   + str((params.get("Population-Size")) +
-            " _Tsize-"  + str((params.get("Population-Size")) +
-            " _Gen-"    + str((params.get("Number-of-Generations"))
+    number_of_runs = 3
 
+    # Run the same configuration many times
+    #--------------------------------------------------------------------------------------------------
+    for run in range(1,number_of_runs + 1):
+        # Genetic Algorithm
+        ga = GeneticAlgorithm(
+            problem_instance = tsp_problem_instance,
+            params = params,
+            run = run,
+            log_name = log_name
+            )
 
-number_of_runs = 3
+        ga_observer = LocalSearchObserver(ga)
+        ga.register_observer(ga_observer)
+        ga.search()
+        ga.save_log()
 
-# Run the same configuration many times
-#--------------------------------------------------------------------------------------------------
-for run in range(1,number_of_runs + 1):
-    # Genetic Algorithm
-    ga = GeneticAlgorithm( 
-        problem_instance = tsp_problem_instance,
-        params = params,
-        run = run,
-        log_name = log_name
-        )
+    # Consolidate the runs
+    #--------------------------------------------------------------------------------------------------
 
-    ga_observer = LocalSearchObserver(ga)
-    ga.register_observer(ga_observer)
-    ga.search()    
-    ga.save_log()
+    # save the config
 
-# Consolidate the runs
-#--------------------------------------------------------------------------------------------------
+    # consolidate the runs information
+    from os import listdir, path, mkdir
+    from os.path import isfile, join
+    from pandas import pandas as pd
+    import numpy as np
 
-# save the config
-
-# consolidate the runs information
-from os import listdir, path, mkdir
-from os.path import isfile, join
-from pandas import pandas as pd
-import numpy as np
-
-log_dir   = f"./log/{log_name}" 
-
-log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
-print(log_files)
-
-fitness_runs = []
-columns_name = []
-counter = 0
-generations = []
-
-for log_name in log_files:
-    if log_name.startswith('run_'):
-        df = pd.read_excel(log_dir + "/" + log_name)
-        fitness_runs.append(list ( df.Fitness ))
-        columns_name.append(log_name.strip(".xslx"))
-        counter += 1
-
-        if not generations:
-            generations = list( df["Generation"] )
+    #log_dir   = f"./log/{log_name}"
+    #log_dir = f"C:/Users/Pedro/Google Drive/IMS/1S-Master/CIFO/CIFO Project/Runs/{log_name}"
+    log_dir = f"C:/Users/Pedro/Runs/{log_name}"
+    if not path.exists(log_dir):
+        mkdir(log_dir)
         
-#fitness_sum = [sum(x) for x in zip(*fitness_runs)]   
+    log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
+    print(log_files)
 
-df = pd.DataFrame(list(zip(*fitness_runs)), columns = columns_name)
+    fitness_runs = []
+    columns_name = []
+    counter = 0
+    generations = []
 
-fitness_sd   = list( df.std( axis = 1 ) )
-fitness_mean = list( df.mean( axis = 1 ) )
+    for log_name in log_files:
+        if log_name.startswith('run_'):
+            df = pd.read_excel(log_dir + "/" + log_name)
+            fitness_runs.append(list ( df.Fitness ))
+            columns_name.append(log_name.strip(".xslx"))
+            counter += 1
 
-#df["Fitness_Sum"] = fitness_sum
-df["Generation"]  = generations
-df["Fitness_SD"]  = fitness_sd
-df["Fitness_Mean"]  = fitness_mean
-df["Fitness_Lower"]  = df["Fitness_Mean"] + df["Fitness_SD"]
-df["Fitness_Upper"]  = df["Fitness_Mean"] - df["Fitness_SD"]
+            if not generations:
+                generations = list( df["Generation"] )
+
+    #fitness_sum = [sum(x) for x in zip(*fitness_runs)]
+
+    df = pd.DataFrame(list(zip(*fitness_runs)), columns = columns_name)
+
+    fitness_sd   = list( df.std( axis = 1 ) )
+    fitness_mean = list( df.mean( axis = 1 ) )
+
+    #df["Fitness_Sum"] = fitness_sum
+    df["Generation"]  = generations
+    df["Fitness_SD"]  = fitness_sd
+    df["Fitness_Mean"]  = fitness_mean
+    df["Fitness_Lower"]  = df["Fitness_Mean"] + df["Fitness_SD"]
+    df["Fitness_Upper"]  = df["Fitness_Mean"] - df["Fitness_SD"]
 
 
-if not path.exists( log_dir ):
-    mkdir( log_dir )
+    if not path.exists( log_dir ):
+        mkdir( log_dir )
 
-df.to_excel( log_dir + "/all.xlsx", index = False, encoding = 'utf-8' )
+    df.to_excel( log_dir + "/all.xlsx", index = False, encoding = 'utf-8' )
 
 #plot_performance_chart( df )
 
-
+for init in range(len(test_init)):
+    params["Initialization-Approach"]=test_init[init]
+    for select in range(len(test_select)):
+        params["Selection-Approach"]=test_select[select]
+        for xover in range(len(test_xover)):
+            params["Crossover-Approach"]=test_xover[xover]
+            for mutation in range(len(test_mutation)):
+                params["Mutation-Aproach"]=test_mutation[mutation]
+                for replacement in range(len(test_replacement)):
+                    params["Replacement-Approach"]=test_replacement[replacement]
+                    for xover_prob in range(len(test_xover_prob)):
+                        params["Crossover-Probability"]=test_xover_prob[xover_prob]
+                        for mut_prob in range(len(test_mut_prob)):
+                            params["Mutation-Probability"]=test_mut_prob[mut_prob]
+                            if str(test_select[select])==str(TournamentSelection().select):
+                                for tourn_size in range(len(test_tournament_size)):
+                                    params["Tournament-Size"]=test_tournament_size[tourn_size]
+                                    one_combination()
+                            else:
+                                    one_combination()
 
 
 #[sum(sublist) for sublist in itertools.izip(*myListOfLists)]
