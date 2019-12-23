@@ -9,7 +9,7 @@ from cifo.custom_problem.travel_salesman_problem import (
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy,
-    RouletteWheelSelection, RankSelection, TournamentSelection,
+    roulettewheel_selection, rank_selection, tournament_selection,
     singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover,
     single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation,
     elitism_replacement, standard_replacement 
@@ -214,13 +214,13 @@ tsp_problem_instance = TravelSalesmanProblem(
 #--------------------------------------------------------------------------------------------------
 # parent selection object
 # parent_selection = TournamentSelection()
-parent_selection = RouletteWheelSelection()
+parent_selection = roulettewheel_selection
 
 # # dictionaries to create test directories
 
 valid_Init = {initialize_using_random: "rand"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
 
-valid_Select = {RouletteWheelSelection(): "rol", TournamentSelection(): "tourn", RankSelection(): "rank"}
+valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
 valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
                 # singlepoint_crossover: "singP" should not be used
@@ -230,7 +230,7 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 test_init = [initialize_using_random]
-test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
+test_select = [roulettewheel_selection, tournament_selection, rank_selection]
 test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
 test_replacement = [elitism_replacement, standard_replacement]
@@ -242,7 +242,7 @@ test_mut_prob = [0.75] # simples
 test_tournament_size = [2] # simples
 
 #initial params
-parent_selection = RouletteWheelSelection()
+# parent_selection = roulettewheel_selection
 
 params = {
         # params
@@ -252,10 +252,10 @@ params = {
         "Mutation-Probability"      : 0.8,
         # operators / approaches
         "Initialization-Approach"   : initialize_using_random,
-        "Selection-Approach"        : parent_selection.select,
+        "Selection-Approach"        : parent_selection,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Approach"          : swap_mutation,
+        "Mutation-Approach"         : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
@@ -277,7 +277,7 @@ def one_combination():
     log_name =  ("I-"    + str(valid_Init.get(params.get("Initialization-Approach"))) +
                 "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) + # this one return None because of .select method
                 "_C-"    + str(valid_Xover.get(params.get("Crossover-Approach"))) +
-                "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
+                "_M-"    + str(valid_Mutation.get(params.get("Mutation-Approach"))) +
                 "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
                 "_CP-"   + str((params.get("Crossover-Probability"))) +
                 "_MP-"   + str((params.get("Mutation-Probability"))) +
@@ -351,8 +351,8 @@ def one_combination():
     df["Generation"]  = generations
     df["Fitness_SD"]  = fitness_sd
     df["Fitness_Mean"]  = fitness_mean
-    df["Fitness_Lower"] = df["Fitness_Mean"] + 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
-    df["Fitness_Upper"] = df["Fitness_Mean"] - 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
+    df["Fitness_Lower"] = df["Fitness_Mean"] - 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
+    df["Fitness_Upper"] = df["Fitness_Mean"] + 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
 
 
     if not path.exists(log_dir):
@@ -376,7 +376,7 @@ for init in range(len(test_init)):
                         params["Crossover-Probability"] = test_xover_prob[xover_prob]
                         for mut_prob in range(len(test_mut_prob)):
                             params["Mutation-Probability"] = test_mut_prob[mut_prob]
-                            if str(test_select[select]) == str(TournamentSelection().select):
+                            if str(test_select[select]) == str(tournament_selection):
                                 for tourn_size in range(len(test_tournament_size)):
                                     params["Tournament-Size"] = test_tournament_size[tourn_size]
                                     one_combination()

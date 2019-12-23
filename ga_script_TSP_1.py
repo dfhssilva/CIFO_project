@@ -9,7 +9,7 @@ from cifo.custom_problem.travel_salesman_problem import (
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_using_random,
-    RouletteWheelSelection, RankSelection, TournamentSelection,
+    roulettewheel_selection, rank_selection, tournament_selection,
     singlepoint_crossover, cycle_crossover, order1_crossover,
     single_point_mutation, swap_mutation,
     elitism_replacement, standard_replacement 
@@ -123,7 +123,7 @@ tsp_problem_instance = TravelSalesmanProblem(
 #--------------------------------------------------------------------------------------------------
 # parent selection object
 #parent_selection = TournamentSelection()
-parent_selection = RouletteWheelSelection()
+parent_selection = roulettewheel_selection
 
 params = {
         # params
@@ -133,10 +133,10 @@ params = {
         "Mutation-Probability"      : 0.8,
         # operators / approaches
         "Initialization-Approach"   : initialize_using_random,
-        "Selection-Approach"        : parent_selection.select,
+        "Selection-Approach"        : parent_selection,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : order1_crossover,
-        "Mutation-Aproach"          : swap_mutation,
+        "Mutation-Approach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
@@ -146,7 +146,7 @@ number_of_runs = 30
 
 # Run the same configuration many times
 #--------------------------------------------------------------------------------------------------
-for run in range(1,number_of_runs + 1):
+for run in range(1, number_of_runs + 1):
     # Genetic Algorithm
     ga = GeneticAlgorithm( 
         problem_instance = tsp_problem_instance,
@@ -202,8 +202,8 @@ fitness_mean = list(df.mean(axis=1))
 df["Generation"]  = generations
 df["Fitness_SD"]  = fitness_sd
 df["Fitness_Mean"]  = fitness_mean
-df["Fitness_Lower"]  = df["Fitness_Mean"] + 1.96*df["Fitness_SD"]/(number_of_runs**0.5)
-df["Fitness_Upper"]  = df["Fitness_Mean"] - 1.96*df["Fitness_SD"]/(number_of_runs**0.5)
+df["Fitness_Lower"]  = df["Fitness_Mean"] - 1.96*df["Fitness_SD"]/(number_of_runs**0.5)
+df["Fitness_Upper"]  = df["Fitness_Mean"] + 1.96*df["Fitness_SD"]/(number_of_runs**0.5)
 
 
 if not path.exists(log_dir):
