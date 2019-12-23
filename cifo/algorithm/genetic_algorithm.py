@@ -21,7 +21,7 @@ from random import random
 from copy import deepcopy
 
 from cifo.algorithm.ga_operators import (initialize_using_random,
-                                         RankSelection, RouletteWheelSelection, TournamentSelection,
+                                         rank_selection, roulettewheel_selection, tournament_selection,
                                          singlepoint_crossover,
                                          single_point_mutation,
                                          standard_replacement, elitism_replacement
@@ -44,10 +44,10 @@ default_params = {
     "Mutation-Probability"      : 0.5,
     
     "Initialization-Approach"   : initialize_using_random,
-    "Selection-Approach"        : RouletteWheelSelection,
+    "Selection-Approach"        : roulettewheel_selection,
     "Tournament-Size"           : 5,
     "Crossover-Approach"        : singlepoint_crossover,
-    "Mutation-Aproach"          : single_point_mutation,
+    "Mutation-Approach"          : single_point_mutation,
     "Replacement-Approach"      : elitism_replacement
 }
 
@@ -232,7 +232,7 @@ class GeneticAlgorithm:
             self._selection_approach = params[ "Selection-Approach" ]
         else:
             print("Undefined Selection approach. The default will be used.")
-            parent_selection = TournamentSelection()
+            parent_selection = tournament_selection()
             self._selection_approach = parent_selection.select
         
         # tournament size
@@ -250,10 +250,10 @@ class GeneticAlgorithm:
 
         # Mutation
         self._mutation_approach = None
-        if "Mutation-Aproach" in params:
-            self._mutation_approach = params[ "Mutation-Aproach" ]
+        if "Mutation-Approach" in params:
+            self._mutation_approach = params[ "Mutation-Approach" ]
         else:
-            print("Undefined Mutation-Aproach. The default will be used.")
+            print("Undefined Mutation-Approach. The default will be used.")
             self._mutation_approach = single_point_mutation
 
         # Replacement

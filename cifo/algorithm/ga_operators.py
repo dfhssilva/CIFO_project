@@ -4,8 +4,6 @@ from copy import deepcopy
 from cifo.problem.objective import ProblemObjective
 from cifo.problem.solution import EncodingDataType
 from cifo.problem.population import Population
-from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
-
 
 ###################################################################################################
 # INITIALIZATION APPROACHES
@@ -87,10 +85,9 @@ def initialize_using_greedy(problem, population_size):
 # SELECTION APPROACHES
 ###################################################################################################
 # -------------------------------------------------------------------------------------------------
-# class RouletteWheelSelection
+# roulettewheel_selection function
 # -------------------------------------------------------------------------------------------------
-# TODO: implement Roulette Wheel for Minimization
-class RouletteWheelSelection:
+def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVEIS USOS para os params, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
     """
     Main idea: better individuals get higher chance
     The chances are proportional to the fitness
@@ -100,30 +97,7 @@ class RouletteWheelSelection:
 
     REMARK: This implementation does not consider minimization problem
     """
-    def select(self, population, objective, params): # INVESTIGAR POSSIVEIS USOS para os params, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
-        """
-        select two different parents using roulette wheel
-        """
-        if objective == ProblemObjective.Maximization:
-            index1 = self._select_index_max(population=population)
-            index2 = index1
-        
-            while index2 == index1:
-                index2 = self._select_index_max(population=population)
-        elif objective == ProblemObjective.Minimization:
-            index1 = self._select_index_min(population=population)
-            index2 = index1
-
-            while index2 == index1:
-                index2 = self._select_index_min(population=population)
-        else:
-            print('The code does not handle multiobjective problems yet.')
-            exit(code=1)
-
-        return population.get(index1), population.get(index2)
-
-
-    def _select_index_max(self, population):
+    def _select_index_max(population):
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
         for solution in population.solutions:
@@ -139,11 +113,11 @@ class RouletteWheelSelection:
             stop_position += (solution.fitness / total_fitness)
             if stop_position > wheel_position:
                 break
-            index += 1    
+            index += 1
 
         return index
 
-    def _select_index_min(self, population):
+    def _select_index_min(population):
         # Get the Total Fitness (all solutions in the population) to calculate the chances proportional to fitness
         total_fitness = 0
         pop_size = population.size  # get the population size for the formula
@@ -164,40 +138,37 @@ class RouletteWheelSelection:
             index += 1
 
         return index
+
+    # select two different parents using roulette wheel
+    if objective == ProblemObjective.Maximization:
+        index1 = _select_index_max(population=population)
+        index2 = index1
+
+        while index2 == index1:
+            index2 = _select_index_max(population=population)
+    elif objective == ProblemObjective.Minimization:
+        index1 = _select_index_min(population=population)
+        index2 = index1
+
+        while index2 == index1:
+            index2 = _select_index_min(population=population)
+    else:
+        print('The code does not handle multiobjective problems yet.')
+        exit(code=1)
+
+    return population.get(index1), population.get(index2)
+
         
 # -------------------------------------------------------------------------------------------------
-# class RankSelection
+# rank_selection function
 # -------------------------------------------------------------------------------------------------
-class RankSelection:
+def rank_selection(population, objective, params):
     """
     Rank Selection sorts the population first according to fitness value and ranks them. Then every chromosome is
     allocated selection probability with respect to its rank. Individuals are selected as per their selection
     probability. Rank selection is an exploration technique of selection.
     """
-    def select(self, population, objective, params):
-        # Step 1: Sort / Rank
-        population = self._sort(population, objective)
-
-        # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
-        rank_list = []
-
-        for index in range(0, population.size):
-            for _ in range(0, index + 1):
-                rank_list.append(index)
-
-        print(f" >> rank_list: {rank_list}")       
-
-        # Step 3: Select solution index
-        index1 = randint(0, len(rank_list)-1)
-        index2 = index1
-        
-        while index2 == index1:
-            index2 = randint(0, len(rank_list)-1)
-
-        return population.get(rank_list[index1]), population.get(rank_list[index2])
-
-
-    def _sort(self, population, objective):
+    def _sort(population, objective):
         if objective == ProblemObjective.Maximization: # in maximization, the solution with higher fitness is at the end
             for i in range(0, population.size):
                 for j in range(i, population.size):
@@ -212,31 +183,42 @@ class RankSelection:
 
         return population
 
+    # Step 1: Sort / Rank
+    population = _sort(population, objective)
+
+    # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
+    rank_list = []
+
+    for index in range(0, population.size):
+        for _ in range(0, index + 1):
+            rank_list.append(index)
+
+    print(f" >> rank_list: {rank_list}")
+
+    # Step 3: Select solution index
+    index1 = randint(0, len(rank_list)-1)
+    index2 = index1
+
+    while index2 == index1:
+        index2 = randint(0, len(rank_list)-1)
+
+    return population.get(rank_list[index1]), population.get(rank_list[index2])
+
 # -------------------------------------------------------------------------------------------------
-# class TournamentSelection
+# function tournament_selection
 # -------------------------------------------------------------------------------------------------
-class TournamentSelection:
+def tournament_selection(population, objective, params):
     """
     """
-    def select(self, population, objective, params):
-        tournament_size = 2
-        if "Tournament-Size" in params:
-            tournament_size = params["Tournament-Size"]
+    tournament_size = 2
+    if "Tournament-Size" in params:
+        tournament_size = params["Tournament-Size"]
 
-        index1 = self._select_index(objective, population, tournament_size)
-        index2 = index1
-        
-        while index2 == index1:
-            index2 = self._select_index(objective, population, tournament_size)
-
-        return population.solutions[index1], population.solutions[index2]
-
-
-    def _select_index(self, objective, population, tournament_size):
+    def _select_index(objective, population, tournament_size):
         index_temp      = -1
         index_selected  = randint(0, population.size - 1)
 
-        if objective == ProblemObjective.Maximization: 
+        if objective == ProblemObjective.Maximization:
             for _ in range(0, tournament_size):
                 index_temp = randint(0, population.size - 1)
 
@@ -247,9 +229,19 @@ class TournamentSelection:
                 index_temp = randint(0, population.size - 1)
 
                 if population.solutions[index_temp].fitness < population.solutions[index_selected].fitness:
-                    index_selected = index_temp            
+                    index_selected = index_temp
 
-        return index_selected         
+        return index_selected
+
+
+    index1 = _select_index(objective, population, tournament_size)
+    index2 = index1
+
+    while index2 == index1:
+        index2 = _select_index(objective, population, tournament_size)
+
+    return population.solutions[index1], population.solutions[index2]
+
 
 ###################################################################################################
 # CROSSOVER APPROACHES
