@@ -410,7 +410,7 @@ def order1_crossover(problem, solution1, solution2):
             if j == len(sub) and k == len(sub):
                 break
 
-               return offspring1, offspring2
+        return offspring1, offspring2
 
 ###################################################################################################
 # MUTATION APPROACHES
