@@ -114,7 +114,7 @@ class TravelSalesmanProblem(ProblemTemplate):
     
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
-    def is_admissible(self, solution, debug=False): #<< use this signature in the sub classes, the meta-heuristic 
+    def is_admissible(self, solution, debug=True): #<< use this signature in the sub classes, the meta-heuristic
         """
         Checks if the solution:
             - has unique values equal to the size of the enconding_rule
@@ -125,11 +125,13 @@ class TravelSalesmanProblem(ProblemTemplate):
         if debug:
             result = False
 
-            if (len(set(solution)) == self.encoding_rule["Size"]) & (len(solution) == self.encoding_rule["Size"]) & \
-                    all([True if i in range(1,(self.encoding_rule["Size"]+1)) else False for i in solution]):
+            if (len(set(solution.representation)) == self.encoding_rule["Size"]) & \
+                    (len(solution.representation) == self.encoding_rule["Size"]) & \
+                    all([True if i in range(1,(self.encoding_rule["Size"]+1))
+                         else False for i in solution.representation]):
                 result = True
-
-            print(solution, result)
+            else:
+                print('Error: Solution ' + str(solution.representation) + ' Result ' + str(result))
 
             return result
         else:

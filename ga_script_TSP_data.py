@@ -217,17 +217,17 @@ tsp_problem_instance = TravelSalesmanProblem(
 parent_selection = RouletteWheelSelection()
 
 # # dictionaries to create test directories
-#
-# valid_Init = {initialize_using_random: "std"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
-#
-# valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
-#
-# valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
-#                 # singlepoint_crossover: "singP" should not be used
-# valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-#                   scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
-#
-# valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
+
+valid_Init = {initialize_using_random: "rand"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
+
+valid_Select = {RouletteWheelSelection(): "rol", TournamentSelection(): "tourn", RankSelection(): "rank"}
+
+valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
+                # singlepoint_crossover: "singP" should not be used
+valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
+                  scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
+
+valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 test_init = [initialize_using_random]
 test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
@@ -259,33 +259,32 @@ params = {
         "Replacement-Approach"      : elitism_replacement
     }
 
-dir_labels = {initialize_using_random: "rnd", initialize_using_hc: "hc", initialize_using_sa: "sa",
-              initialize_using_greedy: "greedy", RouletteWheelSelection().select: "rol",
-              TournamentSelection().select: "tourn", RankSelection().select: "rank", cycle_crossover: "cycle",
-              pmx_crossover: "pmx",  order1_crossover: "order1", swap_mutation: "swap", insert_mutation: "insert",
-              inversion_mutation: "invert", scramble_mutation: "scramble", elitism_replacement: "elite",
-              standard_replacement: "std"}
-
-labels_dict = {k: dir_labels.get(v) if k in ["Initialization-Approach", "Selection-Approach", "Crossover-Approach",
-                                     "Mutation-Approach", "Replacement-Approach"] else v for (k, v) in params.items()}
+# dir_labels = {initialize_using_random: "rnd", initialize_using_hc: "hc", initialize_using_sa: "sa",
+#               initialize_using_greedy: "greedy", RouletteWheelSelection().select: "rol",
+#               TournamentSelection().select: "tourn", RankSelection().select: "rank", cycle_crossover: "cycle",
+#               pmx_crossover: "pmx",  order1_crossover: "order1", swap_mutation: "swap", insert_mutation: "insert",
+#               inversion_mutation: "invert", scramble_mutation: "scramble", elitism_replacement: "elite",
+#               standard_replacement: "std"}
+#
+# labels_dict = {k: dir_labels.get(v) if k in ["Initialization-Approach", "Selection-Approach", "Crossover-Approach",
+#                                      "Mutation-Approach", "Replacement-Approach"] else v for (k, v) in params.items()}
 
 def one_combination():
+    # log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
+    #            "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
+    #            "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
 
-    log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
-               "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
-               "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
-
-    # log_name =  (  "I-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
-    #             "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) + #this one return None because of .select method
-    #             "_C-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
-    #             "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
-    #             "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
-    #             "_CP-" + str((params.get("Crossover-Probability"))) +
-    #             "_MP-"   + str((params.get("Mutation-Probability")))+
-    #             "_PS-"   + str((params.get("Population-Size"))) +
-    #             "_Ts-"  + str((params.get("Tournament-Size"))) +
-    #             "_G-"    + str((params.get("Number-of-Generations")))
-    #             )
+    log_name =  ("I-"    + str(valid_Init.get(params.get("Initialization-Approach"))) +
+                "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) + # this one return None because of .select method
+                "_C-"    + str(valid_Xover.get(params.get("Crossover-Approach"))) +
+                "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
+                "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
+                "_CP-"   + str((params.get("Crossover-Probability"))) +
+                "_MP-"   + str((params.get("Mutation-Probability")))+
+                "_PS-"   + str((params.get("Population-Size"))) +
+                "_TS-"   + str((params.get("Tournament-Size"))) +
+                "_G-"    + str((params.get("Number-of-Generations")))
+                )
 
 
     number_of_runs = 3

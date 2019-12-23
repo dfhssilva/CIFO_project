@@ -10,7 +10,7 @@ from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_using_random,
     RouletteWheelSelection, RankSelection, TournamentSelection,
-    singlepoint_crossover, cycle_crossover,
+    singlepoint_crossover, cycle_crossover, order1_crossover,
     single_point_mutation, swap_mutation,
     elitism_replacement, standard_replacement 
 )    
@@ -123,19 +123,19 @@ tsp_problem_instance = TravelSalesmanProblem(
 #--------------------------------------------------------------------------------------------------
 # parent selection object
 #parent_selection = TournamentSelection()
-parent_selection = RankSelection()
+parent_selection = RouletteWheelSelection()
 
 params = {
         # params
         "Population-Size"           : 10,
-        "Number-of-Generations"     : 10,
+        "Number-of-Generations"     : 100,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
         "Initialization-Approach"   : initialize_using_random,
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : cycle_crossover,
+        "Crossover-Approach"        : order1_crossover,
         "Mutation-Aproach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }

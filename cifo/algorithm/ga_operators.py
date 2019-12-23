@@ -116,8 +116,8 @@ class RouletteWheelSelection:
             while index2 == index1:
                 index2 = self._select_index_min(population=population)
         else:
-            print('Objective is not well defined, we will proceed with Minimization')
-            return self.select(population=population, objective='Minimization')
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         return population.get(index1), population.get(index2)
 
@@ -390,20 +390,27 @@ def order1_crossover(problem, solution1, solution2):
     sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
     j = 0
     k = 0
-                # order by which elements must be considered
-    for i in [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, (crosspoint2+1))]:
-        # replace offspring1 if element is not in the middle
-        if solution2.representation[i] not in solution1.representation[crosspoint1:(crosspoint2+1)]:
-            offspring1.representation[sub[j]] = solution2.representation[i]
-            j += 1
-        # replace offspring2 if element is not in the middle
-        if solution1.representation[i] not in solution2.representation[crosspoint1:(crosspoint2+1)]:
-            offspring2.representation[sub[k]] = solution1.representation[i]
-            k += 1
-            if k == len(sub):
+
+    if crosspoint2 == (len(solution1.representation)-1) and crosspoint1 == 0:
+        return solution1, solution2
+    else:
+                        # order by which elements must be considered
+        for i in [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, (crosspoint2+1))]:
+
+            # replace offspring1 if element is not in the middle
+            if solution2.representation[i] not in solution1.representation[crosspoint1:(crosspoint2+1)]:
+                offspring1.representation[sub[j]] = solution2.representation[i]
+                j += 1
+
+            # replace offspring2 if element is not in the middle
+            if solution1.representation[i] not in solution2.representation[crosspoint1:(crosspoint2+1)]:
+                offspring2.representation[sub[k]] = solution1.representation[i]
+                k += 1
+
+            if j == len(sub) and k == len(sub):
                 break
 
-    return offspring1, offspring2
+               return offspring1, offspring2
 
 ###################################################################################################
 # MUTATION APPROACHES
@@ -411,8 +418,8 @@ def order1_crossover(problem, solution1, solution2):
 # -------------------------------------------------------------------------------------------------
 # Singlepoint mutation
 # -----------------------------------------------------------------------------------------------
-def single_point_mutation( problem, solution):
-    singlepoint = randint( 0, len( solution.representation )-1 )
+def single_point_mutation(problem, solution):
+    singlepoint = randint(0, len( solution.representation )-1)
     #print(f" >> singlepoint: {singlepoint}")
 
     encoding    = problem.encoding
