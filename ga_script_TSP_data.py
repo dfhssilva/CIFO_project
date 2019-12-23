@@ -210,26 +210,24 @@ tsp_problem_instance = TravelSalesmanProblem(
     decision_variables = tsp_decision_variables
 )
 
-
 # Configuration
 #--------------------------------------------------------------------------------------------------
 # parent selection object
-#parent_selection = TournamentSelection()
+# parent_selection = TournamentSelection()
 parent_selection = RouletteWheelSelection()
 
-# dictionaries to create test directories
-
-valid_Init = {initialize_using_random: "std"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
-
-valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
-
-valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
-                # singlepoint_crossover: "singP" should not be used
-valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
-
-valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
-
+# # dictionaries to create test directories
+#
+# valid_Init = {initialize_using_random: "std"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
+#
+# valid_Select = {RouletteWheelSelection(): "Rol", TournamentSelection(): "Tourn", RankSelection(): "Rank"}
+#
+# valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
+#                 # singlepoint_crossover: "singP" should not be used
+# valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
+#                   scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
+#
+# valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 test_init = [initialize_using_random]
 test_select = [RouletteWheelSelection().select, TournamentSelection().select, RankSelection().select]
@@ -244,6 +242,8 @@ test_mut_prob = [0.75] # simples
 test_tournament_size = [2] # simples
 
 #initial params
+parent_selection = RouletteWheelSelection()
+
 params = {
         # params
         "Population-Size"           : 10,
@@ -255,29 +255,44 @@ params = {
         "Selection-Approach"        : parent_selection.select,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Aproach"          : swap_mutation,            #TODO: corrigir nome nos vários ficheiros  Approach
+        "Mutation-Approach"          : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
+dir_labels = {initialize_using_random: "rnd", initialize_using_hc: "hc", initialize_using_sa: "sa",
+              initialize_using_greedy: "greedy", RouletteWheelSelection().select: "rol",
+              TournamentSelection().select: "tourn", RankSelection().select: "rank", cycle_crossover: "cycle",
+              pmx_crossover: "pmx",  order1_crossover: "order1", swap_mutation: "swap", insert_mutation: "insert",
+              inversion_mutation: "invert", scramble_mutation: "scramble", elitism_replacement: "elite",
+              standard_replacement: "std"}
+
+labels_dict = {k: dir_labels.get(v) if k in ["Initialization-Approach", "Selection-Approach", "Crossover-Approach",
+                                     "Mutation-Approach", "Replacement-Approach"] else v for (k, v) in params.items()}
+
 def one_combination():
-    log_name =  (  "I-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
-                "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) +
-                "_C-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
-                "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
-                "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
-                "_CP-" + str((params.get("Crossover-Probability"))) +
-                "_MP-"   + str((params.get("Mutation-Probability")))+
-                "_PS-"   + str((params.get("Population-Size"))) +
-                "_Ts-"  + str((params.get("Tournament-Size"))) +
-                "_G-"    + str((params.get("Number-of-Generations")))
-                )
+
+    log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
+               "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
+               "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
+
+    # log_name =  (  "I-"      + str(valid_Init.get(params.get("Initialization-Approach"))) +
+    #             "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) + #this one return None because of .select method
+    #             "_C-"  + str(valid_Xover.get(params.get("Crossover-Approach"))) +
+    #             "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
+    #             "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
+    #             "_CP-" + str((params.get("Crossover-Probability"))) +
+    #             "_MP-"   + str((params.get("Mutation-Probability")))+
+    #             "_PS-"   + str((params.get("Population-Size"))) +
+    #             "_Ts-"  + str((params.get("Tournament-Size"))) +
+    #             "_G-"    + str((params.get("Number-of-Generations")))
+    #             )
 
 
     number_of_runs = 3
 
-    # Run the same configuration many times
+    # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
-    for run in range(1,number_of_runs + 1):
+    for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
             problem_instance = tsp_problem_instance,
@@ -302,9 +317,9 @@ def one_combination():
     from pandas import pandas as pd
     import numpy as np
 
-    #log_dir   = f"./log/{log_name}"
+    log_dir   = f"./log/{log_name}"
     #log_dir = f"C:/Users/Pedro/Google Drive/IMS/1S-Master/CIFO/CIFO Project/Runs/{log_name}"
-    log_dir = f"C:/Users/Pedro/Runs/{log_name}"
+    # log_dir = f"C:/Users/Pedro/Runs/{log_name}"
     if not path.exists(log_dir):
         mkdir(log_dir)
 
@@ -355,7 +370,7 @@ for init in range(len(test_init)):
         for xover in range(len(test_xover)):
             params["Crossover-Approach"]=test_xover[xover]
             for mutation in range(len(test_mutation)):
-                params["Mutation-Aproach"]=test_mutation[mutation]
+                params["Mutation-Approach"]=test_mutation[mutation]
                 for replacement in range(len(test_replacement)):
                     params["Replacement-Approach"]=test_replacement[replacement]
                     for xover_prob in range(len(test_xover_prob)):
@@ -367,7 +382,7 @@ for init in range(len(test_init)):
                                     params["Tournament-Size"]=test_tournament_size[tourn_size]
                                     one_combination()
                             else:
-                                    one_combination()
+                                one_combination()
 
 
 #[sum(sublist) for sublist in itertools.izip(*myListOfLists)]
