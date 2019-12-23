@@ -1,5 +1,5 @@
 from copy import deepcopy
-from pandas import pandas as pd
+import pandas as pd
 import os
 
 
@@ -19,13 +19,13 @@ class GeneticAlgorithmLogger:
     #
     #----------------------------------------------------------------------------------------------    
     def add(self, generation, solution):
-        self._runs.append( self._run )
-        self._generations.append( generation )
-        self._fitness.append( solution.fitness)
+        self._runs.append(self._run)
+        self._generations.append(generation)
+        self._fitness.append(solution.fitness) # adds the fittest solution of each generation
 
     #
     #----------------------------------------------------------------------------------------------  
-    def save( self ):
+    def save(self):
         
         log_dir   = f"./log/{self._log_name}" 
         file_name = f"/run_{self._run}.xlsx"  

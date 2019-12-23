@@ -19,7 +19,7 @@ from cifo.util.observer import LocalSearchObserver
 from random import randint
 import numpy as np
 
-def plot_performance_chart( df ):
+def plot_performance_chart(df):
     import plotly.graph_objects as go
     import plotly.express as px
     from plotly.subplots import make_subplots
@@ -207,7 +207,7 @@ tsp_decision_variables = {
 
 # Problem Instance
 tsp_problem_instance = TravelSalesmanProblem(
-    decision_variables = tsp_decision_variables
+    decision_variables=tsp_decision_variables
 )
 
 # Configuration
@@ -280,7 +280,7 @@ def one_combination():
                 "_M-"    + str(valid_Mutation.get(params.get("Mutation-Aproach"))) +
                 "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
                 "_CP-"   + str((params.get("Crossover-Probability"))) +
-                "_MP-"   + str((params.get("Mutation-Probability")))+
+                "_MP-"   + str((params.get("Mutation-Probability"))) +
                 "_PS-"   + str((params.get("Population-Size"))) +
                 "_TS-"   + str((params.get("Tournament-Size"))) +
                 "_G-"    + str((params.get("Number-of-Generations")))
@@ -294,10 +294,10 @@ def one_combination():
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
-            problem_instance = tsp_problem_instance,
-            params = params,
-            run = run,
-            log_name = log_name
+            problem_instance=tsp_problem_instance,
+            params=params,
+            run=run,
+            log_name=log_name
             )
 
         ga_observer = LocalSearchObserver(ga)
@@ -333,52 +333,52 @@ def one_combination():
     for log_name in log_files:
         if log_name.startswith('run_'):
             df = pd.read_excel(log_dir + "/" + log_name)
-            fitness_runs.append(list ( df.Fitness ))
+            fitness_runs.append(list(df.Fitness))
             columns_name.append(log_name.strip(".xslx"))
             counter += 1
 
             if not generations:
-                generations = list( df["Generation"] )
+                generations = list(df["Generation"])
 
     #fitness_sum = [sum(x) for x in zip(*fitness_runs)]
 
-    df = pd.DataFrame(list(zip(*fitness_runs)), columns = columns_name)
+    df = pd.DataFrame(list(zip(*fitness_runs)), columns=columns_name)
 
-    fitness_sd   = list( df.std( axis = 1 ) )
-    fitness_mean = list( df.mean( axis = 1 ) )
+    fitness_sd   = list(df.std(axis=1))
+    fitness_mean = list(df.mean(axis=1))
 
     #df["Fitness_Sum"] = fitness_sum
     df["Generation"]  = generations
     df["Fitness_SD"]  = fitness_sd
     df["Fitness_Mean"]  = fitness_mean
-    df["Fitness_Lower"]  = df["Fitness_Mean"] + df["Fitness_SD"]
-    df["Fitness_Upper"]  = df["Fitness_Mean"] - df["Fitness_SD"]
+    df["Fitness_Lower"] = df["Fitness_Mean"] + 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
+    df["Fitness_Upper"] = df["Fitness_Mean"] - 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
 
 
-    if not path.exists( log_dir ):
-        mkdir( log_dir )
+    if not path.exists(log_dir):
+        mkdir(log_dir)
 
-    df.to_excel( log_dir + "/all.xlsx", index = False, encoding = 'utf-8' )
+    df.to_excel(log_dir + "/all.xlsx", index=False, encoding='utf-8')
 
-#plot_performance_chart( df )
+#plot_performance_chart(df)
 
 for init in range(len(test_init)):
-    params["Initialization-Approach"]=test_init[init]
+    params["Initialization-Approach"] = test_init[init]
     for select in range(len(test_select)):
-        params["Selection-Approach"]=test_select[select]
+        params["Selection-Approach"] = test_select[select]
         for xover in range(len(test_xover)):
-            params["Crossover-Approach"]=test_xover[xover]
+            params["Crossover-Approach"] = test_xover[xover]
             for mutation in range(len(test_mutation)):
-                params["Mutation-Approach"]=test_mutation[mutation]
+                params["Mutation-Approach"] = test_mutation[mutation]
                 for replacement in range(len(test_replacement)):
-                    params["Replacement-Approach"]=test_replacement[replacement]
+                    params["Replacement-Approach"] = test_replacement[replacement]
                     for xover_prob in range(len(test_xover_prob)):
-                        params["Crossover-Probability"]=test_xover_prob[xover_prob]
+                        params["Crossover-Probability"] = test_xover_prob[xover_prob]
                         for mut_prob in range(len(test_mut_prob)):
-                            params["Mutation-Probability"]=test_mut_prob[mut_prob]
-                            if str(test_select[select])==str(TournamentSelection().select):
+                            params["Mutation-Probability"] = test_mut_prob[mut_prob]
+                            if str(test_select[select]) == str(TournamentSelection().select):
                                 for tourn_size in range(len(test_tournament_size)):
-                                    params["Tournament-Size"]=test_tournament_size[tourn_size]
+                                    params["Tournament-Size"] = test_tournament_size[tourn_size]
                                     one_combination()
                             else:
                                 one_combination()

@@ -4,6 +4,7 @@ from copy import deepcopy
 from cifo.problem.objective import ProblemObjective
 from cifo.problem.solution import EncodingDataType
 from cifo.problem.population import Population
+from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
 
 
 ###################################################################################################
@@ -521,6 +522,14 @@ def elitism_replacement(problem, current_population, new_population):
            new_population.solutions[0] = current_population.solutions[-1]
 
     return deepcopy(new_population)
+
+
+###################################################################################################
+# SAVE THE BEST SOLUTION
+####################################################################################################
+def best_solution(method, population):
+    return
+
 
 ###################################################################################################
 # HELPER FUNCTIONS

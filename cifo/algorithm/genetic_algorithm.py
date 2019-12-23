@@ -288,7 +288,7 @@ class GeneticAlgorithm:
             "fittest"   : self._fittest
         }
 
-        if message == "" :
+        if message == "":
             self._logger.add( 
                 generation = self._generation, 
                 solution = self._fittest 
