@@ -287,7 +287,7 @@ def one_combination():
                 )
 
 
-    number_of_runs = 3
+    number_of_runs = 50
 
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
