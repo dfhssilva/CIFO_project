@@ -273,9 +273,19 @@ def one_combination():
     # log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
     #            "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
     #            "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
+    from os import listdir, path, mkdir
+    from os.path import isfile, join
+    from pandas import pandas as pd
+
+    log_base_dir="./log/"       #Base dir for log of initial runs
+    if not path.exists(log_base_dir):
+        mkdir(log_base_dir)
+    all_dir = "./log_all/"      #Base dir for resume the resume files
+    if not path.exists(all_dir):
+        mkdir(all_dir)
 
     log_name =  ("I-"    + str(valid_Init.get(params.get("Initialization-Approach"))) +
-                "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) + # this one return None because of .select method
+                "_S-"    + str(valid_Select.get(params.get("Selection-Approach"))) +
                 "_C-"    + str(valid_Xover.get(params.get("Crossover-Approach"))) +
                 "_M-"    + str(valid_Mutation.get(params.get("Mutation-Approach"))) +
                 "_R-"    + str(valid_Replacement.get(params.get("Replacement-Approach"))) +
@@ -285,19 +295,30 @@ def one_combination():
                 "_TS-"   + str((params.get("Tournament-Size"))) +
                 "_G-"    + str((params.get("Number-of-Generations")))
                 )
+    resume_name= f"{all_dir}{log_name}.xlsx"
 
+    # checks if the same run as already been performed, if so, skips it.
+    ------------------
+    log_dir = str(log_base_dir) + str(log_name)
+    if not path.exists(log_dir):
+       mkdir(log_dir)
 
-    number_of_runs = 50
+    runs_made = [f for f in listdir(all_dir) if isfile(join(all_dir, f))]
+    if (str(log_name)+".xlsx") in runs_made:
+        print (f"Run {log_name}.xlsx already made, skipping")
+        return
 
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
+    number_of_runs = 2
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
             problem_instance=tsp_problem_instance,
             params=params,
             run=run,
-            log_name=log_name
+            log_name=log_name,
+            log_dir=log_base_dir
             )
 
         ga_observer = LocalSearchObserver(ga)
@@ -307,21 +328,6 @@ def one_combination():
 
     # Consolidate the runs
     #--------------------------------------------------------------------------------------------------
-
-    # save the config
-
-    # consolidate the runs information
-    from os import listdir, path, mkdir
-    from os.path import isfile, join
-    from pandas import pandas as pd
-    import numpy as np
-
-    log_dir   = f"./log/{log_name}"
-    all_dir   = "./log_all/"
-    #log_dir = f"C:/Users/Pedro/Google Drive/IMS/1S-Master/CIFO/CIFO Project/Runs/{log_name}"
-    # log_dir = f"C:/Users/Pedro/Runs/{log_name}"
-    if not path.exists(log_dir):
-        mkdir(log_dir)
 
 
     log_files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
@@ -356,13 +362,6 @@ def one_combination():
     df["Fitness_Lower"] = df["Fitness_Mean"] - 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
     df["Fitness_Upper"] = df["Fitness_Mean"] + 1.96 * df["Fitness_SD"] / (number_of_runs ** 0.5)
 
-
-    if not path.exists(log_dir):
-        mkdir(log_dir)
-    if not path.exists(all_dir):
-        mkdir(all_dir)
-
-
     #df.to_excel(log_dir + "/all.xlsx", index=False, encoding='utf-8')
     log_name = ("I-" + str(valid_Init.get(params.get("Initialization-Approach"))) +
                 "_S-" + str(
@@ -380,7 +379,9 @@ def one_combination():
     df.to_excel(all_dir + f"{log_name}.xlsx", index=False, encoding='utf-8')
 
 #plot_performance_chart(df)
-
+##################################################################################################
+#       RUNS Through the Several list of possible parameters
+##################################################################################################
 for init in range(len(test_init)):
     params["Initialization-Approach"] = test_init[init]
     for select in range(len(test_select)):

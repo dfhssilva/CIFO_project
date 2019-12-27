@@ -81,7 +81,7 @@ class GeneticAlgorithm:
     """
     # Constructor
     # ---------------------------------------------------------------------------------------------
-    def __init__(self, problem_instance, params = default_params, run = 0, log_name = "temp"):
+    def __init__(self, problem_instance, params = default_params, run = 0, log_name = "temp",log_dir="./log/"):
         self._text              = ""
         self._generation        = 0
         self._run               = run
@@ -92,7 +92,7 @@ class GeneticAlgorithm:
 
         self._parse_params(params)
 
-        self._logger = GeneticAlgorithmLogger(log_name, run)
+        self._logger = GeneticAlgorithmLogger(log_dir, log_name, run)
 
         self._observers  = []  
 
@@ -150,7 +150,7 @@ class GeneticAlgorithm:
                     offspring1.id = [self._generation, i]
                     i += 1
                     offspring2.id = [self._generation, i]
-                    i += 2
+                    i += 2          #TODO:check if +=2 ???? why not +=1
 
                 # 2.1.3. Try Apply Mutation (depends on the mutation probability)
                 if self.apply_mutation: 
@@ -214,7 +214,7 @@ class GeneticAlgorithm:
         if "Mutation-Probability" in params:
             self._mutation_probability = params[ "Mutation-Probability" ]
 
-        self._number_of_generations       = 5
+        self._number_of_generations = 5
         if "Number-of-Generations" in params:
             self._number_of_generations = params[ "Number-of-Generations" ]
         

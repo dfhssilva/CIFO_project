@@ -9,8 +9,9 @@ class GeneticAlgorithmLogger:
     """
     #
     #----------------------------------------------------------------------------------------------
-    def __init__(self, log_name, run):
+    def __init__(self, log_dir, log_name, run):
         self._log_name      = log_name
+        self._log_dir       = log_dir
         self._run           = run
         self._runs          = []
         self._generations   = []
@@ -27,10 +28,10 @@ class GeneticAlgorithmLogger:
     #----------------------------------------------------------------------------------------------  
     def save(self):
         
-        log_dir   = f"./log/{self._log_name}" 
+        final_log_dir   = str(self._log_dir) + str(self._log_name)
         file_name = f"/run_{self._run}.xlsx"  
         
-        print(f'log: {log_dir + file_name}')
+        print(f'log: {final_log_dir + file_name}')
 
         df = pd.DataFrame(
             list(
@@ -43,7 +44,7 @@ class GeneticAlgorithmLogger:
             columns =['Run', 'Generation', 'Fitness']
         )
 
-        if not os.path.exists(log_dir):
-            os.mkdir(log_dir)
+        if not os.path.exists(final_log_dir):
+            os.mkdir(final_log_dir)
 
-        df.to_excel(log_dir + file_name, index = False, encoding = 'utf-8')
+        df.to_excel(final_log_dir + file_name, index = False, encoding = 'utf-8')
