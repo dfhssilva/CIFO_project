@@ -55,20 +55,72 @@ def initialize_using_random(problem, population_size):
 def initialize_using_hc(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Hill Climbing
-    """
 
-    pass
+    Required:
+    @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
+    @ population_size - to define the size of the population to be returned.
+    """
+    solution_list = []
+
+    # generate a population of admissible solutions (individuals)
+    for i in range(0, population_size):
+        s = problem.build_solution(method='Hill Climbing')
+
+        # check if the solution is admissible
+        while not problem.is_admissible(s):
+            s = problem.build_solution(method='Hill Climbing')
+
+        s.id = [0, i]
+
+        problem.evaluate_solution(s)
+
+        solution_list.append(s)
+
+    population = Population( 
+        problem = problem,
+        maximum_size = population_size, 
+        solution_list = solution_list
+    )
+
+    return population
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Simulated Annealing
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Hill Climbing
+#TODO: OPTIONAL, implement a initialization based on Simulated Annealing
 # Remark: remember, you will need a neighborhood function for each problem
 def initialize_using_sa(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Simulated Annealing
+
+    Required:
+    @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
+    @ population_size - to define the size of the population to be returned.
     """
-    pass
+    solution_list = []
+
+    # generate a population of admissible solutions (individuals)
+    for i in range(0, population_size):
+        s = problem.build_solution(method='Simulated Annealing')
+
+        # check if the solution is admissible
+        while not problem.is_admissible(s):
+            s = problem.build_solution(method='Simulated Annealing')
+
+        s.id = [0, i]
+
+        problem.evaluate_solution(s)
+
+        solution_list.append(s)
+
+    population = Population(
+        problem=problem,
+        maximum_size=population_size,
+        solution_list=solution_list
+    )
+
+    return population
+
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Greedy Method
@@ -78,8 +130,34 @@ def initialize_using_sa(problem, population_size):
 def initialize_using_greedy(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using a Greedy Algorithm
+
+    Required:
+    @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
+    @ population_size - to define the size of the population to be returned.
     """
-    pass
+    solution_list = []
+
+    # generate a population of admissible solutions (individuals)
+    for i in range(0, population_size):
+        s = problem.build_solution(method='Greedy')
+
+        # check if the solution is admissible
+        while not problem.is_admissible(s):
+            s = problem.build_solution(method='Greedy')
+
+        s.id = [0, i]
+
+        problem.evaluate_solution(s)
+
+        solution_list.append(s)
+
+    population = Population(
+        problem=problem,
+        maximum_size=population_size,
+        solution_list=solution_list
+    )
+
+    return population
 
 ###################################################################################################
 # SELECTION APPROACHES
@@ -242,7 +320,7 @@ def tournament_selection(population, objective, params):
 
     return population.solutions[index1], population.solutions[index2]
 
-
+# TODO: uniform selection
 ###################################################################################################
 # CROSSOVER APPROACHES
 ###################################################################################################
@@ -405,6 +483,9 @@ def order1_crossover(problem, solution1, solution2):
 
         return offspring1, offspring2
 
+# TODO: use more than one crossovers in the same run
+# TODO: heuristic crossover
+# TODO: edge crossover
 ###################################################################################################
 # MUTATION APPROACHES
 ###################################################################################################
@@ -491,7 +572,7 @@ def scramble_mutation(problem, solution):
     return solution
 
 
-#TODO: Implement Greedy Swap mutation (SE TIVERMOS TEMPO)
+#TODO: Implement Greedy Swap mutation
 ###################################################################################################
 # REPLACEMENT APPROACHES
 ###################################################################################################
@@ -514,14 +595,6 @@ def elitism_replacement(problem, current_population, new_population):
            new_population.solutions[0] = current_population.solutions[-1]
 
     return deepcopy(new_population)
-
-
-###################################################################################################
-# SAVE THE BEST SOLUTION
-####################################################################################################
-def best_solution(method, population):
-    return
-
 
 ###################################################################################################
 # HELPER FUNCTIONS

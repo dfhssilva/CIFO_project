@@ -4,7 +4,7 @@
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
 from cifo.algorithm.hill_climbing import HillClimbing
 from cifo.custom_problem.travel_salesman_problem import (
-    TravelSalesmanProblem, tsp_decision_variables_example, tsp_bitflip_get_neighbors # MUDAAAAAAAAAARR !!!!!!!!!!!!!
+    TravelSalesmanProblem, tsp_decision_variables_example, tsp_get_neighbors
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
@@ -298,7 +298,7 @@ def one_combination():
     resume_name= f"{all_dir}{log_name}.xlsx"
 
     # checks if the same run as already been performed, if so, skips it.
-    ------------------
+    # -----------------
     log_dir = str(log_base_dir) + str(log_name)
     if not path.exists(log_dir):
        mkdir(log_dir)

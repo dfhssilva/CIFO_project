@@ -81,7 +81,7 @@ class GeneticAlgorithm:
     """
     # Constructor
     # ---------------------------------------------------------------------------------------------
-    def __init__(self, problem_instance, params = default_params, run = 0, log_name = "temp",log_dir="./log/"):
+    def __init__(self, problem_instance, params = default_params, run = 0, log_name = "temp", log_dir="./log/"):
         self._text              = ""
         self._generation        = 0
         self._run               = run
@@ -89,6 +89,7 @@ class GeneticAlgorithm:
         self._problem_instance  = problem_instance
         self._population        = None
         self._observers         = []
+        self._best_solution     = None
 
         self._parse_params(params)
 
@@ -129,21 +130,22 @@ class GeneticAlgorithm:
         # 1. Initial population
         self._population = self._initialize(problem, self._population_size)
         self._fittest = self._population.fittest
+        self._best_solution = self._fittest
 
         self._notify()
 
         #2. Repeat n generations )(#1 loop )
-        for self._generation in range( 1, self._number_of_generations + 1):
+        for self._generation in range(1, self._number_of_generations + 1):
             
-            new_population = Population( problem = problem, maximum_size = self._population_size, solution_list=[] )
+            new_population = Population(problem = problem, maximum_size = self._population_size, solution_list=[])
             i = 0
 
             # 2.1. Repeat until generate the next generation (#2 loop )
             while new_population.has_space:
                 # 2.1.1. Selection
-                parent1, parent2 = select( self._population, problem.objective, self._params )
-                offspring1 = deepcopy(parent1) # parent1.clone()
-                offspring2 = deepcopy(parent2) # parent2.clone()
+                parent1, parent2 = select(self._population, problem.objective, self._params)
+                offspring1 = deepcopy(parent1)  # parent1.clone()
+                offspring2 = deepcopy(parent2)  # parent2.clone()
                 # 2.1.2. Try Apply Crossover (depends on the crossover probability)
                 if self.apply_crossover: 
                     offspring1, offspring2 = cross(problem, parent1, parent2)
@@ -154,27 +156,30 @@ class GeneticAlgorithm:
 
                 # 2.1.3. Try Apply Mutation (depends on the mutation probability)
                 if self.apply_mutation: 
-                    offspring1 = mutate( problem, offspring1 )  
+                    offspring1 = mutate(problem, offspring1)
                     offspring1.id = [self._generation, i]
                     i += 1
                 if self.apply_mutation: 
-                    offspring2 = mutate( problem, offspring2 )   
+                    offspring2 = mutate(problem, offspring2)
                     offspring2.id = [self._generation, i]
                     i += 1
 
                 # add the offsprings in the new population (New Generation)
-                if new_population.has_space and is_admissible( offspring1 ):
-                    problem.evaluate_solution ( offspring1 )
-                    new_population.solutions.append( offspring1 )
+                if new_population.has_space and is_admissible(offspring1):
+                    problem.evaluate_solution(offspring1)
+                    new_population.solutions.append(offspring1)
                 
-                if new_population.has_space and is_admissible( offspring2 ): 
-                    problem.evaluate_solution( offspring2 )
-                    new_population.solutions.append( offspring2 )
+                if new_population.has_space and is_admissible(offspring2):
+                    problem.evaluate_solution(offspring2)
+                    new_population.solutions.append(offspring2)
                     #print(f'Added O2 - {offspring2.id}-{offspring2.representation}')
 
-            self._population = replace(problem, self._population, new_population )
+            self._population = replace(problem, self._population, new_population)
 
             self._fittest = self._population.fittest
+
+            self.find_best_solution()
+
             self._notify()
 
         self._notify(message = "Fittest Solution")
@@ -185,7 +190,7 @@ class GeneticAlgorithm:
 
 
     @property
-    def apply_crossover( self ):
+    def apply_crossover(self):
         chance = random()
         return chance < self._crossover_probability
 
@@ -229,7 +234,7 @@ class GeneticAlgorithm:
         # Selection
         self._selection_approach = None
         if "Selection-Approach" in params:
-            self._selection_approach = params[ "Selection-Approach" ]
+            self._selection_approach = params["Selection-Approach"]
         else:
             print("Undefined Selection approach. The default will be used.")
             parent_selection = tournament_selection()
@@ -238,12 +243,12 @@ class GeneticAlgorithm:
         # tournament size
         self._tournament_size = 5
         if "Tournament-Size" in params:
-            self._tournament_size = params[ "Tournament-Size" ]
+            self._tournament_size = params["Tournament-Size"]
 
         # Crossover
         self._crossover_approach = None
         if "Crossover-Approach" in params:
-            self._crossover_approach =  params[ "Crossover-Approach" ]
+            self._crossover_approach = params["Crossover-Approach"]
         else:
             print("Undefined Crossover-Approach. The default will be used.")
             self._crossover_approach = singlepoint_crossover
@@ -251,7 +256,7 @@ class GeneticAlgorithm:
         # Mutation
         self._mutation_approach = None
         if "Mutation-Approach" in params:
-            self._mutation_approach = params[ "Mutation-Approach" ]
+            self._mutation_approach = params["Mutation-Approach"]
         else:
             print("Undefined Mutation-Approach. The default will be used.")
             self._mutation_approach = single_point_mutation
@@ -259,7 +264,7 @@ class GeneticAlgorithm:
         # Replacement
         self._replacement_approach = None
         if "Replacement-Approach" in params:
-            self._replacement_approach = params[ "Replacement-Approach" ]
+            self._replacement_approach = params["Replacement-Approach"]
         else:
             print("Undefined Replacement-Approach. The default will be used.")
             self._replacement_approach = elitism_replacement
@@ -302,7 +307,7 @@ class GeneticAlgorithm:
 
     # get state
     #----------------------------------------------------------------------------------------------
-    def get_state( self ):
+    def get_state(self):
         return self._state
 
     
@@ -320,4 +325,12 @@ class GeneticAlgorithm:
     #
     #    return weight
 
+    def find_best_solution(self):
+        if self._fittest.fitness < self._best_solution.fitness:
+            self._best_solution = self._fittest
 
+        print('Fittest pop: ' + str(self._fittest))
+        print('Best solution: ' + str(self._best_solution))
+        print('Best solution fitness: ' + str(self._best_solution.fitness))
+
+    # TODO: best solution for maximization

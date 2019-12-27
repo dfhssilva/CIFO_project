@@ -15,10 +15,11 @@ CIFO - Computation Intelligence for Optimization
 Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 """
 # -------------------------------------------------------------------------------------------------
+from copy import deepcopy
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
-from cifo.util.observer            import LocalSearchMessage
+from cifo.util.observer     import LocalSearchMessage
 
 class HillClimbing:
     """
@@ -39,7 +40,7 @@ class HillClimbing:
     """
     # Constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, problem_instance, neighborhood_function, feedback = None, params = {} ): 
+    def __init__(self, problem_instance, neighborhood_function, feedback=None, params={}):
         """
         Hill Climbing Constructor
 
@@ -79,7 +80,8 @@ class HillClimbing:
     
         # parse params
         # Default params: 
-        # {"Maximum-Iterations": 10, "Stop-Conditions":"Classical", "Target-Fitness" : None, "Neighborhood-Size" = 0 } 
+        # {"Maximum-Iterations": 1000, "Stop-Conditions":"Classical", "Target-Fitness" : None, "Neighborhood-Size": 0,
+        # "N-Changes": 1}
         # Motivation: Enables the user to change some Hill Climbing Behaviors
         # (Flexibility)
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,20 +100,25 @@ class HillClimbing:
             self._check_stop_conditions = self._check_alternative1_stop_conditions
         
         self._target_fitness = None
-        if "Target-Fitness" in params: self._target_fitness = params["Target-Fitness" ]
+        if "Target-Fitness" in params: self._target_fitness = params["Target-Fitness"]
 
         self._description = f"Maximum-Iterations: {self._max_iterations} | Stop-Condition: {self._stop_condition_approach} "
 
         # neighborhood size
         self._neighborhood_size = 0
         if "Neighborhood-Size" in params: 
-            self._neighborhood_size = params["Neighborhood-Size" ]
+            self._neighborhood_size = params["Neighborhood-Size"]
+
+        # number of changes (n_changes): number of iterations of the neighborhood defining function
+        self._n_changes = 1
+        if "N-Changes" in params:
+            self._n_changes = params["N-Changes"]
 
         # Prepare the internal methods for multi-objective / single-objective:
         # Motivation: Avoid in each selection step check if it is multi-single or min/max 
         # (Optimization)
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        if self._problem_instance.is_multi_objective:
+        if self._problem_instance.objective == ProblemObjective.MultiObjective:
             # Multi-objective
             print("NOT IMPLEMENTED.")
         else: 
@@ -142,7 +149,7 @@ class HillClimbing:
         3: Return the best solution
 
         """
-        self._notify( message = LocalSearchMessage.Started)
+        self._notify(message=LocalSearchMessage.Started)
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         searching = True
@@ -153,21 +160,22 @@ class HillClimbing:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # 1. Initialize
         self._initialize()
-        self._notify(message = LocalSearchMessage.Initialized)
+        self._notify(message=LocalSearchMessage.Initialized)
 
         # 2. Repeat while exists a better neighbor
         self._iteration = 0
         while searching:
             self._iteration += 1
+            print('iteration: ' + str(self._iteration))
             # 2.1: Get the best neighbor
             self._get_best_neighbor()
             # 2.2: Select the best, between the current best and best neighbor
             changed = self._select()
             # 2.3: Check stop conditions
-            searching = self._check_stop_conditions ( changed ) 
+            searching = self._check_stop_conditions(changed)
         
         #3: Return the best solution
-        self._notify(message = "FINISHED")
+        self._notify(message="FINISHED")
         return self._solution
 
 
@@ -179,16 +187,16 @@ class HillClimbing:
         """
         self._solution = self._problem_instance.build_solution()
 
-        while not self._problem_instance.is_admissible( self._solution ):
+        while not self._problem_instance.is_admissible(self._solution):
             self._solution = self._problem_instance.build_solution()
         
-        self._problem_instance.evaluate_solution( self._solution, feedback = self._feedback)
+        self._problem_instance.evaluate_solution(self._solution, feedback=self._feedback)
 
         
         
     # _get_best_neighbor for maximization
     #----------------------------------------------------------------------------------------------
-    def _get_best_neighbor_maximization(self ):
+    def _get_best_neighbor_maximization(self):
         """
         Get the best neighbor of the neighborhood : MAXIMIZATION
         """
@@ -197,17 +205,16 @@ class HillClimbing:
         neighborhood =  self._get_neighbors( 
             solution = self._solution, 
             problem  = self._problem_instance, 
-            neighborhood_size = self._neighborhood_size )
-
+            neighborhood_size = self._neighborhood_size,
+            n_changes = self._n_changes)
         best_neighbor = None
 
         # Find the best neighbor in neighborhood of the current solution
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         for neighbor in neighborhood:
-
-            if self._problem_instance.is_admissible( neighbor ):
+            if self._problem_instance.is_admissible(neighbor):
                 self._problem_instance.evaluate_solution( 
-                    solution =  neighbor, 
+                    solution = neighbor,
                     feedback = self._feedback
                     )
 
@@ -230,23 +237,23 @@ class HillClimbing:
         neighborhood =  self._get_neighbors( 
             solution = self._solution, 
             problem  = self._problem_instance, 
-            neighborhood_size = self._neighborhood_size )
+            neighborhood_size = self._neighborhood_size,
+            n_changes = self._n_changes)
 
         best_neighbor = None
 
         # Find the best neighbor in neighborhood of the current solution
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         for neighbor in neighborhood:
-            self._problem_instance.evaluate_solution( solution = neighbor, feedback = self._feedback)
-
-            if best_neighbor == None: 
-                best_neighbor = neighbor
+            self._problem_instance.evaluate_solution(solution=neighbor, feedback=self._feedback)
+            if best_neighbor is None:
+                best_neighbor = deepcopy(neighbor)
             else:
                 if neighbor.fitness <= best_neighbor.fitness:
-                    best_neighbor = neighbor
-        
-        self._neighbor = best_neighbor
+                    best_neighbor = deepcopy(neighbor)
 
+        self._neighbor = best_neighbor
+        print('neighbor fitness: ' + str(self._neighbor.fitness))
     # _select for minimization
     #----------------------------------------------------------------------------------------------    
     def _select_minimization(self):
@@ -259,10 +266,10 @@ class HillClimbing:
         """
         if self._neighbor.fitness <= self._solution.fitness:
             self._solution = self._neighbor
-            self._notify(message = LocalSearchMessage.ReplacementAccepted) 
+            self._notify(message=LocalSearchMessage.ReplacementAccepted)
             return True
 
-        self._notify(message = LocalSearchMessage.ReplacementRejected)
+        self._notify(message=LocalSearchMessage.ReplacementRejected)
         return False
 
     # _select for maximization
@@ -277,41 +284,41 @@ class HillClimbing:
         """
         if self._neighbor.fitness >= self._solution.fitness:
             self._solution = self._neighbor
-            self._notify(message = LocalSearchMessage.ReplacementAccepted) 
+            self._notify(message=LocalSearchMessage.ReplacementAccepted)
             return True
 
-        self._notify(message = LocalSearchMessage.ReplacementRejected)
+        self._notify(message=LocalSearchMessage.ReplacementRejected)
         return False
     
     # _check_classical_stop_conditions
     #----------------------------------------------------------------------------------------------  
-    def _check_classical_stop_conditions( self, changed ):
+    def _check_classical_stop_conditions(self, changed):
         """
         Classical - Stops, when there is no better neighbor or the number of max iterations was achieved.
         """
         searching = changed and (self._iteration < self._max_iterations) 
-        if not changed : 
-            self._notify( message = LocalSearchMessage.StoppedPrematurely )
+        if not changed:
+            self._notify(message=LocalSearchMessage.StoppedPrematurely)
         elif not searching: 
-            self._notify( message = LocalSearchMessage.Stopped )
+            self._notify(message=LocalSearchMessage.Stopped)
         elif self._target_fitness:
             if self._solution.fitness >= self._target_fitness:
-                self._notify( message = LocalSearchMessage.StoppedTargetAchieved )
+                self._notify(message=LocalSearchMessage.StoppedTargetAchieved)
                 return False
-        return  searching
+        return searching
 
     # _select for maximization
     #----------------------------------------------------------------------------------------------  
-    def _check_alternative1_stop_conditions( self, changed ):
+    def _check_alternative1_stop_conditions(self, changed):
         """
         Alternative 1 - Stops when the number of max iterations was achieved. It can be good when the neighborhood can be different for the same solution   
         """
         searching = self._iteration < self._max_iterations
-        if not searching : 
-            self._notify( message = LocalSearchMessage.Stopped )
+        if not searching:
+            self._notify(message=LocalSearchMessage.Stopped)
         elif self._target_fitness:
             if self._solution.fitness >= self._target_fitness:
-                self._notify( message = LocalSearchMessage.StoppedTargetAchieved )
+                self._notify(message=LocalSearchMessage.StoppedTargetAchieved)
                 return False
         return searching
 
@@ -347,22 +354,22 @@ class HillClimbing:
     
     # _select for maximization
     #----------------------------------------------------------------------------------------------
-    def get_state( self ):
+    def get_state(self):
         return self._state 
 
     # _select for maximization
     #----------------------------------------------------------------------------------------------
     def register_observer(self, observer):
-        self._observers.append( observer )
+        self._observers.append(observer)
 
     # _select for maximization
     #----------------------------------------------------------------------------------------------
-    def unregister_observer(self, observer ):
-        self._observers.remove( observer) 
+    def unregister_observer(self, observer):
+        self._observers.remove(observer)
 
     # _select for maximization
     #----------------------------------------------------------------------------------------------
-    def _notify( self, message, neighbors = None ):
+    def _notify( self, message, neighbors=None):
 
         self._state = {
             "iteration" : self._iteration,

@@ -8,7 +8,7 @@ class Population:
     Population - 
     """
     # ---------------------------------------------------------------------------------------------
-    def __init__(self, problem , maximum_size, solution_list):
+    def __init__(self, problem, maximum_size, solution_list):
         self._problem   = problem
         self._objective = problem.objective
         self._max_size  = maximum_size
@@ -20,7 +20,7 @@ class Population:
     @property
     def fittest(self):
         self.sort()
-        if len(self._list) > 0 :
+        if len(self._list) > 0:
             return self._list[-1]
         return None
 

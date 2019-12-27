@@ -1,10 +1,12 @@
 from copy import deepcopy
-from random import choice, randint, shuffle
+from random import choice, randint, shuffle, sample
 import numpy as np
+import itertools
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
 from cifo.problem.solution import LinearSolution, Encoding
+from cifo.algorithm.hill_climbing import HillClimbing
 
 tsp_encoding_rule = {
     "Size"         : -1, # Number of the cities from the distance matrix
@@ -72,20 +74,20 @@ class TravelSalesmanProblem(ProblemTemplate):
         # Call the Parent-class constructor to store these values and to execute any other logic to be implemented by
         # the constructor of the super-class
         super().__init__(
-            decision_variables = decision_variables, 
-            constraints = constraints, 
+            decision_variables = decision_variables,
+            constraints = constraints,
             encoding_rule = encoding_rule
         )
 
         # 1. Define the Name of the Problem
         self._name = "Travel Salesman Problem"
-        
+
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Minimization
 
     # Build Solution for Travel Salesman Problem
     #----------------------------------------------------------------------------------------------
-    def build_solution(self, method = 'Random'):
+    def build_solution(self, method='Random'):
         """
         Creates a initial solution and returns it according to the enconding rule and the chosen method from the
         following available methods:
@@ -94,11 +96,11 @@ class TravelSalesmanProblem(ProblemTemplate):
             - 'Random' (default method)
             - 'Greedy'
         """
-        if method == 'Random': # shuffles the list and then instanciates it as a Linear Solution
+        if method == 'Random':  # shuffles the list and then instanciates it as a Linear Solution
             encoding_data = self._encoding.encoding_data
 
             solution_representation = encoding_data.copy()
-            np.random.shuffle(solution_representation) # inplace suffle
+            np.random.shuffle(solution_representation)  # inplace suffle
 
             solution = LinearSolution(
                 representation = solution_representation,
@@ -106,12 +108,23 @@ class TravelSalesmanProblem(ProblemTemplate):
             )
 
             return solution
+        elif method == 'Hill Climbing':
+
+            solution = HillClimbing(
+                        problem_instance = self,
+                        neighborhood_function = tsp_get_neighbors
+                        ).search()
+            #TODO: allow changes in params for Hill Climbing
+
+            return solution
+        #elif method == 'Simulated Annealing': TODO: build SA initialization
+        #    return solution
         else:
             print('Please choose one of these methods: Hill Climbing, Simulated Annealing or Random. It will use the '
                   'Random method')
             return self.build_solution()
 
-    
+
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
     def is_admissible(self, solution, debug=True): #<< use this signature in the sub classes, the meta-heuristic
@@ -159,12 +172,39 @@ class TravelSalesmanProblem(ProblemTemplate):
         solution._fitness = fitness
         solution._is_fitness_calculated = True
 
-        return solution    
+        return solution
 
 # -------------------------------------------------------------------------------------------------
 # OPTIONAL - it is only needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
-def tsp_bitflip_get_neighbors(solution, problem, neighborhood_size = 0):
+def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
+    neighbors_final = [solution]
 
-    pass
+    def n_change(list_solutions):
+        neighbors = []
+
+        for k in list_solutions:
+            for l in range(0, len(k.representation)):
+                for j in range((l+1), len(k.representation)):
+                    neighbor = deepcopy(k)
+
+                    neighbor.representation[l], neighbor.representation[j] = neighbor.representation[j], \
+                                                                             neighbor.representation[l]
+
+                    if neighbor.representation not in list(map(lambda x: x.representation, neighbors)):
+                        neighbors.append(neighbor)
+
+        print('n_neighbors: ' + str(len(neighbors)))
+
+        #neighbors = [n for n in neighbors if list(map(lambda x: x.representation, neighbors)).count(n.representation) > 1]
+
+        return neighbors
+
+    for i in range(0, n_changes):
+        neighbors_final = n_change(neighbors_final)
+
+    if solution in neighbors_final:
+        neighbors_final.remove(solution)
+
+    return neighbors_final
