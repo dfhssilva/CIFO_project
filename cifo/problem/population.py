@@ -27,11 +27,11 @@ class Population:
     @property
     def least_fit(self):
         self.sort()
-        if len(self._list) > 0 :
-            return self._list[ 0 ]
+        if len(self._list) > 0:
+            return self._list[0]
         return None
 
-    def replace_leastfit(self, solution ):
+    def replace_leastfit(self, solution):
         self.sort()
         self._list[ 0 ] = solution
 
@@ -49,14 +49,14 @@ class Population:
 
 
     def add(self, solution):
-        self._list.append( solution )    
+        self._list.append(solution)
 
     def get(self, index):
         """
         It returns a solution of the population according to the index
         """
-        if index >= 0  and index < len(self._list):
-            return self._list[ index ]
+        if (index >= 0) and (index < len(self._list)):
+            return self._list[index]
         else: 
             return None 
 
@@ -77,22 +77,21 @@ class Population:
         - Minimization
         - Multi-objective { set of objectives }
         """
-    
 
-        if self._objective == ProblemObjective.Maximization :
-            for i in range (0, len( self._list )) :
-                for j in range (i, len (self._list )) :
-                    if self._list[ i ].fitness > self._list[ j ].fitness:
-                        swap = self._list[ j ]
-                        self._list[ j ] = self._list[ i ]
-                        self._list[ i ] = swap
+        if self._objective == ProblemObjective.Maximization:
+            for i in range(0, len(self._list)):
+                for j in range(i, len(self._list)):
+                    if self._list[i].fitness > self._list[j].fitness:
+                        swap = self._list[j]
+                        self._list[j] = self._list[i]
+                        self._list[i] = swap
                         
-        elif self._objective == ProblemObjective.Minimization :    
-            for i in range (0, len( self._list )) :
-                for j in range (i, len (self._list )) :
-                    if self._list[ i ].fitness < self._list[ j ].fitness:
-                        swap =self._list[ j ]
-                        self._list[ j ] = self._list[ i ]
-                        self._list[ i ] = swap                  
+        elif self._objective == ProblemObjective.Minimization:
+            for i in range(0, len(self._list)):
+                for j in range(i, len(self._list)):
+                    if self._list[i].fitness < self._list[j].fitness:
+                        swap = self._list[j]
+                        self._list[j] = self._list[i]
+                        self._list[i] = swap
 
         self._sorted = True

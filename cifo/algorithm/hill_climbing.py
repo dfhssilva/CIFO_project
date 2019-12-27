@@ -92,7 +92,7 @@ class HillClimbing:
             self._max_iterations = params["Maximum-Iterations"]
         
         # stop condition approach
-        self._stop_condition_approach  = "Classical"
+        self._stop_condition_approach = "Classical"
         self._check_stop_conditions = self._check_classical_stop_conditions
         if "Stop-Conditions" in params: 
             self._stop_condition_approach = params["Stop-Conditions"]

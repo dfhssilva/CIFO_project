@@ -95,13 +95,13 @@ class GeneticAlgorithm:
 
         self._logger = GeneticAlgorithmLogger(log_dir, log_name, run)
 
-        self._observers  = []  
+        self._observers = []
 
 
     
     # search
     # ---------------------------------------------------------------------------------------------
-    def search( self ):
+    def search(self):
         """
             Genetic Algorithm - Search Algorithm
             1. Initial population
@@ -125,7 +125,7 @@ class GeneticAlgorithm:
         is_admissible   = self._problem_instance.is_admissible
 
         self._generation = 0
-        self._notify(message = "Genetic Algorithm")
+        self._notify(message="Genetic Algorithm")
 
         # 1. Initial population
         self._population = self._initialize(problem, self._population_size)
@@ -137,7 +137,7 @@ class GeneticAlgorithm:
         #2. Repeat n generations )(#1 loop )
         for self._generation in range(1, self._number_of_generations + 1):
             
-            new_population = Population(problem = problem, maximum_size = self._population_size, solution_list=[])
+            new_population = Population(problem=problem, maximum_size=self._population_size, solution_list=[])
             i = 0
 
             # 2.1. Repeat until generate the next generation (#2 loop )
@@ -182,7 +182,7 @@ class GeneticAlgorithm:
 
             self._notify()
 
-        self._notify(message = "Fittest Solution")
+        self._notify(message="Fittest Solution")
         return self._fittest    
 
     def __str__(self):
@@ -195,7 +195,7 @@ class GeneticAlgorithm:
         return chance < self._crossover_probability
 
     @property
-    def apply_mutation( self ):
+    def apply_mutation(self):
         chance = random()
         return chance < self._mutation_probability
 
@@ -269,22 +269,22 @@ class GeneticAlgorithm:
             print("Undefined Replacement-Approach. The default will be used.")
             self._replacement_approach = elitism_replacement
 
-        self._notify( message = "Configuration", content = self._text )
+        self._notify(message="Configuration", content=self._text)
 
 
     # register observer
     #----------------------------------------------------------------------------------------------
     def register_observer(self, observer):
-        self._observers.append( observer )
+        self._observers.append(observer)
 
     # unregister observer
     #----------------------------------------------------------------------------------------------
-    def unregister_observer(self, observer ):
-        self._observers.remove( observer) 
+    def unregister_observer(self, observer):
+        self._observers.remove(observer)
 
     # notify
     #----------------------------------------------------------------------------------------------
-    def _notify( self,  message = "", content = ""):
+    def _notify(self,  message="", content=""):
 
         self._state = {
             "iteration" : self._generation,
@@ -299,7 +299,7 @@ class GeneticAlgorithm:
                 solution = self._fittest 
             )
         
-        #if message == "Fittest Solution" :
+        #if message == "Fittest Solution":
         #    self._logger.save()
 
         for observer in self._observers:
@@ -315,7 +315,7 @@ class GeneticAlgorithm:
         self._logger.save()
     
     
-    #def calc_weights( self, solution ): 
+    #def calc_weights(self, solution):
     #    weights = self._problem_instance.decision_variables["Weights"] 
     #
     #    weight = 0

@@ -127,7 +127,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
-    def is_admissible(self, solution, debug=True): #<< use this signature in the sub classes, the meta-heuristic
+    def is_admissible(self, solution, debug=True):  # << use this signature in the sub classes, the meta-heuristic
         """
         Checks if the solution:
             - has unique values equal to the size of the enconding_rule
@@ -153,7 +153,7 @@ class TravelSalesmanProblem(ProblemTemplate):
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------
     # It should be seen as an abstract method 
-    def evaluate_solution(self, solution, feedback = None): # << This method does not need to be extended, it already
+    def evaluate_solution(self, solution, feedback=None):  # << This method does not need to be extended, it already
                                         # automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
         Calculates the total distance of the defined route
@@ -194,8 +194,6 @@ def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
 
                     if neighbor.representation not in list(map(lambda x: x.representation, neighbors)):
                         neighbors.append(neighbor)
-
-        print('n_neighbors: ' + str(len(neighbors)))
 
         #neighbors = [n for n in neighbors if list(map(lambda x: x.representation, neighbors)).count(n.representation) > 1]
 

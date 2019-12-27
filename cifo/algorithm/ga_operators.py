@@ -493,19 +493,20 @@ def order1_crossover(problem, solution1, solution2):
 # Singlepoint mutation
 # -----------------------------------------------------------------------------------------------
 def single_point_mutation(problem, solution):
-    singlepoint = randint(0, len( solution.representation )-1)
+    singlepoint = randint(0, len(solution.representation)-1)
     #print(f" >> singlepoint: {singlepoint}")
 
-    encoding    = problem.encoding
+    encoding = problem.encoding
 
-    if encoding.encoding_type == EncodingDataType.choices :
+    if encoding.encoding_type == EncodingDataType.choices:
         try:
             temp = deepcopy(encoding.encoding_data)
 
             temp.pop(solution.representation[singlepoint])
 
             gene = temp[0]
-            if len(temp) > 1 : gene = choices(temp)
+            if len(temp) > 1:
+                gene = choices(temp)
 
             solution.representation[singlepoint] = gene
 
@@ -519,9 +520,10 @@ def single_point_mutation(problem, solution):
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
 def swap_mutation(problem, solution):
-    index = sample(range(0,len(solution.representation)), 2)
+    index = sample(range(0, len(solution.representation)), 2)
 
-    solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], solution.representation[index[0]]
+    solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
+                                                                           solution.representation[index[0]]
 
     return solution
 
@@ -531,7 +533,7 @@ def swap_mutation(problem, solution):
 def insert_mutation(problem, solution):
     solution2 = deepcopy(solution)
 
-    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) # get two indexes
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1))  # get two indexes
 
     # inserting the second value in the index after 1st mutation point
     solution2.representation[(mutpoint1 + 1)] = solution.representation[mutpoint2]
@@ -546,11 +548,11 @@ def insert_mutation(problem, solution):
 # Inversion mutation
 # -----------------------------------------------------------------------------------------------
 def inversion_mutation(problem, solution):
-    solution2 = deepcopy(solution) # create a copy that we will edit and return
+    solution2 = deepcopy(solution)  # create a copy that we will edit and return
 
-    mutpoint1, mutpoint2 = get_two_diff_order_index(0,(len(solution.representation) - 1)) # get two indexes
+    mutpoint1, mutpoint2 = get_two_diff_order_index(0, (len(solution.representation) - 1))  # get two indexes
 
-    for i in range(mutpoint1, (mutpoint2 + 1)): # replace the indexes by inverse order
+    for i in range(mutpoint1, (mutpoint2 + 1)):  # replace the indexes by inverse order
         solution2.representation[i] = solution.representation[mutpoint2]
         mutpoint2 -= 1
 
@@ -560,14 +562,14 @@ def inversion_mutation(problem, solution):
 # Scramble mutation
 # -----------------------------------------------------------------------------------------------
 def scramble_mutation(problem, solution):
-
     mutpoint1, mutpoint2 = get_two_diff_order_index(0, (len(solution.representation) - 1))  # get two indexes
 
-    shuffle_part = solution.representation[mutpoint1: (mutpoint2+1)] #store the part of the solution to be shuffled in separate list
+    # store the part of the solution to be shuffled in separate list
+    shuffle_part = solution.representation[mutpoint1: (mutpoint2+1)]
 
-    shuffle(shuffle_part) #shuffle the middle part (shuffle works inplace)
+    shuffle(shuffle_part)  # shuffle the middle part (shuffle works inplace)
 
-    solution.representation[mutpoint1: (mutpoint2 + 1)] = shuffle_part #replace the segment with shuffled part
+    solution.representation[mutpoint1: (mutpoint2 + 1)] = shuffle_part  # replace the segment with shuffled part
 
     return solution
 

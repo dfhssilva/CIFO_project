@@ -205,7 +205,7 @@ parent_selection = roulettewheel_selection
 params = {
         # params
         "Population-Size"           : 10,
-        "Number-of-Generations"     : 1,
+        "Number-of-Generations"     : 10,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
         # operators / approaches
@@ -213,7 +213,7 @@ params = {
         "Selection-Approach"        : parent_selection,
         "Tournament-Size"           : 5,
         "Crossover-Approach"        : order1_crossover,
-        "Mutation-Approach"          : swap_mutation,
+        "Mutation-Approach"         : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
