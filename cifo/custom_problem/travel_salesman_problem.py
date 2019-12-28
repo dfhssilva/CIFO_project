@@ -112,7 +112,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
             solution = HillClimbing(
                         problem_instance = self,
-                        neighborhood_function = tsp_get_neighbors
+                        neighborhood_function =self.tsp_get_neighbors_np
                         ).search()
             #TODO: allow changes in params for Hill Climbing
 
@@ -174,6 +174,37 @@ class TravelSalesmanProblem(ProblemTemplate):
 
         return solution
 
+    def tsp_get_neighbors_np(self, solution, problem, neighborhood_size=0, n_changes=3):
+        initial_sol = np.asarray(solution.representation)       # change to numpy array for performance
+        neighbors_np = [initial_sol]                            #list of numpy arrays for performance
+
+        def n_change(list_solutions):
+            neighbors = []
+
+            for k in list_solutions:                            #find all neighbors
+                for l in range(0, len(k)):
+                    for j in range((l + 1), len(k)):
+                        neighbor = np.copy(k)
+                        neighbor[l], neighbor[j] = neighbor[j], neighbor[l]
+                        neighbors.append(neighbor)
+
+            return neighbors
+
+        for i in range(0, n_changes):                       #How many swaps to allow,
+            neighbors_np = n_change(neighbors_np)           # This escalates fast!!! one should be more than enough
+
+                                                            # convert back to linear solution for evaluation
+        neighbors_final = []
+        for sol in neighbors_np:
+            sol = sol.tolist()
+            solution = LinearSolution(
+                representation=sol,
+                encoding_rule=self._encoding_rule
+            )
+            neighbors_final.append(solution)
+
+        return neighbors_final                              # return a list of solutions
+
 # -------------------------------------------------------------------------------------------------
 # OPTIONAL - it is only needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
@@ -191,18 +222,19 @@ def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
 
                     neighbor.representation[l], neighbor.representation[j] = neighbor.representation[j], \
                                                                              neighbor.representation[l]
-
-                    if neighbor.representation not in list(map(lambda x: x.representation, neighbors)):
-                        neighbors.append(neighbor)
+                    #if neighbor.representation not in list(map(lambda x: x.representation, neighbors)):
+                    neighbors.append(neighbor)
 
         #neighbors = [n for n in neighbors if list(map(lambda x: x.representation, neighbors)).count(n.representation) > 1]
 
         return neighbors
 
-    for i in range(0, n_changes):
+    for i in range(0, nchanges):
         neighbors_final = n_change(neighbors_final)
+        print(str(len(neighbors_final))+"i="+str(i))
 
-    if solution in neighbors_final:
-        neighbors_final.remove(solution)
+    #if solution in neighbors_final:                # slower than evaluating the solution also
+    #    neighbors_final.remove(solution)
 
     return neighbors_final
+

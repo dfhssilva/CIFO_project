@@ -87,7 +87,7 @@ class HillClimbing:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
         # max iterations
-        self._max_iterations = 10
+        self._max_iterations = 100
         if "Maximum-Iterations" in params: 
             self._max_iterations = params["Maximum-Iterations"]
         

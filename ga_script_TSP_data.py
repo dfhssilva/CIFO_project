@@ -218,7 +218,7 @@ parent_selection = roulettewheel_selection
 
 # # dictionaries to create test directories
 
-valid_Init = {initialize_using_random: "rand"} # initialize_using_hc: "hc" , initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
+valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc"}#, initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
@@ -229,7 +229,7 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-test_init = [initialize_using_random]
+test_init = [initialize_using_hc, initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
 test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
@@ -238,7 +238,7 @@ test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 #test_xover_prob = [0.75] # simples
 test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 #test_mut_prob = [0.75] # simples
-test_tournament_size = [2,5,10] # simples
+test_tournament_size = [2,5,10]
 #test_tournament_size = [2] # simples
 
 #initial params
