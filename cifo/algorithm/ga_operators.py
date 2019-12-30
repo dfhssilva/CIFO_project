@@ -2,8 +2,9 @@ from random import uniform, randint, choices, sample, shuffle
 from copy import deepcopy
 
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import EncodingDataType
+from cifo.problem.solution import EncodingDataType, LinearSolution, Encoding
 from cifo.problem.population import Population
+from cifo.problem.problem_template import ProblemTemplate
 
 ###################################################################################################
 # INITIALIZATION APPROACHES
@@ -483,9 +484,79 @@ def order1_crossover(problem, solution1, solution2):
 
         return offspring1, offspring2
 
-# TODO: use more than one crossovers in the same run
-# TODO: heuristic crossover
-# TODO: edge crossover
+# -------------------------------------------------------------------------------------------------
+# Heuristic Crossover
+# -------------------------------------------------------------------------------------------------
+def heuristic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    distances = ProblemTemplate.decision_variables["Distances"]
+
+    def apply_crossover_individually(offspring, matrix):
+        first = randint(1, len(solution1.representation))
+
+        offspring[0] = first
+
+        element = first
+        i = 1
+        while True:
+            idx1 = solution1.representation.index(element) + 1
+            idx2 = solution2.representation.index(element) + 1
+
+            if idx1 == len(solution1.representation):
+                idx1 = 0
+            if idx2 == len(solution2.representation):
+                idx2 = 0
+
+            # get the elements in each parent next to the first element
+            element1 = solution1[idx1]
+            element2 = solution2[idx2]
+
+            if (element1 == element2) or (element2 in offspring[0:i]):
+                offspring[i] = element1    # if the elements are equal or element 2 is already one of the changed elements
+                element = element1          # in offspring1 (if it is will close the cycle too early)
+
+            elif element1 in offspring[0:i]:   # element 1 is already one of the changed elements in offspring1
+                offspring[i] = element2        # (if it is will close the cycle too early)
+                element = element2
+
+            else:   # evaluate which element has the shortest path
+                distance1 = matrix[element][element1]
+                distance2 = matrix[element][element2]
+
+                if distance1 <= distance2:
+                    offspring[i] = element1
+                    element = element1
+                else:
+                    offspring[i] = element2
+                    element = element2
+
+            i += 1
+
+            if i == len(solution1.representation):
+                break
+
+        return offspring
+
+    offspring1 = apply_crossover_individually(offspring1, distances)
+    offspring2 = apply_crossover_individually(offspring2, distances)
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Multiple Crossover
+# -------------------------------------------------------------------------------------------------
+def multiple_crossover(problem, solution1, solution2):
+    prob = uniform(0, 1)
+
+    if prob < (1/3):
+        return pmx_crossover(problem, solution1, solution2)
+    elif (1/3) <= prob < (2/3):
+        return order1_crossover(problem, solution1, solution2)
+    else:
+        return heuristic_crossover(problem, solution1, solution2)
+
 ###################################################################################################
 # MUTATION APPROACHES
 ###################################################################################################

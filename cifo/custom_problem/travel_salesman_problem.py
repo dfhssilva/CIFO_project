@@ -229,7 +229,7 @@ def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
 
         return neighbors
 
-    for i in range(0, nchanges):
+    for i in range(0, n_changes):
         neighbors_final = n_change(neighbors_final)
         print(str(len(neighbors_final))+"i="+str(i))
 
