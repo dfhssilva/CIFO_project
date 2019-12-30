@@ -127,8 +127,6 @@ def initialize_using_sa(problem, population_size):
 # -------------------------------------------------------------------------------------------------
 # Initialization using Greedy Method
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Greedy Method
-# Remark: remember, you will need a neighborhood function for each problem
 def initialize_using_greedy(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using a Greedy Algorithm
