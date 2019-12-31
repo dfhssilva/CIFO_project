@@ -168,7 +168,7 @@ class TravelSalesmanProblem(ProblemTemplate):
             initial_solution[-1] = np.setdiff1d(copy, initial_solution[0:-1], assume_unique=True)[0]
                 #list(set(copy) - set(initial_solution[0:-1]))[0]
 
-            print('greedy solutions: ', list(initial_solution))
+            #print('greedy solutions: ', list(initial_solution))
             solution = LinearSolution(
                 representation=list(initial_solution),
                 encoding_rule=self._encoding_rule
@@ -176,7 +176,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
             return solution
         else:
-            print('Please choose one of these methods: Hill Climbing, Greedy, Random or Mix. It will use the Random method')
+            print('Please choose one of these methods: Hill Climbing, Greedy, Random or Multiple. It will use the Random method')
             return self.build_solution()
 
 
@@ -236,12 +236,12 @@ class TravelSalesmanProblem(ProblemTemplate):
 # -------------------------------------------------------------------------------------------------
     def tsp_get_neighbors_np(self, solution, problem, neighborhood_size=0, n_changes=3):
         initial_sol = np.asarray(solution.representation)       # change to numpy array for performance
-        neighbors_np = [initial_sol]                            #list of numpy arrays for performance
+        neighbors_np = [initial_sol]                            # list of numpy arrays for performance
 
         def n_change(list_solutions):
             neighbors = []
 
-            for k in list_solutions:                            #find all neighbors
+            for k in list_solutions:                            # find all neighbors
                 for l in range(0, len(k)):
                     for j in range((l + 1), len(k)):
                         neighbor = np.copy(k)
@@ -250,7 +250,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
             return neighbors
 
-        for i in range(0, n_changes):                       #How many swaps to allow,
+        for i in range(0, n_changes):                       # How many swaps to allow,
             neighbors_np = n_change(neighbors_np)           # This escalates fast!!! one should be more than enough
 
                                                             # convert back to linear solution for evaluation

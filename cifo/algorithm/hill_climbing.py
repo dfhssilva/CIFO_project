@@ -166,7 +166,7 @@ class HillClimbing:
         self._iteration = 0
         while searching:
             self._iteration += 1
-            print('iteration: ' + str(self._iteration))
+            #print('iteration: ' + str(self._iteration))
             # 2.1: Get the best neighbor
             self._get_best_neighbor()
             # 2.2: Select the best, between the current best and best neighbor
@@ -253,7 +253,7 @@ class HillClimbing:
                     best_neighbor = deepcopy(neighbor)
 
         self._neighbor = best_neighbor
-        print('neighbor fitness: ' + str(self._neighbor.fitness))
+        #print('neighbor fitness: ' + str(self._neighbor.fitness))
     # _select for minimization
     #----------------------------------------------------------------------------------------------    
     def _select_minimization(self):

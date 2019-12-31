@@ -612,9 +612,6 @@ def order1_crossover(problem, solution1, solution2):
 # Heuristic Crossover
 # -------------------------------------------------------------------------------------------------
 def heuristic_crossover(problem, solution1, solution2):
-    # print('solution1', solution1.representation)
-    # print('solution2', solution2.representation)
-    # print('HEURISTIC')
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
@@ -625,13 +622,10 @@ def heuristic_crossover(problem, solution1, solution2):
 
         # get the element that will be in the first position of the offspring
         first = randint(1, len(solution1.representation))
-        # print('first: ', first)
 
         offspring.representation[0] = first  # put the element in the first position
-        # print('offspring.representation: ', offspring.representation)
 
         element = first
-        # print('element: ', element)
         i = 1
         while True:
             idx1 = solution1.representation.index(element) + 1  # get the index of the city next to element in solution 1
@@ -645,31 +639,23 @@ def heuristic_crossover(problem, solution1, solution2):
             # get the elements in each parent next to the first element
             element1 = solution1.representation[idx1]
             element2 = solution2.representation[idx2]
-            # print('element1: ', element1)
-            # print('element2: ', element2)
 
             # if element1 is equal to element2 and element is not one of the changed elements in offspring1
             if (element1 == element2) and (element2 not in offspring.representation[0:i]):
                 offspring.representation[i] = element2    # if the elements are equal or element 2 is already one of the changed elements
                 element = element2          # in offspring1 (if it is will close the cycle too early)
-                # print('offspring.representation: ', offspring.representation)
-                # print('element: ', element)
 
             # if element1 is already one of the changed elements in offspring1 and element2 is not one of the
             # changed elements in offspring1
             elif (element1 in offspring.representation[0:i]) and (element2 not in offspring.representation[0:i]):
                 offspring.representation[i] = element2        # (if it is will close the cycle too early)
                 element = element2
-                # print('offspring.representation: ', offspring.representation)
-                # print('element: ', element)
 
             # if element2 is already one of the changed elements in offspring1 and element1 is not one of the
             # changed elements in offspring1
             elif (element2 in offspring.representation[0:i]) and (element1 not in offspring.representation[0:i]):
                 offspring.representation[i] = element1        # (if it is will close the cycle too early)
                 element = element1
-                # print('offspring.representation: ', offspring.representation)
-                # print('element: ', element)
 
             # evaluate which element has the shortest path
             elif (element2 not in offspring.representation[0:i]) and (element1 not in offspring.representation[0:i]):
@@ -679,13 +665,10 @@ def heuristic_crossover(problem, solution1, solution2):
                 if distance1 <= distance2:  # if distance1 is the shortest path
                     offspring.representation[i] = element1  # replace the index i in offspring with the element 1
                     element = element1  # set the next element to look for
-                    # print('offspring.representation: ', offspring.representation)
-                    # print('element: ', element)
+
                 else:  # if distance2 is the shortest path
                     offspring.representation[i] = element2  # replace the index i in offspring with the element 1
                     element = element2  # set the next element to look for
-                    # print('offspring.representation: ', offspring.representation)
-                    # print('element: ', element)
             else:
                 element = sample((set(copy) - set(offspring.representation[0:i])), 1)[0]
                 offspring.representation[i] = element  # replace the index i in offspring with the element
