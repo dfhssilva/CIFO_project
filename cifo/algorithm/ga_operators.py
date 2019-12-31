@@ -301,7 +301,7 @@ def tournament_selection(population, objective, params):
 
                 if population.solutions[index_temp].fitness > population.solutions[index_selected].fitness:
                     index_selected = index_temp
-        elif objective == ProblemObjective.Minimization:
+        elif objective == ProblemObjective.Minimization:    #TODO: elif? and no else?
             for _ in range(0, tournament_size):
                 index_temp = randint(0, population.size - 1)
 
@@ -445,7 +445,7 @@ def cycle_crossover(problem, solution1, solution2):
                     break
 
     return offspring1, offspring2
-
+#TODO: check cycle crossover np and complete or delete
 def cycle_crossover_np(problem, solution1, solution2):
     cycle = 1   # number of cycles
 
@@ -609,6 +609,7 @@ def multiple_crossover(problem, solution1, solution2):
         return order1_crossover(problem, solution1, solution2)
     else:
         return heuristic_crossover(problem, solution1, solution2)
+#TODO: talk about this . Look at crossovers performance
 
 
 ###################################################################################################

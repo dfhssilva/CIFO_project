@@ -19,6 +19,10 @@ from cifo.util.observer import LocalSearchObserver
 from random import randint
 import numpy as np
 
+from os import listdir, path, mkdir
+from os.path import isfile, join
+from pandas import pandas as pd
+
 def plot_performance_chart(df):
     import plotly.graph_objects as go
     import plotly.express as px
@@ -216,33 +220,32 @@ tsp_problem_instance = TravelSalesmanProblem(
 # parent_selection = TournamentSelection()
 parent_selection = roulettewheel_selection
 
-# # dictionaries to create test directories
-
-valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc"}#, initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
+# dictionaries to create test directories
+valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedy"} #, initialize_using_sa: "sa"
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
-valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
+valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"} #TODO: complete these dictionaries, do imports of new methods?
                 # singlepoint_crossover: "singP" should not be used
 valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
                   scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
+#Parameters to gridsearch in a run
 test_init = [initialize_using_hc, initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
 test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
 test_replacement = [elitism_replacement, standard_replacement]
-test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-#test_xover_prob = [0.75] # simples
-test_mut_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-#test_mut_prob = [0.75] # simples
-test_tournament_size = [2,5,10]
+#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_xover_prob = [0.1, 0.9]
+test_mut_prob = [0.1, 0.9]
+#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples
 
 #initial params
-# parent_selection = roulettewheel_selection
 
 params = {
         # params
@@ -259,23 +262,14 @@ params = {
         "Replacement-Approach"      : elitism_replacement
     }
 
-# dir_labels = {initialize_using_random: "rnd", initialize_using_hc: "hc", initialize_using_sa: "sa",
-#               initialize_using_greedy: "greedy", RouletteWheelSelection().select: "rol",
-#               TournamentSelection().select: "tourn", RankSelection().select: "rank", cycle_crossover: "cycle",
-#               pmx_crossover: "pmx",  order1_crossover: "order1", swap_mutation: "swap", insert_mutation: "insert",
-#               inversion_mutation: "invert", scramble_mutation: "scramble", elitism_replacement: "elite",
-#               standard_replacement: "std"}
-#
-# labels_dict = {k: dir_labels.get(v) if k in ["Initialization-Approach", "Selection-Approach", "Crossover-Approach",
-#                                      "Mutation-Approach", "Replacement-Approach"] else v for (k, v) in params.items()}
 
 def one_combination():
-    # log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
-    #            "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
-    #            "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
-    from os import listdir, path, mkdir
-    from os.path import isfile, join
-    from pandas import pandas as pd
+    """
+    Actually runs the algorithm with one set of parameters.
+    Names the resume file from parameters of search
+    Creates the resume file from all the runs for a set of parameters
+
+    """
 
     log_base_dir="./log/"       #Base dir for log of initial runs
     if not path.exists(log_base_dir):
@@ -310,7 +304,7 @@ def one_combination():
 
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
-    number_of_runs = 2
+    number_of_runs = 30
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
