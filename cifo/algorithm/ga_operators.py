@@ -116,7 +116,7 @@ def initialize_using_multiple(problem, population_size):
 
             if problem.is_admissible(s):
                 s.id = [0, i]
-                
+
                 problem.evaluate_solution(s)
 
                 solution_list.append(s)

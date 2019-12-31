@@ -319,7 +319,7 @@ def one_combination():
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
     overall_best_solution = None
-    number_of_runs = 2
+    number_of_runs = 30
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
