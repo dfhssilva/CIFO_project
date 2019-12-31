@@ -112,8 +112,8 @@ class TravelSalesmanProblem(ProblemTemplate):
         elif method == 'Hill Climbing':
 
             solution = HillClimbing(
-                        problem_instance = self,
-                        neighborhood_function =self.tsp_get_neighbors_np
+                        problem_instance=self,
+                        neighborhood_function=self.tsp_get_neighbors_np
                         ).search()
             #TODO: allow changes in params for Hill Climbing
 
@@ -122,7 +122,7 @@ class TravelSalesmanProblem(ProblemTemplate):
         #    return solution
         elif method == 'Greedy':
             # get a random solution where we will keep the first element
-            initial_solution = self.build_solution(method='Random')
+            initial_solution = np.array(self.build_solution(method='Random'))
             copy = initial_solution.copy()
 
             distances = self.decision_variables["Distances"]

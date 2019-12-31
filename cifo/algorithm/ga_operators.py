@@ -256,11 +256,15 @@ def rank_selection(population, objective, params):
                     if population.solutions[i].fitness > population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
 
-        else:    # in minimization, the solution with smaller fitness is at the end
+        elif objective == ProblemObjective.Minimization: # in minimization, the solution with smaller fitness is at the end
             for i in range(0, population.size):
                 for j in range(i, population.size):
                     if population.solutions[i].fitness < population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
+
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         return population
 
@@ -307,9 +311,11 @@ def tournament_selection(population, objective, params):
 
                 if population.solutions[index_temp].fitness < population.solutions[index_selected].fitness:
                     index_selected = index_temp
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         return index_selected
-
 
     index1 = _select_index(objective, population, tournament_size)
     index2 = index1
@@ -409,10 +415,10 @@ def cycle_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)  # solution1.clone()
     offspring2 = deepcopy(solution2)  # .clone()
 
-    index_visited = [] # list of visited indexes during the cycles
+    index_visited = []  # list of visited indexes during the cycles
 
-    while len(index_visited) < len(solution1.representation): # the loop only ends when all the indexes were visited
-        for i in range(0, len(solution1.representation)): # Get the smallest index of the solution not visited
+    while len(index_visited) < len(solution1.representation):  # the loop only ends when all the indexes were visited
+        for i in range(0, len(solution1.representation)):  # get the smallest index of the solution not visited
             if i not in index_visited:
                 idx = i
                 index_visited.append(idx)
@@ -455,10 +461,10 @@ def cycle_crossover_np(problem, solution1, solution2):
     offspring1_np = np.copy(sol1)  # solution1.clone()
     offspring2_np = np.copy(sol2)  # .clone()
     my_len = len(sol1)
-    index_visited = [] # list of visited indexes during the cycles
+    index_visited = []  # list of visited indexes during the cycles
 
-    while len(index_visited) < my_len: # the loop only ends when all the indexes were visited
-        for i in range(0, my_len): # Get the smallest index of the solution not visited
+    while len(index_visited) < my_len:  # the loop only ends when all the indexes were visited
+        for i in range(0, my_len):  # get the smallest index of the solution not visited
             if i not in index_visited:
                 idx = i
                 index_visited.append(idx)
@@ -470,7 +476,7 @@ def cycle_crossover_np(problem, solution1, solution2):
                 offspring2_np[idx] = sol1[idx]
 
                 # get the respective index of the solution 1 for the element in solution 2
-                idx=np.where(sol1 == sol2[idx])[0][0]
+                idx = np.where(sol1 == sol2[idx])[0][0]
                 #idx = solution1.representation.index(solution2.representation[idx])
 
                 if idx not in index_visited:    # if the index was already visited, the cycle ends
@@ -490,6 +496,7 @@ def cycle_crossover_np(problem, solution1, solution2):
                 else:
                     cycle += 1      # go to the next cycle
                     break
+
     offspring1 = from_rep_to_sol(
         representation= offspring1_np,
 
@@ -511,7 +518,7 @@ def order1_crossover(problem, solution1, solution2):
 
     # indexes of the elements not in the middle
     sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
-    len_sub=len(sub)
+    len_sub = len(sub)
     j = 0
     k = 0
 

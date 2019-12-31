@@ -10,8 +10,8 @@ from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy,
     roulettewheel_selection, rank_selection, tournament_selection,
-    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover,
-    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation,
+    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover,
+    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
@@ -225,18 +225,20 @@ valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initia
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
-valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"} #TODO: complete these dictionaries, do imports of new methods?
+valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover: "order1", heuristic_crossover: "heur",
+               multiple_crossover: "mix"} #TODO: complete these dictionaries, do imports of new methods?
                 # singlepoint_crossover: "singP" should not be used
 valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
+                  scramble_mutation: "scramble",  greedy_mutation: "greedy"}
+                    # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 #Parameters to gridsearch in a run
-test_init = [initialize_using_hc, initialize_using_random]
+test_init = [initialize_using_hc, initialize_using_random, initialize_using_greedy]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
-test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
+test_xover = [cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover] # singlepoint_crossover should not be used
+test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation] # single_point_mutation should not be used
 test_replacement = [elitism_replacement, standard_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_xover_prob = [0.1, 0.9]
@@ -304,6 +306,7 @@ def one_combination():
 
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
+    best_solution = 0
     number_of_runs = 30
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
@@ -314,6 +317,9 @@ def one_combination():
             log_name=log_name,
             log_dir=log_base_dir
             )
+
+        if ga.best_solution.fitness < best_solution:
+            best_solution = ga.best_solution
 
         ga_observer = LocalSearchObserver(ga)
         ga.register_observer(ga_observer)
@@ -373,9 +379,10 @@ def one_combination():
     df.to_excel(all_dir + f"{log_name}.xlsx", index=False, encoding='utf-8')
 
 #plot_performance_chart(df)
-##################################################################################################
-#       RUNS Through the Several list of possible parameters
-##################################################################################################
+
+# -------------------------------------------------------------------------------------------------
+# RUNS Through the Several list of possible parameters
+# -------------------------------------------------------------------------------------------------
 for init in range(len(test_init)):
     params["Initialization-Approach"] = test_init[init]
     for select in range(len(test_select)):
@@ -396,7 +403,6 @@ for init in range(len(test_init)):
                                     one_combination()
                             else:
                                 one_combination()
-
 
 #[sum(sublist) for sublist in itertools.izip(*myListOfLists)]
 

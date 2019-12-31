@@ -199,6 +199,10 @@ class GeneticAlgorithm:
         chance = random()
         return chance < self._mutation_probability
 
+    @property
+    def best_solution(self):
+        return self._best_solution
+
     # initialize
     # ---------------------------------------------------------------------------------------------
     def _parse_params(self, params):
@@ -217,16 +221,16 @@ class GeneticAlgorithm:
 
         self._mutation_probability = 0.5
         if "Mutation-Probability" in params:
-            self._mutation_probability = params[ "Mutation-Probability" ]
+            self._mutation_probability = params["Mutation-Probability"]
 
         self._number_of_generations = 5
         if "Number-of-Generations" in params:
-            self._number_of_generations = params[ "Number-of-Generations" ]
+            self._number_of_generations = params["Number-of-Generations"]
         
         # Initialization signature: <method_name>( problem, population_size ):
         self._initialize = None
         if "Initialization-Approach" in params:
-            self._initialize = params[ "Initialization-Approach" ]
+            self._initialize = params["Initialization-Approach"]
         else:
             print("Undefined Initialization approach. The default will be used.")
             self._initialize = initialize_using_random
