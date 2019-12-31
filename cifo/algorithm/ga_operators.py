@@ -1,9 +1,12 @@
-from random import uniform, randint, choices, sample, shuffle
+from random import uniform, randint, choices, sample, shuffle, random
 from copy import deepcopy
+import numpy as np
+import math
 
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import EncodingDataType
+from cifo.problem.solution import EncodingDataType, LinearSolution
 from cifo.problem.population import Population
+
 
 ###################################################################################################
 # INITIALIZATION APPROACHES
@@ -265,22 +268,18 @@ def rank_selection(population, objective, params):
     population = _sort(population, objective)
 
     # Step 2: Create a rank list [0, 1, 1, 2, 2, 2, ...]
-    rank_list = []
 
-    for index in range(0, population.size):
-        for _ in range(0, index + 1):
-            rank_list.append(index)
-
-    print(f" >> rank_list: {rank_list}")
+    # New Step 2: get the triangular number instead of len list
+    def triangular_number(n):
+        return n * (n + 1) // 2
 
     # Step 3: Select solution index
-    index1 = randint(0, len(rank_list)-1)
-    index2 = index1
+    index1, index2 = get_two_diff_order_index(start=0, stop=(triangular_number(population.size)-1), order=False, diff=True)
 
-    while index2 == index1:
-        index2 = randint(0, len(rank_list)-1)
+    def undo_triangular_number(n):
+        return int(abs(math.ceil(((math.sqrt(8 * n +1) - 1) / 2)-1)))
 
-    return population.get(rank_list[index1]), population.get(rank_list[index2])
+    return population.get(undo_triangular_number(index1)), population.get(undo_triangular_number(index2))
 
 # -------------------------------------------------------------------------------------------------
 # function tournament_selection
@@ -421,8 +420,9 @@ def cycle_crossover(problem, solution1, solution2):
 
         if cycle % 2 == 0:    # when the cycle is even
             while True:
-                offspring1.representation[idx] = solution2.representation[idx]    # save de swaped elements
-                offspring2.representation[idx] = solution1.representation[idx]
+                offspring1.representation[idx] = solution2.representation[idx]    # save the swaped elements
+                offspring2.representation[idx] = solution1.representation[idx]      #TODO:check the warnin on the line before
+                                                                                    #solve with a idx=0 before?
 
                 # get the respective index of the solution 1 for the element in solution 2
                 idx = solution1.representation.index(solution2.representation[idx])
@@ -446,6 +446,58 @@ def cycle_crossover(problem, solution1, solution2):
 
     return offspring1, offspring2
 
+def cycle_crossover_np(problem, solution1, solution2):
+    cycle = 1   # number of cycles
+
+    # only changes when the cycle is even (considering it starts at 1)
+    sol1 = np.asarray(solution1.representation)
+    sol2 = np.asarray(solution1.representation)
+    offspring1_np = np.copy(sol1)  # solution1.clone()
+    offspring2_np = np.copy(sol2)  # .clone()
+    my_len = len(sol1)
+    index_visited = [] # list of visited indexes during the cycles
+
+    while len(index_visited) < my_len: # the loop only ends when all the indexes were visited
+        for i in range(0, my_len): # Get the smallest index of the solution not visited
+            if i not in index_visited:
+                idx = i
+                index_visited.append(idx)
+                break
+
+        if cycle % 2 == 0:    # when the cycle is even
+            while True:
+                offspring1_np[idx] = sol2[idx]    # save de swaped elements
+                offspring2_np[idx] = sol1[idx]
+
+                # get the respective index of the solution 1 for the element in solution 2
+                idx=np.where(sol1 == sol2[idx])[0][0]
+                #idx = solution1.representation.index(solution2.representation[idx])
+
+                if idx not in index_visited:    # if the index was already visited, the cycle ends
+                    index_visited.append(idx)   # if not, append to the list of visited indexes
+                else:
+                    cycle += 1      # go to the next cycle
+                    break
+
+        else:       # when the cycle is odd
+            while True:
+                # get the respective index of the solution 1 for the element in solution 2
+                idx = np.where(sol1 == sol2[idx])[0][0]
+                #idx = solution1.representation.index(solution2.representation[idx])
+
+                if idx not in index_visited:    # if the index was already visited, the cycle ends
+                    index_visited.append(idx)   # if not, append to the list of visited indexes
+                else:
+                    cycle += 1      # go to the next cycle
+                    break
+    offspring1 = from_rep_to_sol(
+        representation= offspring1_np,
+
+        )
+
+
+    return offspring1, offspring2
+
 # -------------------------------------------------------------------------------------------------
 # Order1 Crossover
 # -------------------------------------------------------------------------------------------------
@@ -459,6 +511,7 @@ def order1_crossover(problem, solution1, solution2):
 
     # indexes of the elements not in the middle
     sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
+    len_sub=len(sub)
     j = 0
     k = 0
 
@@ -478,7 +531,7 @@ def order1_crossover(problem, solution1, solution2):
                 offspring2.representation[sub[k]] = solution1.representation[i]
                 k += 1
 
-            if j == len(sub) and k == len(sub):
+            if j == len_sub and k == len_sub:
                 break
 
         return offspring1, offspring2
@@ -610,12 +663,17 @@ def get_two_diff_order_index(start=0, stop=1, order=True, diff=True):
     stop - integer (default= 1)
     order - boolean ( default= True)
     """
-    first = randint(start, stop)
-    second = randint(start, stop)
+    my_range = stop - start
+    first = int(my_range * random())+start
+    second = int(my_range * random())+start
+
+    #first = randint(start, stop)
+    #second = randint(start, stop)
 
     if diff:
         while first == second:
-            second = randint(start, stop)
+            second = int( my_range * random()) + start
+            #second = randint(start, stop)
     if order:
         if first > second:
             second, first = first, second
