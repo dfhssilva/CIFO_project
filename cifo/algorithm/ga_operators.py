@@ -33,30 +33,28 @@ def initialize_using_random(problem, population_size):
     # generate a population of admissible solutions (individuals)
     for i in range(0, population_size):
         s = problem.build_solution(method='Random')
-        
+
         # check if the solution is admissible
         while not problem.is_admissible(s):
             s = problem.build_solution(method='Random')
-        
+
         s.id = [0, i]
 
         problem.evaluate_solution(s)
-        
+
         solution_list.append(s)
 
-    population = Population( 
+    population = Population(
         problem = problem,
-        maximum_size = population_size, 
+        maximum_size = population_size,
         solution_list = solution_list
     )
-    
+
     return population
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Hill Climbing
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Hill Climbing
-# Remark: remember, you will need a neighborhood function for each problem
 def initialize_using_hc(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Hill Climbing
@@ -81,9 +79,70 @@ def initialize_using_hc(problem, population_size):
 
         solution_list.append(s)
 
-    population = Population( 
+    population = Population(
         problem = problem,
-        maximum_size = population_size, 
+        maximum_size = population_size,
+        solution_list = solution_list
+    )
+
+    return population
+
+# -------------------------------------------------------------------------------------------------
+# Initialization using Multiple Initializations
+# -------------------------------------------------------------------------------------------------
+def initialize_using_multiple(problem, population_size):
+    """
+    Initialize a population of solutions (feasible solution) for an evolutionary algorithm using multiple algorithms:
+    - One solution from greedy initialization
+    - One solution from hill climbing initialization
+    - The rest of the solutions from random initialization
+
+    Required:
+    @ problem - problem's build solution function knows how to create an individual in accordance with the encoding.
+    @ population_size - to define the size of the population to be returned.
+    """
+    solution_list = []
+
+    i = 0
+    # generate a population of admissible solutions (individuals)
+    if population_size >= 4:
+        while i in range(0, population_size):
+            if i > 4:
+                s = problem.build_solution(method='Random')
+            elif i < 2:
+                s = problem.build_solution(method='Greedy')
+            else:
+                s = problem.build_solution(method='Hill Climbing')
+
+            if problem.is_admissible(s):
+                s.id = [0, i]
+
+                problem.evaluate_solution(s)
+
+                solution_list.append(s)
+
+                i += 1
+    else:
+        while i in range(0, population_size):
+            if i > 2:
+                s = problem.build_solution(method='Random')
+            elif i == 0:
+                s = problem.build_solution(method='Greedy')
+            else:
+                s = problem.build_solution(method='Hill Climbing')
+
+            if problem.is_admissible(s):
+                s.id = [0, i]
+
+                problem.evaluate_solution(s)
+
+                solution_list.append(s)
+
+                i += 1
+
+    population = Population(
+        problem = problem,
+        maximum_size = population_size,
         solution_list = solution_list
     )
 
@@ -159,6 +218,8 @@ def initialize_using_greedy(problem, population_size):
         maximum_size=population_size,
         solution_list=solution_list
     )
+
+
 
     return population
 
@@ -239,7 +300,7 @@ def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVE
 
     return population.get(index1), population.get(index2)
 
-        
+
 # -------------------------------------------------------------------------------------------------
 # rank_selection function
 # -------------------------------------------------------------------------------------------------
@@ -256,11 +317,15 @@ def rank_selection(population, objective, params):
                     if population.solutions[i].fitness > population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
 
-        else:    # in minimization, the solution with smaller fitness is at the end
+        elif objective == ProblemObjective.Minimization: # in minimization, the solution with smaller fitness is at the end
             for i in range(0, population.size):
                 for j in range(i, population.size):
                     if population.solutions[i].fitness < population.solutions[j].fitness:
                         population.solutions[i], population.solutions[j] = population.solutions[j], population.solutions[i]
+
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         return population
 
@@ -301,15 +366,17 @@ def tournament_selection(population, objective, params):
 
                 if population.solutions[index_temp].fitness > population.solutions[index_selected].fitness:
                     index_selected = index_temp
-        elif objective == ProblemObjective.Minimization:    #TODO: elif? and no else?
+        elif objective == ProblemObjective.Minimization:
             for _ in range(0, tournament_size):
                 index_temp = randint(0, population.size - 1)
 
                 if population.solutions[index_temp].fitness < population.solutions[index_selected].fitness:
                     index_selected = index_temp
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         return index_selected
-
 
     index1 = _select_index(objective, population, tournament_size)
     index2 = index1
@@ -319,7 +386,7 @@ def tournament_selection(population, objective, params):
 
     return population.solutions[index1], population.solutions[index2]
 
-# TODO: uniform selection
+
 ###################################################################################################
 # CROSSOVER APPROACHES
 ###################################################################################################
@@ -337,7 +404,7 @@ def singlepoint_crossover(problem, solution1, solution2):
         offspring1.representation[i] = solution2.representation[i]
         offspring2.representation[i] = solution1.representation[i]
 
-    return offspring1, offspring2    
+    return offspring1, offspring2
 
 # -------------------------------------------------------------------------------------------------
 # Partially Mapped Crossover (PMX)
@@ -409,20 +476,23 @@ def cycle_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)  # solution1.clone()
     offspring2 = deepcopy(solution2)  # .clone()
 
-    index_visited = [] # list of visited indexes during the cycles
+    index_visited = []  # list of visited indexes during the cycles
+    idx = None
 
-    while len(index_visited) < len(solution1.representation): # the loop only ends when all the indexes were visited
-        for i in range(0, len(solution1.representation)): # Get the smallest index of the solution not visited
+    while len(index_visited) < len(solution1.representation):  # the loop only ends when all the indexes were visited
+        for i in range(0, len(solution1.representation)):  # get the smallest index of the solution not visited
             if i not in index_visited:
                 idx = i
                 index_visited.append(idx)
                 break
 
+        if idx == None:
+            print('Warning: idx equals None')
+
         if cycle % 2 == 0:    # when the cycle is even
             while True:
                 offspring1.representation[idx] = solution2.representation[idx]    # save the swaped elements
-                offspring2.representation[idx] = solution1.representation[idx]      #TODO:check the warnin on the line before
-                                                                                    #solve with a idx=0 before?
+                offspring2.representation[idx] = solution1.representation[idx]
 
                 # get the respective index of the solution 1 for the element in solution 2
                 idx = solution1.representation.index(solution2.representation[idx])
@@ -445,6 +515,7 @@ def cycle_crossover(problem, solution1, solution2):
                     break
 
     return offspring1, offspring2
+
 #TODO: check cycle crossover np and complete or delete
 def cycle_crossover_np(problem, solution1, solution2):
     cycle = 1   # number of cycles
@@ -455,10 +526,10 @@ def cycle_crossover_np(problem, solution1, solution2):
     offspring1_np = np.copy(sol1)  # solution1.clone()
     offspring2_np = np.copy(sol2)  # .clone()
     my_len = len(sol1)
-    index_visited = [] # list of visited indexes during the cycles
+    index_visited = []  # list of visited indexes during the cycles
 
-    while len(index_visited) < my_len: # the loop only ends when all the indexes were visited
-        for i in range(0, my_len): # Get the smallest index of the solution not visited
+    while len(index_visited) < my_len:  # the loop only ends when all the indexes were visited
+        for i in range(0, my_len):  # get the smallest index of the solution not visited
             if i not in index_visited:
                 idx = i
                 index_visited.append(idx)
@@ -470,7 +541,7 @@ def cycle_crossover_np(problem, solution1, solution2):
                 offspring2_np[idx] = sol1[idx]
 
                 # get the respective index of the solution 1 for the element in solution 2
-                idx=np.where(sol1 == sol2[idx])[0][0]
+                idx = np.where(sol1 == sol2[idx])[0][0]
                 #idx = solution1.representation.index(solution2.representation[idx])
 
                 if idx not in index_visited:    # if the index was already visited, the cycle ends
@@ -490,7 +561,8 @@ def cycle_crossover_np(problem, solution1, solution2):
                 else:
                     cycle += 1      # go to the next cycle
                     break
-    offspring1 = from_rep_to_sol(
+
+    offspring1 = LinearSolution(
         representation= offspring1_np,
 
         )
@@ -511,7 +583,7 @@ def order1_crossover(problem, solution1, solution2):
 
     # indexes of the elements not in the middle
     sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
-    len_sub=len(sub)
+    len_sub = len(sub)
     j = 0
     k = 0
 
@@ -543,13 +615,15 @@ def heuristic_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
-    distances = ProblemTemplate.decision_variables["Distances"]
+    distances = problem.distances
 
     def apply_crossover_individually(offspring, matrix):
+        copy = offspring.representation.copy()
+
         # get the element that will be in the first position of the offspring
         first = randint(1, len(solution1.representation))
 
-        offspring[0] = first  # put the element in the first position
+        offspring.representation[0] = first  # put the element in the first position
 
         element = first
         i = 1
@@ -563,32 +637,48 @@ def heuristic_crossover(problem, solution1, solution2):
                 idx2 = 0                               # replace it with the first index of all
 
             # get the elements in each parent next to the first element
-            element1 = solution1[idx1]
-            element2 = solution2[idx2]
+            element1 = solution1.representation[idx1]
+            element2 = solution2.representation[idx2]
 
-            if (element1 == element2) or (element2 in offspring[0:i]):
-                offspring[i] = element1    # if the elements are equal or element 2 is already one of the changed elements
-                element = element1          # in offspring1 (if it is will close the cycle too early)
+            # if element1 is equal to element2 and element is not one of the changed elements in offspring1
+            if (element1 == element2) and (element2 not in offspring.representation[0:i]):
+                offspring.representation[i] = element2    # if the elements are equal or element 2 is already one of the changed elements
+                element = element2          # in offspring1 (if it is will close the cycle too early)
 
-            elif element1 in offspring[0:i]:   # element 1 is already one of the changed elements in offspring1
-                offspring[i] = element2        # (if it is will close the cycle too early)
+            # if element1 is already one of the changed elements in offspring1 and element2 is not one of the
+            # changed elements in offspring1
+            elif (element1 in offspring.representation[0:i]) and (element2 not in offspring.representation[0:i]):
+                offspring.representation[i] = element2        # (if it is will close the cycle too early)
                 element = element2
 
-            else:   # evaluate which element has the shortest path
+            # if element2 is already one of the changed elements in offspring1 and element1 is not one of the
+            # changed elements in offspring1
+            elif (element2 in offspring.representation[0:i]) and (element1 not in offspring.representation[0:i]):
+                offspring.representation[i] = element1        # (if it is will close the cycle too early)
+                element = element1
+
+            # evaluate which element has the shortest path
+            elif (element2 not in offspring.representation[0:i]) and (element1 not in offspring.representation[0:i]):
                 distance1 = matrix[element][element1]  # get the distance between the city in offspring and the element1
                 distance2 = matrix[element][element2]  # get the distance between the city in offspring and the element1
 
                 if distance1 <= distance2:  # if distance1 is the shortest path
-                    offspring[i] = element1   # replace the index i in offspring with the element 1
-                    element = element1        # set the next element to look for
-                else:                       # if distance2 is the shortest path
-                    offspring[i] = element2   # replace the index i in offspring with the element 1
-                    element = element2        # set the next element to look for
+                    offspring.representation[i] = element1  # replace the index i in offspring with the element 1
+                    element = element1  # set the next element to look for
+
+                else:  # if distance2 is the shortest path
+                    offspring.representation[i] = element2  # replace the index i in offspring with the element 1
+                    element = element2  # set the next element to look for
+            else:
+                element = sample((set(copy) - set(offspring.representation[0:i])), 1)[0]
+                offspring.representation[i] = element  # replace the index i in offspring with the element
 
             i += 1  # iterate to the next index in the offspring to replace it with the correct element
 
-            if i == len(solution1.representation):
+            if i == (len(solution1.representation)-1):
                 break
+
+        offspring.representation[-1] = list(set(copy) - set(offspring.representation[0:-1]))[0]
 
         return offspring
 
@@ -700,44 +790,30 @@ def scramble_mutation(problem, solution):
     return solution
 
 # -------------------------------------------------------------------------------------------------
-# Greedy Insert mutation
+# Greedy Swap mutation
 # -----------------------------------------------------------------------------------------------
 def greedy_mutation(problem, solution):
     offspring = deepcopy(solution)
 
-    mutpoint1 = randint(0, (len(solution.representation) - 1))
+    mutpoint1 = randint(0, (len(solution.representation) - 2))
 
     element = solution.representation[mutpoint1]
 
-    distances = ProblemTemplate.decision_variables["Distances"]
+    distances = problem.distances
+    distance_array = np.array(heapq.nsmallest(3, distances[element]))
 
     # get the index (item name) of the second smallest distance between mutpoint1 and all the other cities
-    closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
+    #closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
+    closest_city = np.argwhere(distances[element] == distance_array[1])[0][0]
 
     if closest_city == 0:  # the closest city can not be our first city on the matrix
-        closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
+        #closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
+        closest_city = np.argwhere(distances[element] == distance_array[2])[0][0]
 
-    # if mutpoint1 corresponds to the end position
-    if mutpoint1 == (len(solution.representation) - 1):
-        # function pop works with indexes
-        offspring.representation.pop(solution.representation.index(closest_city)) # take the closest_city from the offspring
-        offspring.representation.append(closest_city)  # add the closest_city at the end
-    else:
-        # inserting the closest city in the index after the mutation point
-        offspring.representation[(mutpoint1 + 1)] = closest_city
+    mutpoint2 = np.argwhere(solution.representation == closest_city)[0][0]
 
-        # if the closest city was behind the mutpoint1, the replacement is different
-        if solution.representation.index(closest_city) < mutpoint1:
-            # delete the closest city from the offspring
-            offspring.representation.pop(solution.representation.index(closest_city))
-
-            # append in the offspring the rest of the elements that were after mutpoint1 in solution 1
-            for i in range((mutpoint1 + 1), len(solution.representation)):
-                offspring.representation.append(solution[i])
-        else:
-            # passing the rest of the elements by their original order to after the number inserted
-            for i in range((mutpoint1 + 2), (solution.representation.index(closest_city) + 1)):
-                offspring.representation[i] = solution.representation[(i - 1)]
+    offspring.representation[mutpoint1+1], offspring.representation[mutpoint2] = offspring.representation[mutpoint2], \
+                                                                           offspring.representation[mutpoint1+1]
 
     # if final offspring equals the initial parent call the function again
     if offspring.representation == solution.representation:
@@ -745,6 +821,20 @@ def greedy_mutation(problem, solution):
 
     return offspring
 
+# -------------------------------------------------------------------------------------------------
+# Multiple mutation
+# -----------------------------------------------------------------------------------------------
+def multiple_mutation(problem, solution):
+    prob = uniform(0, 1)
+
+    if prob < (1 / 3):
+        return greedy_mutation(problem, solution)
+    elif (1 / 3) <= prob < (2 / 3):
+        return swap_mutation(problem, solution)
+    else:
+        return scramble_mutation(problem, solution)
+
+# TODO: talk about this . Look at mutations performance
 
 ###################################################################################################
 # REPLACEMENT APPROACHES

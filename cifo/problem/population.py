@@ -77,7 +77,6 @@ class Population:
         - Minimization
         - Multi-objective { set of objectives }
         """
-
         if self._objective == ProblemObjective.Maximization:
             for i in range(0, len(self._list)):
                 for j in range(i, len(self._list)):
@@ -93,5 +92,10 @@ class Population:
                         swap = self._list[j]
                         self._list[j] = self._list[i]
                         self._list[i] = swap
+
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
+
 
         self._sorted = True

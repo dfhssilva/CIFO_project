@@ -87,7 +87,7 @@ class HillClimbing:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
         # max iterations
-        self._max_iterations = 100
+        self._max_iterations = 50
         if "Maximum-Iterations" in params: 
             self._max_iterations = params["Maximum-Iterations"]
         
@@ -166,7 +166,7 @@ class HillClimbing:
         self._iteration = 0
         while searching:
             self._iteration += 1
-            print('iteration: ' + str(self._iteration))
+            #print('iteration: ' + str(self._iteration))
             # 2.1: Get the best neighbor
             self._get_best_neighbor()
             # 2.2: Select the best, between the current best and best neighbor
@@ -185,10 +185,10 @@ class HillClimbing:
         """
         Create a feasible initial solution
         """
-        self._solution = self._problem_instance.build_solution()
+        self._solution = self._problem_instance.build_solution(method="Greedy")
 
         while not self._problem_instance.is_admissible(self._solution):
-            self._solution = self._problem_instance.build_solution()
+            self._solution = self._problem_instance.build_solution(method="Greedy")
         
         self._problem_instance.evaluate_solution(self._solution, feedback=self._feedback)
 
@@ -253,7 +253,7 @@ class HillClimbing:
                     best_neighbor = deepcopy(neighbor)
 
         self._neighbor = best_neighbor
-        print('neighbor fitness: ' + str(self._neighbor.fitness))
+        #print('neighbor fitness: ' + str(self._neighbor.fitness))
     # _select for minimization
     #----------------------------------------------------------------------------------------------    
     def _select_minimization(self):
