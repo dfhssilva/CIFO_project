@@ -105,23 +105,40 @@ def initialize_using_multiple(problem, population_size):
 
     i = 0
     # generate a population of admissible solutions (individuals)
-    while i in range(0, population_size):
-        if i > 1:
-            s = problem.build_solution(method='Random')
-        elif i == 0:
-            s = problem.build_solution(method='Greedy')
-        else:
-            s = problem.build_solution(method='Hill Climbing')
+    if population_size >= 4:
+        while i in range(0, population_size):
+            if i > 4:
+                s = problem.build_solution(method='Random')
+            elif i < 2:
+                s = problem.build_solution(method='Greedy')
+            else:
+                s = problem.build_solution(method='Hill Climbing')
 
+            if problem.is_admissible(s):
+                s.id = [0, i]
+                
+                problem.evaluate_solution(s)
 
-        if problem.is_admissible(s):
-            s.id = [0, i]
+                solution_list.append(s)
 
-            problem.evaluate_solution(s)
+                i += 1
+    else:
+        while i in range(0, population_size):
+            if i > 2:
+                s = problem.build_solution(method='Random')
+            elif i == 0:
+                s = problem.build_solution(method='Greedy')
+            else:
+                s = problem.build_solution(method='Hill Climbing')
 
-            solution_list.append(s)
+            if problem.is_admissible(s):
+                s.id = [0, i]
 
-            i += 1
+                problem.evaluate_solution(s)
+
+                solution_list.append(s)
+
+                i += 1
 
     population = Population(
         problem = problem,
