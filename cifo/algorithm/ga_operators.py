@@ -1,5 +1,7 @@
 from random import uniform, randint, choices, sample, shuffle, random
 from copy import deepcopy
+import numpy as np
+import math
 import heapq
 
 from cifo.problem.objective import ProblemObjective
