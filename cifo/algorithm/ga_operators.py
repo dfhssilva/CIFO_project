@@ -1,11 +1,11 @@
 from random import uniform, randint, choices, sample, shuffle, random
 from copy import deepcopy
-import numpy as np
-import math
+import heapq
 
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import EncodingDataType, LinearSolution
+from cifo.problem.solution import EncodingDataType, LinearSolution, Encoding
 from cifo.problem.population import Population
+from cifo.problem.problem_template import ProblemTemplate
 
 
 ###################################################################################################
@@ -128,8 +128,6 @@ def initialize_using_sa(problem, population_size):
 # -------------------------------------------------------------------------------------------------
 # Initialization using Greedy Method
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Greedy Method
-# Remark: remember, you will need a neighborhood function for each problem
 def initialize_using_greedy(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using a Greedy Algorithm
@@ -536,9 +534,81 @@ def order1_crossover(problem, solution1, solution2):
 
         return offspring1, offspring2
 
-# TODO: use more than one crossovers in the same run
-# TODO: heuristic crossover
-# TODO: edge crossover
+# -------------------------------------------------------------------------------------------------
+# Heuristic Crossover
+# -------------------------------------------------------------------------------------------------
+def heuristic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    distances = ProblemTemplate.decision_variables["Distances"]
+
+    def apply_crossover_individually(offspring, matrix):
+        # get the element that will be in the first position of the offspring
+        first = randint(1, len(solution1.representation))
+
+        offspring[0] = first  # put the element in the first position
+
+        element = first
+        i = 1
+        while True:
+            idx1 = solution1.representation.index(element) + 1  # get the index of the city next to element in solution 1
+            idx2 = solution2.representation.index(element) + 1  # get the index of the city next to element in solution 2
+
+            if idx1 == len(solution1.representation):  # if the index corresponds to the length of the solution
+                idx1 = 0                               # replace it with the first index of all
+            if idx2 == len(solution2.representation):  # if the index corresponds to the length of the solution
+                idx2 = 0                               # replace it with the first index of all
+
+            # get the elements in each parent next to the first element
+            element1 = solution1[idx1]
+            element2 = solution2[idx2]
+
+            if (element1 == element2) or (element2 in offspring[0:i]):
+                offspring[i] = element1    # if the elements are equal or element 2 is already one of the changed elements
+                element = element1          # in offspring1 (if it is will close the cycle too early)
+
+            elif element1 in offspring[0:i]:   # element 1 is already one of the changed elements in offspring1
+                offspring[i] = element2        # (if it is will close the cycle too early)
+                element = element2
+
+            else:   # evaluate which element has the shortest path
+                distance1 = matrix[element][element1]  # get the distance between the city in offspring and the element1
+                distance2 = matrix[element][element2]  # get the distance between the city in offspring and the element1
+
+                if distance1 <= distance2:  # if distance1 is the shortest path
+                    offspring[i] = element1   # replace the index i in offspring with the element 1
+                    element = element1        # set the next element to look for
+                else:                       # if distance2 is the shortest path
+                    offspring[i] = element2   # replace the index i in offspring with the element 1
+                    element = element2        # set the next element to look for
+
+            i += 1  # iterate to the next index in the offspring to replace it with the correct element
+
+            if i == len(solution1.representation):
+                break
+
+        return offspring
+
+    offspring1 = apply_crossover_individually(offspring1, distances)
+    offspring2 = apply_crossover_individually(offspring2, distances)
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Multiple Crossover
+# -------------------------------------------------------------------------------------------------
+def multiple_crossover(problem, solution1, solution2):
+    prob = uniform(0, 1)
+
+    if prob < (1/3):
+        return pmx_crossover(problem, solution1, solution2)
+    elif (1/3) <= prob < (2/3):
+        return order1_crossover(problem, solution1, solution2)
+    else:
+        return heuristic_crossover(problem, solution1, solution2)
+
+
 ###################################################################################################
 # MUTATION APPROACHES
 ###################################################################################################
@@ -626,8 +696,53 @@ def scramble_mutation(problem, solution):
 
     return solution
 
+# -------------------------------------------------------------------------------------------------
+# Greedy Insert mutation
+# -----------------------------------------------------------------------------------------------
+def greedy_mutation(problem, solution):
+    offspring = deepcopy(solution)
 
-#TODO: Implement Greedy Swap mutation
+    mutpoint1 = randint(0, (len(solution.representation) - 1))
+
+    element = solution.representation[mutpoint1]
+
+    distances = ProblemTemplate.decision_variables["Distances"]
+
+    # get the index (item name) of the second smallest distance between mutpoint1 and all the other cities
+    closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
+
+    if closest_city == 0:  # the closest city can not be our first city on the matrix
+        closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
+
+    # if mutpoint1 corresponds to the end position
+    if mutpoint1 == (len(solution.representation) - 1):
+        # function pop works with indexes
+        offspring.representation.pop(solution.representation.index(closest_city)) # take the closest_city from the offspring
+        offspring.representation.append(closest_city)  # add the closest_city at the end
+    else:
+        # inserting the closest city in the index after the mutation point
+        offspring.representation[(mutpoint1 + 1)] = closest_city
+
+        # if the closest city was behind the mutpoint1, the replacement is different
+        if solution.representation.index(closest_city) < mutpoint1:
+            # delete the closest city from the offspring
+            offspring.representation.pop(solution.representation.index(closest_city))
+
+            # append in the offspring the rest of the elements that were after mutpoint1 in solution 1
+            for i in range((mutpoint1 + 1), len(solution.representation)):
+                offspring.representation.append(solution[i])
+        else:
+            # passing the rest of the elements by their original order to after the number inserted
+            for i in range((mutpoint1 + 2), (solution.representation.index(closest_city) + 1)):
+                offspring.representation[i] = solution.representation[(i - 1)]
+
+    # if final offspring equals the initial parent call the function again
+    if offspring.representation == solution.representation:
+        offspring = greedy_mutation(problem, solution)
+
+    return offspring
+
+
 ###################################################################################################
 # REPLACEMENT APPROACHES
 ###################################################################################################

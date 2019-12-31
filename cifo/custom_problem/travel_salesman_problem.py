@@ -2,6 +2,7 @@ from copy import deepcopy
 from random import choice, randint, shuffle, sample
 import numpy as np
 import itertools
+import heapq
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
@@ -119,9 +120,57 @@ class TravelSalesmanProblem(ProblemTemplate):
             return solution
         #elif method == 'Simulated Annealing': TODO: build SA initialization
         #    return solution
+        elif method == 'Greedy':
+            # get a random solution where we will keep the first element
+            initial_solution = self.build_solution(method='Random')
+            copy = initial_solution.copy()
+
+            distances = self.decision_variables["Distances"]
+
+            element = initial_solution.representation[0]
+
+            # i can not reach the last position because there is no more cities to evaluate
+            for i in range(1, (len(initial_solution.representation)-1)):
+                # get the index (item name) of the second smallest distance between element in index i and all the other cities
+                closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
+
+                if closest_city == 0:  # the closest city can not be our first city on the matrix
+                    closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
+
+                n = 2  # let us to go through the distance ascending list
+
+                # while the closest city is already in the changed slice of the initial_solution, we have to keep looking
+                while closest_city in initial_solution.representation[0:i]:
+                    # get the next closest city in the distance ascending list with the element evaluated
+                    closest_city = distances[element].index(
+                        heapq.nsmallest(len(initial_solution.representation), distances[element])[n]
+                        )
+
+                    if closest_city == 0:  # the closest city can not be our first city on the matrix
+                        closest_city = distances[element].index(
+                            heapq.nsmallest(len(initial_solution.representation), distances[element])[n+1]
+                            )
+                        n += 1  # if it is not a valid closest city the n should be plus one than the usual
+
+                    n += 1
+
+                # change the current position in initial_solution with the closest_city
+                initial_solution.representation[i] = closest_city
+
+                # get the next element to evaluate the closest city
+                element = initial_solution.representation[i]
+
+            # change the last index with the missing element
+            initial_solution.representation[-1] = list(set(copy) - set(initial_solution.representation[0:-1]))[0]
+
+            solution = LinearSolution(
+                representation=initial_solution.representation,
+                encoding_rule=self._encoding_rule
+            )
+
+            return solution
         else:
-            print('Please choose one of these methods: Hill Climbing, Simulated Annealing or Random. It will use the '
-                  'Random method')
+            print('Please choose one of these methods: Hill Climbing, Greedy or Random. It will use the Random method')
             return self.build_solution()
 
 
@@ -229,7 +278,7 @@ def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
 
         return neighbors
 
-    for i in range(0, nchanges):
+    for i in range(0, n_changes):
         neighbors_final = n_change(neighbors_final)
         print(str(len(neighbors_final))+"i="+str(i))
 

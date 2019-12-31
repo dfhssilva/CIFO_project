@@ -104,7 +104,7 @@ class Encoding():
     
     # constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, encoding_rule ):
+    def __init__(self, encoding_rule):
         """
         Encoding Constructor
         
