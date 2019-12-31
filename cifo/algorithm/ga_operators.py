@@ -33,30 +33,28 @@ def initialize_using_random(problem, population_size):
     # generate a population of admissible solutions (individuals)
     for i in range(0, population_size):
         s = problem.build_solution(method='Random')
-        
+
         # check if the solution is admissible
         while not problem.is_admissible(s):
             s = problem.build_solution(method='Random')
-        
+
         s.id = [0, i]
 
         problem.evaluate_solution(s)
-        
+
         solution_list.append(s)
 
-    population = Population( 
+    population = Population(
         problem = problem,
-        maximum_size = population_size, 
+        maximum_size = population_size,
         solution_list = solution_list
     )
-    
+
     return population
 
 # -------------------------------------------------------------------------------------------------
 # Initialization using Hill Climbing
 # -------------------------------------------------------------------------------------------------
-#TODO: OPTIONAL, implement a initialization based on Hill Climbing
-# Remark: remember, you will need a neighborhood function for each problem
 def initialize_using_hc(problem, population_size):
     """
     Initialize a population of solutions (feasible solution) for an evolutionary algorithm using Hill Climbing
@@ -81,9 +79,9 @@ def initialize_using_hc(problem, population_size):
 
         solution_list.append(s)
 
-    population = Population( 
+    population = Population(
         problem = problem,
-        maximum_size = population_size, 
+        maximum_size = population_size,
         solution_list = solution_list
     )
 
@@ -239,7 +237,7 @@ def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVE
 
     return population.get(index1), population.get(index2)
 
-        
+
 # -------------------------------------------------------------------------------------------------
 # rank_selection function
 # -------------------------------------------------------------------------------------------------
@@ -305,7 +303,7 @@ def tournament_selection(population, objective, params):
 
                 if population.solutions[index_temp].fitness > population.solutions[index_selected].fitness:
                     index_selected = index_temp
-        elif objective == ProblemObjective.Minimization:    #TODO: elif? and no else?
+        elif objective == ProblemObjective.Minimization:
             for _ in range(0, tournament_size):
                 index_temp = randint(0, population.size - 1)
 
@@ -325,7 +323,7 @@ def tournament_selection(population, objective, params):
 
     return population.solutions[index1], population.solutions[index2]
 
-# TODO: uniform selection
+
 ###################################################################################################
 # CROSSOVER APPROACHES
 ###################################################################################################
@@ -343,7 +341,7 @@ def singlepoint_crossover(problem, solution1, solution2):
         offspring1.representation[i] = solution2.representation[i]
         offspring2.representation[i] = solution1.representation[i]
 
-    return offspring1, offspring2    
+    return offspring1, offspring2
 
 # -------------------------------------------------------------------------------------------------
 # Partially Mapped Crossover (PMX)
@@ -416,6 +414,7 @@ def cycle_crossover(problem, solution1, solution2):
     offspring2 = deepcopy(solution2)  # .clone()
 
     index_visited = []  # list of visited indexes during the cycles
+    idx = None
 
     while len(index_visited) < len(solution1.representation):  # the loop only ends when all the indexes were visited
         for i in range(0, len(solution1.representation)):  # get the smallest index of the solution not visited
@@ -424,11 +423,13 @@ def cycle_crossover(problem, solution1, solution2):
                 index_visited.append(idx)
                 break
 
+        if idx == None:
+            print('Warning: idx equals None')
+
         if cycle % 2 == 0:    # when the cycle is even
             while True:
                 offspring1.representation[idx] = solution2.representation[idx]    # save the swaped elements
-                offspring2.representation[idx] = solution1.representation[idx]      #TODO:check the warnin on the line before
-                                                                                    #solve with a idx=0 before?
+                offspring2.representation[idx] = solution1.representation[idx]
 
                 # get the respective index of the solution 1 for the element in solution 2
                 idx = solution1.representation.index(solution2.representation[idx])
@@ -451,6 +452,7 @@ def cycle_crossover(problem, solution1, solution2):
                     break
 
     return offspring1, offspring2
+
 #TODO: check cycle crossover np and complete or delete
 def cycle_crossover_np(problem, solution1, solution2):
     cycle = 1   # number of cycles
@@ -497,7 +499,7 @@ def cycle_crossover_np(problem, solution1, solution2):
                     cycle += 1      # go to the next cycle
                     break
 
-    offspring1 = from_rep_to_sol(
+    offspring1 = LinearSolution(
         representation= offspring1_np,
 
         )
@@ -550,7 +552,7 @@ def heuristic_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
-    distances = ProblemTemplate.decision_variables["Distances"]
+    distances = problem.distances
 
     def apply_crossover_individually(offspring, matrix):
         # get the element that will be in the first position of the offspring
@@ -716,7 +718,7 @@ def greedy_mutation(problem, solution):
 
     element = solution.representation[mutpoint1]
 
-    distances = ProblemTemplate.decision_variables["Distances"]
+    distances = problem.distances
 
     # get the index (item name) of the second smallest distance between mutpoint1 and all the other cities
     closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])

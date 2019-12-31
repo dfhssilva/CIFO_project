@@ -86,8 +86,8 @@ class ProblemTemplate:
         return self._encoding
     
     @encoding.setter
-    def encoding(self, encoding_rule ):
-        self._encoding = Encoding( encoding_rule )
+    def encoding(self, encoding_rule):
+        self._encoding = Encoding(encoding_rule)
         
     
     # Build Solution Function - build_solution()

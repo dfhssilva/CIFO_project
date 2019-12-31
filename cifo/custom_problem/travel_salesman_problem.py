@@ -86,6 +86,10 @@ class TravelSalesmanProblem(ProblemTemplate):
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Minimization
 
+    @property
+    def distances(self):
+        return self._distances
+
     # Build Solution for Travel Salesman Problem
     #----------------------------------------------------------------------------------------------
     def build_solution(self, method='Random'):
@@ -122,49 +126,45 @@ class TravelSalesmanProblem(ProblemTemplate):
         #    return solution
         elif method == 'Greedy':
             # get a random solution where we will keep the first element
-            initial_solution = np.array(self.build_solution(method='Random'))
+            initial_solution = np.array(self.build_solution(method='Random').representation)
             copy = initial_solution.copy()
 
-            distances = self.decision_variables["Distances"]
-
-            element = initial_solution.representation[0]
+            element = initial_solution[0]
 
             # i can not reach the last position because there is no more cities to evaluate
-            for i in range(1, (len(initial_solution.representation)-1)):
+            for i in range(1, (len(initial_solution)-1)):
+                distance_array = np.array(heapq.nsmallest(len(initial_solution), self._distances[element]))
+
                 # get the index (item name) of the second smallest distance between element in index i and all the other cities
-                closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
+                closest_city = self._distances[element].index(distance_array[1])
 
                 if closest_city == 0:  # the closest city can not be our first city on the matrix
-                    closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
+                    closest_city = self._distances[element].index(distance_array[2])
 
                 n = 2  # let us to go through the distance ascending list
 
                 # while the closest city is already in the changed slice of the initial_solution, we have to keep looking
-                while closest_city in initial_solution.representation[0:i]:
+                while closest_city in initial_solution[0:i]:
                     # get the next closest city in the distance ascending list with the element evaluated
-                    closest_city = distances[element].index(
-                        heapq.nsmallest(len(initial_solution.representation), distances[element])[n]
-                        )
+                    closest_city = self._distances[element].index(distance_array[n])
 
                     if closest_city == 0:  # the closest city can not be our first city on the matrix
-                        closest_city = distances[element].index(
-                            heapq.nsmallest(len(initial_solution.representation), distances[element])[n+1]
-                            )
+                        closest_city = self._distances[element].index(distance_array[n+1])
                         n += 1  # if it is not a valid closest city the n should be plus one than the usual
 
                     n += 1
 
                 # change the current position in initial_solution with the closest_city
-                initial_solution.representation[i] = closest_city
+                initial_solution[i] = closest_city
 
                 # get the next element to evaluate the closest city
-                element = initial_solution.representation[i]
+                element = initial_solution[i]
 
             # change the last index with the missing element
-            initial_solution.representation[-1] = list(set(copy) - set(initial_solution.representation[0:-1]))[0]
+            initial_solution[-1] = list(set(copy) - set(initial_solution[0:-1]))[0]
 
             solution = LinearSolution(
-                representation=initial_solution.representation,
+                representation=initial_solution,
                 encoding_rule=self._encoding_rule
             )
 
@@ -223,6 +223,11 @@ class TravelSalesmanProblem(ProblemTemplate):
 
         return solution
 
+
+# -------------------------------------------------------------------------------------------------
+# OPTIONAL - it is only needed if you will implement Local Search Methods
+#            (Hill Climbing and Simulated Annealing)
+# -------------------------------------------------------------------------------------------------
     def tsp_get_neighbors_np(self, solution, problem, neighborhood_size=0, n_changes=3):
         initial_sol = np.asarray(solution.representation)       # change to numpy array for performance
         neighbors_np = [initial_sol]                            #list of numpy arrays for performance
@@ -254,10 +259,6 @@ class TravelSalesmanProblem(ProblemTemplate):
 
         return neighbors_final                              # return a list of solutions
 
-# -------------------------------------------------------------------------------------------------
-# OPTIONAL - it is only needed if you will implement Local Search Methods
-#            (Hill Climbing and Simulated Annealing)
-# -------------------------------------------------------------------------------------------------
 def tsp_get_neighbors(solution, problem, neighborhood_size = 0, n_changes=1):
     neighbors_final = [solution]
 

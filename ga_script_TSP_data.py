@@ -221,15 +221,15 @@ tsp_problem_instance = TravelSalesmanProblem(
 parent_selection = roulettewheel_selection
 
 # dictionaries to create test directories
-valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedy"} #, initialize_using_sa: "sa"
+valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedyI"} #, initialize_using_sa: "sa"
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
 valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover: "order1", heuristic_crossover: "heur",
-               multiple_crossover: "mix"} #TODO: complete these dictionaries, do imports of new methods?
+               multiple_crossover: "mix"}
                 # singlepoint_crossover: "singP" should not be used
 valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble",  greedy_mutation: "greedy"}
+                  scramble_mutation: "scramble",  greedy_mutation: "greedyM"}
                     # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
@@ -318,6 +318,7 @@ def one_combination():
             log_dir=log_base_dir
             )
 
+        # find the best solution over the runs
         if ga.best_solution.fitness < best_solution:
             best_solution = ga.best_solution
 

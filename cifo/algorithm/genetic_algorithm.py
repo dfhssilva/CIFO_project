@@ -28,6 +28,7 @@ from cifo.algorithm.ga_operators import (initialize_using_random,
                                          )
 
 from cifo.problem.population import Population
+from cifo.problem.objective import ProblemObjective
 
 from cifo.util.terminal import Terminal, FontColor
 
@@ -152,7 +153,8 @@ class GeneticAlgorithm:
                     offspring1.id = [self._generation, i]
                     i += 1
                     offspring2.id = [self._generation, i]
-                    i += 2          #TODO:check if +=2 ???? why not +=1
+                    #i += 2
+                    i += 1
 
                 # 2.1.3. Try Apply Mutation (depends on the mutation probability)
                 if self.apply_mutation: 
@@ -163,6 +165,9 @@ class GeneticAlgorithm:
                     offspring2 = mutate(problem, offspring2)
                     offspring2.id = [self._generation, i]
                     i += 1
+
+                #in our opinion the id's should be added after applying crossover and/or mutation, but we will not
+                # change because it is not relevant
 
                 # add the offsprings in the new population (New Generation)
                 if new_population.has_space and is_admissible(offspring1):
@@ -329,12 +334,18 @@ class GeneticAlgorithm:
     #
     #    return weight
 
+    # find the best solution for each generation in each run
     def find_best_solution(self):
-        if self._fittest.fitness < self._best_solution.fitness:
-            self._best_solution = self._fittest
+        if self._problem_instance.objective == ProblemObjective.Minimization:
+            if self._fittest.fitness < self._best_solution.fitness:
+                self._best_solution = self._fittest
+        elif self._problem_instance.objective == ProblemObjective.Maximization:
+            if self._fittest.fitness > self._best_solution.fitness:
+                self._best_solution = self._fittest
+        else:
+            print('The code does not handle multiobjective problems yet.')
+            exit(code=1)
 
         print('Fittest pop: ' + str(self._fittest))
         print('Best solution: ' + str(self._best_solution))
         print('Best solution fitness: ' + str(self._best_solution.fitness))
-
-    # TODO: best solution for maximization
