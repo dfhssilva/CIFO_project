@@ -8,16 +8,22 @@ from cifo.custom_problem.travel_salesman_problem import (
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
-    initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy,
+    initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy, initialize_using_multiple,
     roulettewheel_selection, rank_selection, tournament_selection,
-    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover,
-    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation,
+    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover,
+    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation,
+    multiple_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import LocalSearchObserver
 from random import randint
 import numpy as np
+from copy import deepcopy
+
+from os import listdir, path, mkdir
+from os.path import isfile, join
+from pandas import pandas as pd
 
 def plot_performance_chart(df):
     import plotly.graph_objects as go
@@ -198,9 +204,18 @@ input = [
     [55.93722702,30.70635332,50.95819548,65.57023747,30.04357507,40.51150177,33.87317717,16.93508883,77.69760707,53.02684118,29.06494692,43.31765491,34.37176642,54.72147414,6.721991448,31.66727078,6.231497522,62.7329447,47.21524899,25.17666698,55.48401863,46.97351916,6.627974548,52.2676687,67.95880917,18.21817412,72.77673918,44.9128289,57.28386989,29.54258423,89.17537411,24.81918894,49.39393802,84.26505137,71.54523017,12.86466693,32.75012183,17.00339351,73.04874162,24.51377144,64.09553996,49.90199756,39.35911958,31.955111,82.43336544,30.9872945,43.83605472,59.28961986,74.47897182,45.07329279,41.42506554,30.33094716,72.31921582,56.72916661,32.78967384,69.12109652,45.34639631,60.63102968,80.53919439,70.43006517,15.25700746,61.03081565,38.5835255,8.289088535,17.37015267,51.90214837,51.84508121,18.62853682,59.22554537,15.08448974,59.23325207,17.53654317,64.15406021,47.9643968,67.75881503,64.51401743,79.25640275,22.50473552,18.32054533,32.17150539,30.33065566,71.89758244,65.8376319,6.52305319,58.76340355,72.29287347,60.76073152,59.7345962,31.06246063,0]
 ]
 
+input1 =[
+        [0, 2451, 713, 1018, 1631, 1374, 2408],
+        [2451, 0, 1745, 1524, 831, 1240, 959],
+        [713, 1745, 0, 355, 920, 803, 1737],
+        [1018, 1524, 355, 0, 700, 862, 1395],
+        [1631, 831, 920, 700, 0, 663, 1021],
+        [1374, 1240, 803, 862, 663, 0, 1681],
+        [2408, 959, 1737, 1395, 1021, 1681, 0]]
+
 tsp_decision_variables = {
     "Distances" : np.array(input), #<< Number, Mandatory
-    "Item-Name" : [i for i in range(1,len(input[0]))] # << String, Optional, The names of the items, can be used to present the solution.
+    "Item-Name" : [i for i in range(1, len(input[0]))] # << String, Optional, The names of the items, can be used to present the solution.
         # It starts at 1 reserving the 0 for the static city
         # We are setting the departure point, so we only have to arrange the n-1 remaining cities
 }
@@ -216,33 +231,35 @@ tsp_problem_instance = TravelSalesmanProblem(
 # parent_selection = TournamentSelection()
 parent_selection = roulettewheel_selection
 
-# # dictionaries to create test directories
-
-valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc"}#, initialize_using_sa: "sa", initialize_using_greedy: "greedy"}
+# dictionaries to create test directories
+valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedyI",
+              initialize_using_multiple: "mixI"} #, initialize_using_sa: "sa"
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
-valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover:"order1"}
+valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover: "order1", heuristic_crossover: "heur",
+               multiple_crossover: "mixC"}
                 # singlepoint_crossover: "singP" should not be used
 valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble"} # single_point_mutation: "singP" should not be used
+                  scramble_mutation: "scramble",  greedy_mutation: "greedyM", multiple_mutation: "mixM"}
+                    # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-test_init = [initialize_using_hc]#, initialize_using_random]
+# Parameters to gridsearch in a run
+test_init = [initialize_using_hc]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
-test_mutation = [insert_mutation]#, swap_mutation]#, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
-test_replacement = [elitism_replacement]#, standard_replacement]
-test_xover_prob = [0.1, 0.9]
-#test_xover_prob = [0.75] # simples
-test_mut_prob = [0.1, 0.9]
-#test_mut_prob = [0.75] # simples
+test_xover = [heuristic_crossover]  # singlepoint_crossover should not be used
+test_mutation = [insert_mutation, inversion_mutation, scramble_mutation]  # single_point_mutation should not be used
+test_replacement = [elitism_replacement]
+#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
+test_xover_prob = [0.9, 0.1]
+test_mut_prob = [0.9, 0.1]
+#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples
 
 #initial params
-# parent_selection = roulettewheel_selection
 
 params = {
         # params
@@ -259,23 +276,14 @@ params = {
         "Replacement-Approach"      : elitism_replacement
     }
 
-# dir_labels = {initialize_using_random: "rnd", initialize_using_hc: "hc", initialize_using_sa: "sa",
-#               initialize_using_greedy: "greedy", RouletteWheelSelection().select: "rol",
-#               TournamentSelection().select: "tourn", RankSelection().select: "rank", cycle_crossover: "cycle",
-#               pmx_crossover: "pmx",  order1_crossover: "order1", swap_mutation: "swap", insert_mutation: "insert",
-#               inversion_mutation: "invert", scramble_mutation: "scramble", elitism_replacement: "elite",
-#               standard_replacement: "std"}
-#
-# labels_dict = {k: dir_labels.get(v) if k in ["Initialization-Approach", "Selection-Approach", "Crossover-Approach",
-#                                      "Mutation-Approach", "Replacement-Approach"] else v for (k, v) in params.items()}
 
 def one_combination():
-    # log_name = "I-{Initialization-Approach}_S-{Selection-Approach}_C-{Crossover-Approach}_M-{Mutation-Approach}" \
-    #            "_R-{Replacement-Approach}_CP-{Crossover-Probability}_MP-{Mutation-Probability}_PS-{Population-Size}" \
-    #            "_TS-{Tournament-Size}_G-{Number-of-Generations}".format(**labels_dict)
-    from os import listdir, path, mkdir
-    from os.path import isfile, join
-    from pandas import pandas as pd
+    """
+    Actually runs the algorithm with one set of parameters.
+    Names the resume file from parameters of search
+    Creates the resume file from all the runs for a set of parameters
+
+    """
 
     log_base_dir="./log/"       #Base dir for log of initial runs
     if not path.exists(log_base_dir):
@@ -310,6 +318,7 @@ def one_combination():
 
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
+    overall_best_solution = None
     number_of_runs = 30
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
@@ -325,6 +334,17 @@ def one_combination():
         ga.register_observer(ga_observer)
         ga.search()
         ga.save_log()
+
+        # find the best solution over the runs
+        if run == 1:
+            overall_best_solution = deepcopy(ga.best_solution)
+        else:
+            if ga.best_solution.fitness < overall_best_solution.fitness:
+                overall_best_solution = deepcopy(ga.best_solution)
+
+        print('overall_best_solution: ', overall_best_solution.representation)
+        print('overall_best_solution fitness: ', overall_best_solution.fitness)
+
 
     # Consolidate the runs
     #--------------------------------------------------------------------------------------------------
@@ -379,9 +399,10 @@ def one_combination():
     df.to_excel(all_dir + f"{log_name}.xlsx", index=False, encoding='utf-8')
 
 #plot_performance_chart(df)
-##################################################################################################
-#       RUNS Through the Several list of possible parameters
-##################################################################################################
+
+# -------------------------------------------------------------------------------------------------
+# RUNS Through the Several list of possible parameters
+# -------------------------------------------------------------------------------------------------
 for init in range(len(test_init)):
     params["Initialization-Approach"] = test_init[init]
     for select in range(len(test_select)):
@@ -402,7 +423,6 @@ for init in range(len(test_init)):
                                     one_combination()
                             else:
                                 one_combination()
-
 
 #[sum(sublist) for sublist in itertools.izip(*myListOfLists)]
 
