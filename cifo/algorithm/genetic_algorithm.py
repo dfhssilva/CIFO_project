@@ -338,14 +338,14 @@ class GeneticAlgorithm:
     def find_best_solution(self):
         if self._problem_instance.objective == ProblemObjective.Minimization:
             if self._fittest.fitness < self._best_solution.fitness:
-                self._best_solution = self._fittest
+                self._best_solution = deepcopy(self._fittest)
         elif self._problem_instance.objective == ProblemObjective.Maximization:
             if self._fittest.fitness > self._best_solution.fitness:
-                self._best_solution = self._fittest
+                self._best_solution = deepcopy(self._fittest)
         else:
             print('The code does not handle multiobjective problems yet.')
             exit(code=1)
 
-        print('Fittest pop: ' + str(self._fittest))
-        print('Best solution: ' + str(self._best_solution))
-        print('Best solution fitness: ' + str(self._best_solution.fitness))
+        # print('Fittest pop: ' + str(self._fittest))
+        # print('Best solution: ' + str(self._best_solution))
+        # print('Best solution fitness: ' + str(self._best_solution.fitness))

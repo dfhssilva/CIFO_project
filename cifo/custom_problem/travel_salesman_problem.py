@@ -136,20 +136,24 @@ class TravelSalesmanProblem(ProblemTemplate):
                 distance_array = np.array(heapq.nsmallest(len(initial_solution), self._distances[element]))
 
                 # get the index (item name) of the second smallest distance between element in index i and all the other cities
-                closest_city = self._distances[element].index(distance_array[1])
-
+                closest_city = np.argwhere(self._distances[element] == distance_array[1])[0][0]
+                    #self._distances[element].index(distance_array[1])
+                    #np.where(array == item)
                 if closest_city == 0:  # the closest city can not be our first city on the matrix
-                    closest_city = self._distances[element].index(distance_array[2])
+                    closest_city = np.argwhere(self._distances[element] == distance_array[2])[0][0]
+                        #self._distances[element].index(distance_array[2])
 
                 n = 2  # let us to go through the distance ascending list
 
                 # while the closest city is already in the changed slice of the initial_solution, we have to keep looking
                 while closest_city in initial_solution[0:i]:
                     # get the next closest city in the distance ascending list with the element evaluated
-                    closest_city = self._distances[element].index(distance_array[n])
+                    closest_city = np.argwhere(self._distances[element] == distance_array[n])[0][0]
+                        #self._distances[element].index(distance_array[n])
 
                     if closest_city == 0:  # the closest city can not be our first city on the matrix
-                        closest_city = self._distances[element].index(distance_array[n+1])
+                        closest_city = np.argwhere(self._distances[element] == distance_array[n+1])[0][0]
+                            #self._distances[element].index(distance_array[n+1])
                         n += 1  # if it is not a valid closest city the n should be plus one than the usual
 
                     n += 1
@@ -161,16 +165,18 @@ class TravelSalesmanProblem(ProblemTemplate):
                 element = initial_solution[i]
 
             # change the last index with the missing element
-            initial_solution[-1] = list(set(copy) - set(initial_solution[0:-1]))[0]
+            initial_solution[-1] = np.setdiff1d(copy, initial_solution[0:-1], assume_unique=True)[0]
+                #list(set(copy) - set(initial_solution[0:-1]))[0]
 
+            print('greedy solutions: ', list(initial_solution))
             solution = LinearSolution(
-                representation=initial_solution,
+                representation=list(initial_solution),
                 encoding_rule=self._encoding_rule
             )
 
             return solution
         else:
-            print('Please choose one of these methods: Hill Climbing, Greedy or Random. It will use the Random method')
+            print('Please choose one of these methods: Hill Climbing, Greedy, Random or Mix. It will use the Random method')
             return self.build_solution()
 
 

@@ -87,7 +87,7 @@ class HillClimbing:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         
         # max iterations
-        self._max_iterations = 100
+        self._max_iterations = 50
         if "Maximum-Iterations" in params: 
             self._max_iterations = params["Maximum-Iterations"]
         
@@ -185,10 +185,10 @@ class HillClimbing:
         """
         Create a feasible initial solution
         """
-        self._solution = self._problem_instance.build_solution()
+        self._solution = self._problem_instance.build_solution(method="Greedy")
 
         while not self._problem_instance.is_admissible(self._solution):
-            self._solution = self._problem_instance.build_solution()
+            self._solution = self._problem_instance.build_solution(method="Greedy")
         
         self._problem_instance.evaluate_solution(self._solution, feedback=self._feedback)
 
