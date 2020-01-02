@@ -22,7 +22,7 @@ class GeneticAlgorithmLogger:
     def add(self, generation, solution):
         self._runs.append(self._run)
         self._generations.append(generation)
-        self._fitness.append(solution.fitness) # adds the fittest solution of each generation
+        self._fitness.append(solution.fitness)  # adds the fittest solution of each generation
 
     #
     #----------------------------------------------------------------------------------------------  
