@@ -711,8 +711,10 @@ def single_arithmetic_crossover(problem, solution1, solution2):
     crosspoint = randint(0, len(solution1.representation))
     alpha = uniform(0, 1)
 
-    offspring1.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + (1-alpha)*offspring2.representation[crosspoint]
-    offspring2.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + (1-alpha)*offspring2.representation[crosspoint]
+    offspring1.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + \
+                                            (1-alpha)*offspring2.representation[crosspoint]
+    offspring2.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + \
+                                            (1-alpha)*offspring2.representation[crosspoint]
 
     offspring1.representation = list(map(lambda x: x/sum(offspring1.representation), offspring1.representation))
     offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
