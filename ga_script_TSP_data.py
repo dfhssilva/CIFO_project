@@ -238,7 +238,8 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-# Parameters to gridsearch in a run
+
+#Parameters to gridsearch in a run
 test_init = [initialize_using_multiple, initialize_using_hc, initialize_using_greedy, initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
 test_xover = [multiple_crossover, heuristic_crossover, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
