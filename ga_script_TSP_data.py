@@ -251,6 +251,7 @@ test_mut_prob = [0.9, 0.1]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples
 
+
 #initial params
 
 params = {
@@ -311,7 +312,7 @@ def one_combination():
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
     overall_best_solution = None
-    number_of_runs = 2
+    number_of_runs = 30
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
@@ -387,12 +388,11 @@ def one_combination():
                 )
 
     # Exporting summary of configuration with best solution
-    with pd.ExcelWriter(all_dir + f"{log_name}.xlsx", engine="xlsxwriter") as writer:
+    with pd.ExcelWriter(all_dir + f"{log_name}.xlsx") as writer:
         df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
-        pd.DataFrame({'Representation': str(overall_best_solution.representation), 'Fitness': overall_best_solution.fitness},
+        pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness]],
                      columns=["Representation", "Fitness"]).to_excel(writer, sheet_name='Overall_Best_Solution')
 
-#[str(overall_best_solution.representation), overall_best_solution.fitness],
 
 #plot_performance_chart(df)
 
