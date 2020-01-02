@@ -798,6 +798,38 @@ def single_point_mutation(problem, solution):
     # return solution           
 
 # -------------------------------------------------------------------------------------------------
+# Multiple Real Mutation
+# -----------------------------------------------------------------------------------------------
+
+def multiple_real_mutation(problem, solution):
+    index = sample(range(0, len(solution.representation)), 2)
+
+    param = random.random()
+
+    if param < 0.3:
+        solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
+                                                                               solution.representation[index[0]]
+
+    elif param < 0.6:
+        avg_num = math.floor(random.random() * (len(solution.representation) - 1))
+        l = random.sample(range(0, (len(solution.representation) - 1)), avg_num)
+        sum = 0
+        for i in l:
+            sum += solution.representation[i]
+        for i in l:
+            solution.representation[i] = sum / avg_num
+
+    else:
+        rand_num = round(random.random(), 1)
+        solution.representation[index[0]], solution.representation[index[1]] = \
+            round(rand_num * (solution.representation[index[0]]+ solution.representation[index[1]]), 2), round(
+            (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
+
+    return solution
+
+
+
+# -------------------------------------------------------------------------------------------------
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
 def swap_mutation(problem, solution):
