@@ -802,7 +802,6 @@ def single_point_mutation(problem, solution):
 # -------------------------------------------------------------------------------------------------
 # Multiple Real Mutation
 # -----------------------------------------------------------------------------------------------
-
 def multiple_real_mutation(problem, solution):
     index = sample(range(0, len(solution.representation)), 2)
 
@@ -828,8 +827,6 @@ def multiple_real_mutation(problem, solution):
             (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
 
     return solution
-
-
 
 # -------------------------------------------------------------------------------------------------
 # Swap mutation
