@@ -701,6 +701,71 @@ def multiple_crossover(problem, solution1, solution2):
         return heuristic_crossover(problem, solution1, solution2)
 #TODO: talk about this . Look at crossovers performance
 
+# -------------------------------------------------------------------------------------------------
+# Single Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def single_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    crosspoint = randint(0, len(solution1.representation))
+    alpha = uniform(0, 1)
+
+    offspring1.representation[crosspoint], offspring2.representation[crosspoint] = \
+        alpha*offspring1.representation[crosspoint] + (1-alpha)*offspring2.representation[crosspoint]
+
+    offspring1.representation = list(map(lambda x: x/sum(offspring1.representation), offspring1.representation))
+    offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Simple Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def simple_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    crosspoint = randint(0, len(solution1.representation))
+    alpha = uniform(0, 1)
+
+    for i in range(crosspoint, len(solution1.representation)):
+        offspring1.representation[i], offspring2.representation[i] = \
+        alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+
+    offspring1.representation = list(map(lambda x: x / sum(offspring1.representation), offspring1.representation))
+    offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Whole Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def whole_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    alpha = uniform(0, 1)
+
+    for i in range(0, len(solution1.representation)):
+        offspring1.representation[i], offspring2.representation[i] = alpha*offspring1.representation[i] + \
+                                                                     (1-alpha)*offspring2.representation[i]
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Multiple Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def multiple_arithmetic_crossover(problem, solution1, solution2):
+    prob = uniform(0, 1)
+
+    if prob < (1/3):
+        return single_arithmetic_crossover(problem, solution1, solution2)
+    elif (1/3) <= prob < (2/3):
+        return simple_arithmetic_crossover(problem, solution1, solution2)
+    else:
+        return whole_arithmetic_crossover(problem, solution1, solution2)
+
 
 ###################################################################################################
 # MUTATION APPROACHES
