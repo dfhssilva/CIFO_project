@@ -249,7 +249,7 @@ valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 # Parameters to gridsearch in a run
 test_init = [initialize_using_hc]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [heuristic_crossover]  # singlepoint_crossover should not be used
+test_xover = [pmx_crossover]  # singlepoint_crossover should not be used
 test_mutation = [insert_mutation, inversion_mutation, scramble_mutation]  # single_point_mutation should not be used
 test_replacement = [elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
