@@ -10,10 +10,10 @@ from cifo.problem.solution import LinearSolution, Encoding
 from cifo.algorithm.hill_climbing import HillClimbing
 
 tsp_encoding_rule = {
-    "Size"         : -1, # Number of the cities from the distance matrix
+    "Size"         : -1,  # Number of the cities from the distance matrix
     "Is ordered"   : True,
     "Can repeat"   : False,
-    "Data"         : [0,0], # must be defined by the data
+    "Data"         : [0,0],  # must be defined by the data
     "Data Type"    : "Pattern"
 }
 
@@ -55,11 +55,11 @@ class TravelSalesmanProblem(ProblemTemplate):
 
     # Constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables = tsp_decision_variables_example, constraints = None ,
-                 encoding_rule = tsp_encoding_rule):
+    def __init__(self, decision_variables=tsp_decision_variables_example, constraints=None,
+                 encoding_rule=tsp_encoding_rule):
         """
         - Defines:
-            - the Size and the enconding characters (Data) according to the input distances matrix
+            - the Size and the Encoding characters (Data) according to the input distances matrix
             - the objective type (Max or Min)
             - the problem name
         - Optimizes the access to the decision variables

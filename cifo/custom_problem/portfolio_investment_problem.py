@@ -15,20 +15,20 @@ pip_encoding_rule = {
 }
 
 pip_constraints_example = {
-    "Risk-Tolerance" : 1,
+    "Risk-Tolerance": 1,
     "Budget": 10000
 }
 
 # -------------------------------------------------------------------------------------------------
 # PIP - Portfolio Investment Problem 
 # -------------------------------------------------------------------------------------------------
-class PortfolioInvestmentProblem( ProblemTemplate ):
+class PortfolioInvestmentProblem(ProblemTemplate):
     """
     """
 
     # Constructor
     #----------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables, constraints , encoding_rule = knapsack_encoding_rule):
+    def __init__(self, decision_variables, constraints, encoding_rule=pip_encoding_rule):
         """
         """
         # optimize the access to the decision variables
@@ -42,7 +42,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
         )
 
         # 1. Define the Name of the Problem
-        self._name = "Problem Name"
+        self._name = "Portfolio Investment Problem"
         
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Maximization
@@ -56,7 +56,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 
     # Solution Admissibility Function - is_admissible()
     #----------------------------------------------------------------------------------------------
-    def is_admissible( self, solution ): #<< use this signature in the sub classes, the meta-heuristic 
+    def is_admissible(self, solution): #<< use this signature in the sub classes, the meta-heuristic
         """
         """
         pass
@@ -64,7 +64,7 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
     # Evaluate_solution()
     #-------------------------------------------------------------------------------------------------------------
     # It should be seen as an abstract method 
-    def evaluate_solution(self, solution, feedback = None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
+    def evaluate_solution(self, solution, feedback=None):# << This method does not need to be extended, it already automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
         """
         pass     
@@ -74,5 +74,5 @@ class PortfolioInvestmentProblem( ProblemTemplate ):
 # OPTIONAL - it onlu+y is needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
-def pip_bitflip_get_neighbors( solution, problem, neighborhood_size = 0 ):
+def pip_bitflip_get_neighbors(solution, problem, neighborhood_size=0):
     pass
