@@ -238,6 +238,7 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
+
 #Parameters to gridsearch in a run
 test_init = [initialize_using_multiple, initialize_using_hc, initialize_using_greedy, initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
@@ -250,7 +251,6 @@ test_mut_prob = [0.9, 0.1]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples
-
 
 #initial params
 
@@ -393,6 +393,7 @@ def one_combination():
         pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness]],
                      columns=["Representation", "Fitness"]).to_excel(writer, sheet_name='Overall_Best_Solution')
 
+#[str(overall_best_solution.representation), overall_best_solution.fitness],
 
 #plot_performance_chart(df)
 
