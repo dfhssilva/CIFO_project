@@ -20,7 +20,6 @@ from cifo.util.observer import LocalSearchObserver
 from random import randint
 import numpy as np
 from copy import deepcopy
-import xlsxwriter
 
 from os import listdir, path, mkdir
 from os.path import isfile, join
@@ -239,7 +238,7 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-Parameters to gridsearch in a run
+#Parameters to gridsearch in a run
 test_init = [initialize_using_multiple, initialize_using_hc, initialize_using_greedy, initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
 test_xover = [multiple_crossover, heuristic_crossover, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
@@ -313,7 +312,7 @@ def one_combination():
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
     overall_best_solution = None
-    number_of_runs = 30
+    number_of_runs = 2
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
@@ -389,9 +388,9 @@ def one_combination():
                 )
 
     # Exporting summary of configuration with best solution
-    with pd.ExcelWriter(all_dir + f"{log_name}.xlsx", engine="xlsxwriter") as writer:
+    with pd.ExcelWriter(all_dir + f"{log_name}.xlsx") as writer:
         df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
-        pd.DataFrame([overall_best_solution.representation, overall_best_solution.fitness],
+        pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness]],
                      columns=["Representation", "Fitness"]).to_excel(writer, sheet_name='Overall_Best_Solution')
 
 
