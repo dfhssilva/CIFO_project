@@ -5,9 +5,8 @@ import math
 import heapq
 
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import EncodingDataType, LinearSolution, Encoding
+from cifo.problem.solution import EncodingDataType, LinearSolution
 from cifo.problem.population import Population
-from cifo.problem.problem_template import ProblemTemplate
 
 
 ###################################################################################################
@@ -185,7 +184,6 @@ def initialize_using_sa(problem, population_size):
 
     return population
 
-
 # -------------------------------------------------------------------------------------------------
 # Initialization using Greedy Method
 # -------------------------------------------------------------------------------------------------
@@ -219,9 +217,8 @@ def initialize_using_greedy(problem, population_size):
         solution_list=solution_list
     )
 
-
-
     return population
+
 
 ###################################################################################################
 # SELECTION APPROACHES
@@ -288,6 +285,7 @@ def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVE
 
         while index2 == index1:
             index2 = _select_index_max(population=population)
+
     elif objective == ProblemObjective.Minimization:
         index1 = _select_index_min(population=population)
         index2 = index1
@@ -899,11 +897,9 @@ def greedy_mutation(problem, solution):
     distance_array = np.array(heapq.nsmallest(3, distances[element]))
 
     # get the index (item name) of the second smallest distance between mutpoint1 and all the other cities
-    #closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
     closest_city = np.argwhere(distances[element] == distance_array[1])[0][0]
 
     if closest_city == 0:  # the closest city can not be our first city on the matrix
-        #closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
         closest_city = np.argwhere(distances[element] == distance_array[2])[0][0]
 
     mutpoint2 = np.argwhere(solution.representation == closest_city)[0][0]

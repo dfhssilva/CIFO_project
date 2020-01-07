@@ -13,7 +13,7 @@ tsp_encoding_rule = {
     "Size"         : -1,  # Number of the cities from the distance matrix
     "Is ordered"   : True,
     "Can repeat"   : False,
-    "Data"         : [0,0],  # must be defined by the data
+    "Data"         : [0, 0],  # must be defined by the data
     "Data Type"    : "Pattern"
 }
 
@@ -35,8 +35,8 @@ input = [
     ]
 
 tsp_decision_variables_example = {
-    "Distances" : np.array(input), #<< Number, Mandatory
-    "Item-Name" : [i for i in range(1,len(input[0]))] # << String, Optional, The names of the items, can be used to
+    "Distances": np.array(input),
+    "Item-Name": [i for i in range(1, len(input[0]))]  # << String, Optional, The names of the items, can be used to
                                                         # present the solution.
         # It starts at 1 reserving the 0 for the static city
         # We are setting the departure point, so we only have to arrange the 12 remaining cities
@@ -94,10 +94,9 @@ class TravelSalesmanProblem(ProblemTemplate):
     #----------------------------------------------------------------------------------------------
     def build_solution(self, method='Random'):
         """
-        Creates a initial solution and returns it according to the enconding rule and the chosen method from the
+        Creates a initial solution and returns it according to the encoding rule and the chosen method from the
         following available methods:
             - 'Hill Climbing'
-            - 'Simulated Annealing'
             - 'Random' (default method)
             - 'Greedy'
         """
@@ -108,8 +107,8 @@ class TravelSalesmanProblem(ProblemTemplate):
             np.random.shuffle(solution_representation)  # inplace suffle
 
             solution = LinearSolution(
-                representation = solution_representation,
-                encoding_rule = self._encoding_rule
+                representation=solution_representation,
+                encoding_rule=self._encoding_rule
             )
 
             return solution
@@ -137,11 +136,9 @@ class TravelSalesmanProblem(ProblemTemplate):
 
                 # get the index (item name) of the second smallest distance between element in index i and all the other cities
                 closest_city = np.argwhere(self._distances[element] == distance_array[1])[0][0]
-                    #self._distances[element].index(distance_array[1])
-                    #np.where(array == item)
+
                 if closest_city == 0:  # the closest city can not be our first city on the matrix
                     closest_city = np.argwhere(self._distances[element] == distance_array[2])[0][0]
-                        #self._distances[element].index(distance_array[2])
 
                 n = 2  # let us to go through the distance ascending list
 
@@ -149,11 +146,10 @@ class TravelSalesmanProblem(ProblemTemplate):
                 while closest_city in initial_solution[0:i]:
                     # get the next closest city in the distance ascending list with the element evaluated
                     closest_city = np.argwhere(self._distances[element] == distance_array[n])[0][0]
-                        #self._distances[element].index(distance_array[n])
 
                     if closest_city == 0:  # the closest city can not be our first city on the matrix
                         closest_city = np.argwhere(self._distances[element] == distance_array[n+1])[0][0]
-                            #self._distances[element].index(distance_array[n+1])
+
                         n += 1  # if it is not a valid closest city the n should be plus one than the usual
 
                     n += 1
@@ -166,7 +162,6 @@ class TravelSalesmanProblem(ProblemTemplate):
 
             # change the last index with the missing element
             initial_solution[-1] = np.setdiff1d(copy, initial_solution[0:-1], assume_unique=True)[0]
-                #list(set(copy) - set(initial_solution[0:-1]))[0]
 
             #print('greedy solutions: ', list(initial_solution))
             solution = LinearSolution(
@@ -185,8 +180,8 @@ class TravelSalesmanProblem(ProblemTemplate):
     def is_admissible(self, solution, debug=True):  # << use this signature in the sub classes, the meta-heuristic
         """
         Checks if the solution:
-            - has unique values equal to the size of the enconding_rule
-            - has length equal to the size of the enconding_rule
+            - has unique values equal to the size of the encoding_rule
+            - has length equal to the size of the encoding_rule
             - has all values within the defined range of item-names
         If all these conditions are true, the solution is admissible and it returns True.
         """
@@ -195,7 +190,7 @@ class TravelSalesmanProblem(ProblemTemplate):
 
             if (len(set(solution.representation)) == self.encoding_rule["Size"]) & \
                     (len(solution.representation) == self.encoding_rule["Size"]) & \
-                    all([True if i in range(1,(self.encoding_rule["Size"]+1))
+                    all([True if i in range(1, (self.encoding_rule["Size"]+1))
                          else False for i in solution.representation]):
                 result = True
             else:
