@@ -163,7 +163,7 @@ test_tournament_size = [2, 5, 10]
 
 params = {
         # params
-        "Population-Size"           : 4,
+        "Population-Size"           : 40,
         "Number-of-Generations"     : 1000,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
