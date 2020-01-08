@@ -97,7 +97,7 @@ def plot_performance_chart(df):
 # Decision Variables
 
 closing_prices = read_excel(r".\data\sp_12_weeks.xlsx")  # importing data example
-closing_prices = closing_prices.iloc[:, :10]
+#closing_prices = closing_prices.iloc[:, :50]
 
 def get_dv_pip(prices):
     est_ret = np.log(prices.values[1:] / prices.values[:-1])  # returns for each period in column
@@ -108,7 +108,7 @@ def get_dv_pip(prices):
 exp, cov = get_dv_pip(closing_prices)
 
 pip_decision_variables = {
-    "Expected_Returns" : exp,  # The closing prices for each period
+    "Expected_Returns": exp,  # The closing prices for each period
     "Covariance_Returns": cov,
     "Risk_Free_Return": 1.53  # US Treasury Bonds according to Bloomberg on 08/01/2020, 18:08
 }
@@ -150,8 +150,10 @@ test_xover = [single_arithmetic_crossover, simple_arithmetic_crossover, whole_ar
 test_mutation = [multiple_real_mutation]
 test_replacement = [standard_replacement, elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.9, 0.1]
-test_mut_prob = [0.9, 0.1]
+test_xover_prob = [0.1]
+test_mut_prob = [0.1]
+# test_xover_prob = [0.9, 0.1]
+# test_mut_prob = [0.9, 0.1]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples

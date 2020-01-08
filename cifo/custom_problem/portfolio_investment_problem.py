@@ -110,7 +110,6 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         if method == 'Random':  # shuffles the list and then instantiates it as a Linear Solution
             solution_representation = np.random.gamma(1, 2, self._encoding.size)
             solution_representation = solution_representation/solution_representation.sum()
-            #print('Sum representation: ', solution_representation.sum())
             #TODO: implement other initialization
 
             solution = PIP_Solution(
@@ -132,7 +131,7 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         weights have to be equal to 1
         """
         #if (solution.sharpe_ratio < self._risk_tol) | (solution.representation.sum() != 1):
-        solution
+
         # when building the solution sometimes the sum equals to 0.99999 or 1.0000001, if we only check when different
         # from 1, most of the times the solution won't be admissible
         # if (solution.representation.sum() < 0.99) | (solution.representation.sum() > 1.01):
@@ -142,6 +141,7 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         #     return False
         # else:
         #     return True
+        return True
 
     # Evaluate_solution()
     # -------------------------------------------------------------------------------------------------------------
@@ -155,7 +155,6 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         solution._is_fitness_calculated = True
 
         return solution
-
 
 
 # -------------------------------------------------------------------------------------------------

@@ -133,11 +133,11 @@ class GeneticAlgorithm:
         self._fittest = self._population.fittest
         self._best_solution = self._fittest
 
+
         self._notify()
 
         #2. Repeat n generations )(#1 loop )
         for self._generation in range(1, self._number_of_generations + 1):
-            
             new_population = Population(problem=problem, maximum_size=self._population_size, solution_list=[])
             i = 0
 
@@ -184,7 +184,6 @@ class GeneticAlgorithm:
             self._fittest = self._population.fittest
 
             self.find_best_solution()
-            print("Best solution generation: ", self._best_solution)
 
             self._notify()
 
