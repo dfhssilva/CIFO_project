@@ -22,6 +22,7 @@ Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 # -------------------------------------------------------------------------------------------------
 
 # import
+import numpy as np
 from copy import deepcopy
 from cifo.problem.objective import ProblemObjective
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -37,7 +38,7 @@ class LinearSolution:
     """
     # Constructor
     #----------------------------------------------------------------------------------------------    
-    def __init__(self, representation, encoding_rule, is_single_objective = True, id = [0,0] ):
+    def __init__(self, representation, encoding_rule, is_single_objective=True, id=[0,0]):
         self._id                    = id
         self._representation        = representation
         self._encoding_rule         = encoding_rule
@@ -185,6 +186,37 @@ class Encoding():
 # -------------------------------------------------------------------------------------------------   
 class EncodingDataType:
     choices = "Choices"
-    min_max = "Interval" # "Min_Max"
+    min_max = "Interval"  # "Min_Max"
     pattern = "Pattern"
-    
+
+
+# -------------------------------------------------------------------------------------------------
+# PIP_Solution
+# -------------------------------------------------------------------------------------------------
+class PIP_Solution(LinearSolution):
+    """
+    Portfolios
+    """
+    # Constructor
+    # ----------------------------------------------------------------------------------------------
+    def __init__(self, representation, encoding_rule, problem, is_single_objective=True, id=[0, 0]):
+        super().__init__(
+            representation = representation,
+            encoding_rule = encoding_rule
+        )
+
+        self._exp_return = self._representation @ problem._exp_returns  # Portfolio Expected Return formula
+        self._std_return = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)    # Portfolio Variance formula
+        self._sharpe_ratio = (self._exp_return - problem._risk_free_return) / self._std_return
+
+    @property
+    def exp_return(self):
+        return self._exp_return
+
+    @property
+    def std_return(self):
+        return self._std_return
+
+    @property
+    def sharpe_ratio(self):
+        return self._sharpe_ratio

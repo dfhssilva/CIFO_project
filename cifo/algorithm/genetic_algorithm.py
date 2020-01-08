@@ -184,6 +184,7 @@ class GeneticAlgorithm:
             self._fittest = self._population.fittest
 
             self.find_best_solution()
+            print("Best solution generation: ", self._best_solution)
 
             self._notify()
 

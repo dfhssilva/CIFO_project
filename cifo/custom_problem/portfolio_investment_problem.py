@@ -5,7 +5,7 @@ from pandas import read_excel
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import LinearSolution, Encoding
+from cifo.problem.solution import LinearSolution, Encoding, PIP_Solution
 
 pip_encoding_rule = {
     "Size": -1,  # It must be defined by the size of DV (Number of products)
@@ -27,15 +27,16 @@ def get_dv_pip(prices):
 
 exp, cov = get_dv_pip(closing_prices)
 # pip_decision_variables_example = {
-#     "Closing_Prices" : closing_prices,  # The closing prices for each period
-# }
+# #     "Closing_Prices" : closing_prices,  # The closing prices for each period
+# # }
 
 # Just like in knapsack, each portfolio (bag) is composed by stocks (items) which have an expected return (value) and
 # a risk (weight). The main difference is that the stocks (items) are not independent and we need to take into account
 # the covariance between them.
 pip_decision_variables_example = {
     "Expected_Returns" : exp,  # The closing prices for each period
-    "Covariance_Returns": cov
+    "Covariance_Returns": cov,
+    "Risk_Free_Return": 1.53  # US Treasury Bonds according to Bloomberg on 08/01/2020, 18:08
 }
 
 pip_constraints_example = {
@@ -70,6 +71,10 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         if "Covariance_Returns" in decision_variables:
             self._cov_returns = decision_variables["Covariance_Returns"]
 
+        self._risk_free_return = 0
+        if "Risk_Free_Return" in decision_variables:
+            self._risk_free_return = decision_variables["Risk_Free_Return"]
+
         self._risk_tol = 0  # "Tolerance"
         if "Tolerance" in constraints:
             self._risk_tol = constraints["Tolerance"]
@@ -96,17 +101,22 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         # 2. Define the Problem Objective
         self._objective = ProblemObjective.Maximization
 
-    # Build Solution for Knapsack Problem
+    # Build Solution
     # ----------------------------------------------------------------------------------------------
     def build_solution(self, method='Random'):
         """
+        We generate a random solution ensuring that the sum of the weights equals to 1
         """
         if method == 'Random':  # shuffles the list and then instantiates it as a Linear Solution
-            solution_representation = np.random.random(self._encoding.encoding_size)
+            solution_representation = np.random.gamma(1, 2, self._encoding.size)
+            solution_representation = solution_representation/solution_representation.sum()
+            #print('Sum representation: ', solution_representation.sum())
+            #TODO: implement other initialization
 
-            solution = LinearSolution(
+            solution = PIP_Solution(
                 representation = solution_representation,
-                encoding_rule = self._encoding_rule
+                encoding_rule = self._encoding_rule,
+                problem = self
             )
 
             return solution
@@ -118,20 +128,20 @@ class PortfolioInvestmentProblem(ProblemTemplate):
     # ----------------------------------------------------------------------------------------------
     def is_admissible(self, solution):  # << use this signature in the sub classes, the meta-heuristic
         """
+        The solution is admissible if its sharpe ratio is bigger or equal to the risk tolerance and the sum of the
+        weights have to be equal to 1
         """
-        weights = solution.representation
-        # EXPECTED RETURN AND VARIANCE AS ATTRIBUTES OF SOLUTION? CREATE CHILD CLASS OF LINEARSOLUTION TO HOLD THIS ATTRIBUTES?
-        # EVERY SINGLE TIME THIS FUNCTION IS CALLED WE NEED TO CALCULATE THESE
-        portfolio_exp_ret = weights @ self._exp_returns  # Portfolio Expected Return formula
-        portfolio_var_ret = weights.T @ self._cov_returns @ weights  # Portfolio Variance formula
-        risk_free_ret = 0 # Best available rate of return of a risk-free security - FIND VALUE IN DATE
-        portfolio_sharpe_ratio = (portfolio_exp_ret - risk_free_ret) / portfolio_var_ret
-
-        if portfolio_sharpe_ratio < self._risk_tol:
-            return False
-        else:
-            return True
-
+        #if (solution.sharpe_ratio < self._risk_tol) | (solution.representation.sum() != 1):
+        solution
+        # when building the solution sometimes the sum equals to 0.99999 or 1.0000001, if we only check when different
+        # from 1, most of the times the solution won't be admissible
+        # if (solution.representation.sum() < 0.99) | (solution.representation.sum() > 1.01):
+        #     #print('Solution: ', solution.representation)
+        #     #print('Sum representation: ', solution.representation.sum())
+        #     print('ERROR: the solution is not admissible!')
+        #     return False
+        # else:
+        #     return True
 
     # Evaluate_solution()
     # -------------------------------------------------------------------------------------------------------------
@@ -139,25 +149,17 @@ class PortfolioInvestmentProblem(ProblemTemplate):
     def evaluate_solution(self, solution, feedback=None):  # << This method does not need to be extended, it already
         # automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
+        Our objective is to maximize the sharpe ratio so the fitness is the sharpe ratio
         """
-        # est_ret = np.log(self._prices[1:] / self._prices[:-1])  # returns for each period in column
-        # exp_ret = np.sum(est_ret, axis=0)  # expected return over time interval
-        # cov_ret = np.cov(est_ret, rowvar=False)  # estimated covariance matrix over time interval
-
-        #The objective is to maximize the return of the portfolio
-        weights = solution.representation
-        portfolio_exp_ret = weights @ self._exp_returns  # Portfolio Expected Return formula
-        # portfolio_var_ret = weights.T @ self._cov_returns @ weights  # Portfolio Variance formula
-
-        solution._fitness = portfolio_exp_ret
+        solution._fitness = solution.sharpe_ratio
         solution._is_fitness_calculated = True
 
         return solution
 
-    # -------------------------------------------------------------------------------------------------
 
 
-# OPTIONAL - it onlu+y is needed if you will implement Local Search Methods
+# -------------------------------------------------------------------------------------------------
+# OPTIONAL - it's only needed if you will implement Local Search Methods
 #            (Hill Climbing and Simulated Annealing)
 # -------------------------------------------------------------------------------------------------
 def pip_bitflip_get_neighbors(solution, problem, neighborhood_size=0):

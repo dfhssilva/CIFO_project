@@ -706,7 +706,7 @@ def single_arithmetic_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
-    crosspoint = randint(0, len(solution1.representation))
+    crosspoint = randint(0, (len(solution1.representation)-1))
     alpha = uniform(0, 1)
 
     offspring1.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + \
@@ -717,6 +717,9 @@ def single_arithmetic_crossover(problem, solution1, solution2):
     offspring1.representation = list(map(lambda x: x/sum(offspring1.representation), offspring1.representation))
     offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
 
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
+
     return offspring1, offspring2
 
 # -------------------------------------------------------------------------------------------------
@@ -726,7 +729,7 @@ def simple_arithmetic_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
-    crosspoint = randint(0, len(solution1.representation))
+    crosspoint = randint(0, (len(solution1.representation)-1))
     alpha = uniform(0, 1)
 
     for i in range(crosspoint, len(solution1.representation)):
@@ -735,6 +738,9 @@ def simple_arithmetic_crossover(problem, solution1, solution2):
 
     offspring1.representation = list(map(lambda x: x / sum(offspring1.representation), offspring1.representation))
     offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
+
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
 
     return offspring1, offspring2
 
@@ -750,6 +756,9 @@ def whole_arithmetic_crossover(problem, solution1, solution2):
     for i in range(0, len(solution1.representation)):
         offspring1.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
         offspring2.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
 
     return offspring1, offspring2
 
@@ -803,15 +812,15 @@ def single_point_mutation(problem, solution):
 def multiple_real_mutation(problem, solution):
     index = sample(range(0, len(solution.representation)), 2)
 
-    param = random.random()
+    param = random()
 
     if param < 0.3:
         solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
                                                                                solution.representation[index[0]]
 
     elif param < 0.6:
-        avg_num = math.floor(random.random() * (len(solution.representation) - 1))
-        l = random.sample(range(0, (len(solution.representation) - 1)), avg_num)
+        avg_num = math.floor(random() * (len(solution.representation) - 1))
+        l = sample(range(0, (len(solution.representation) - 1)), avg_num)
         sum = 0
         for i in l:
             sum += solution.representation[i]
@@ -819,10 +828,12 @@ def multiple_real_mutation(problem, solution):
             solution.representation[i] = sum / avg_num
 
     else:
-        rand_num = round(random.random(), 1)
+        rand_num = round(random(), 1)
         solution.representation[index[0]], solution.representation[index[1]] = \
-            round(rand_num * (solution.representation[index[0]]+ solution.representation[index[1]]), 2), round(
+            round(rand_num * (solution.representation[index[0]] + solution.representation[index[1]]), 2), round(
             (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
+
+    solution.representation = np.array(solution.representation)
 
     return solution
 

@@ -2,17 +2,15 @@
 # -------------------------------------------------------------------------------------------------
 
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
-from cifo.algorithm.hill_climbing import HillClimbing
-from cifo.custom_problem.travel_salesman_problem import (
-    TravelSalesmanProblem, tsp_decision_variables_example, tsp_get_neighbors
+from cifo.custom_problem.portfolio_investment_problem import (
+    PortfolioInvestmentProblem, pip_decision_variables_example
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
-    initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy, initialize_using_multiple,
+    initialize_using_random,
     roulettewheel_selection, rank_selection, tournament_selection,
-    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover,
-    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation,
-    multiple_mutation,
+    single_arithmetic_crossover, simple_arithmetic_crossover, whole_arithmetic_crossover, multiple_arithmetic_crossover,
+    multiple_real_mutation,
     elitism_replacement, standard_replacement 
 )    
 from cifo.util.terminal import Terminal, FontColor
@@ -24,6 +22,7 @@ from copy import deepcopy
 from os import listdir, path, mkdir
 from os.path import isfile, join
 from pandas import pandas as pd
+from pandas import read_excel
 
 def plot_performance_chart(df):
     import plotly.graph_objects as go
@@ -96,32 +95,33 @@ def plot_performance_chart(df):
 # Problem
 #--------------------------------------------------------------------------------------------------
 # Decision Variables
-input =[
-        [0, 2451, 713, 1018, 1631, 1374, 2408, 213, 2571, 875, 1420, 2145, 1972],
-        [2451, 0, 1745, 1524, 831, 1240, 959, 2596, 403, 1589, 1374, 357, 579],
-        [713, 1745, 0, 355, 920, 803, 1737, 851, 1858, 262, 940, 1453, 1260],
-        [1018, 1524, 355, 0, 700, 862, 1395, 1123, 1584, 466, 1056, 1280, 987],
-        [1631, 831, 920, 700, 0, 663, 1021, 1769, 949, 796, 879, 586, 371],
-        [1374, 1240, 803, 862, 663, 0, 1681, 1551, 1765, 547, 225, 887, 999],
-        [2408, 959, 1737, 1395, 1021, 1681, 0, 2493, 678, 1724, 1891, 1114, 701],
-        [213, 2596, 851, 1123, 1769, 1551, 2493, 0, 2699, 1038, 1605, 2300, 2099],
-        [2571, 403, 1858, 1584, 949, 1765, 678, 2699, 0, 1744, 1645, 653, 600],
-        [875, 1589, 262, 466, 796, 547, 1724, 1038, 1744, 0, 679, 1272, 1162],
-        [1420, 1374, 940, 1056, 879, 225, 1891, 1605, 1645, 679, 0, 1017, 1200],
-        [2145, 357, 1453, 1280, 586, 887, 1114, 2300, 653, 1272, 1017, 0, 504],
-        [1972, 579, 1260, 987, 371, 999, 701, 2099, 600, 1162, 1200, 504, 0],
-    ]
 
-tsp_decision_variables = {
-    "Distances" : np.array(input), #<< Number, Mandatory
-    "Item-Name" : [i for i in range(1, len(input[0]))] # << String, Optional, The names of the items, can be used to present the solution.
-        # It starts at 1 reserving the 0 for the static city
-        # We are setting the departure point, so we only have to arrange the n-1 remaining cities
+closing_prices = read_excel(r".\data\sp_12_weeks.xlsx")  # importing data example
+closing_prices = closing_prices.iloc[:, :10]
+
+def get_dv_pip(prices):
+    est_ret = np.log(prices.values[1:] / prices.values[:-1])  # returns for each period in column
+    exp_ret = np.sum(est_ret, axis=0)  # expected return over time interval
+    cov_ret = np.cov(est_ret, rowvar=False)  # estimated covariance matrix over time interval
+    return exp_ret, cov_ret
+
+exp, cov = get_dv_pip(closing_prices)
+
+pip_decision_variables = {
+    "Expected_Returns" : exp,  # The closing prices for each period
+    "Covariance_Returns": cov,
+    "Risk_Free_Return": 1.53  # US Treasury Bonds according to Bloomberg on 08/01/2020, 18:08
+}
+
+pip_constraints = {
+    "Risk-Tolerance": 1,
+    "Budget": 100000
 }
 
 # Problem Instance
-tsp_problem_instance = TravelSalesmanProblem(
-    decision_variables=tsp_decision_variables
+pip_problem_instance = PortfolioInvestmentProblem(
+    decision_variables=pip_decision_variables,
+    constraints=pip_constraints
 )
 
 # Configuration
@@ -131,27 +131,24 @@ tsp_problem_instance = TravelSalesmanProblem(
 parent_selection = roulettewheel_selection
 
 # dictionaries to create test directories
-valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedyI",
-              initialize_using_multiple: "mixI"} #, initialize_using_sa: "sa"
+valid_Init = {initialize_using_random: "rand"}
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
-valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover: "order1", heuristic_crossover: "heur",
-               multiple_crossover: "mixC"}
-                # singlepoint_crossover: "singP" should not be used
-valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble",  greedy_mutation: "greedyM", multiple_mutation: "mixM"}
-                    # single_point_mutation: "singP" should not be used
+valid_Xover = {single_arithmetic_crossover: "single", simple_arithmetic_crossover: "simple",
+               whole_arithmetic_crossover: "whole", multiple_arithmetic_crossover: "mixC"}
+
+valid_Mutation = {multiple_real_mutation: "mixM"}
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 
 #Parameters to gridsearch in a run
-test_init = [initialize_using_multiple, initialize_using_hc, initialize_using_greedy, initialize_using_random]
+test_init = [initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [multiple_crossover, heuristic_crossover, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
-test_mutation = [multiple_mutation, greedy_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
-test_replacement = [elitism_replacement] #standard_replacement
+test_xover = [single_arithmetic_crossover, simple_arithmetic_crossover, whole_arithmetic_crossover, multiple_arithmetic_crossover]
+test_mutation = [multiple_real_mutation]
+test_replacement = [standard_replacement, elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_xover_prob = [0.9, 0.1]
 test_mut_prob = [0.9, 0.1]
@@ -164,7 +161,7 @@ test_tournament_size = [2, 5, 10]
 
 params = {
         # params
-        "Population-Size"           : 40,
+        "Population-Size"           : 4,
         "Number-of-Generations"     : 1000,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
@@ -172,8 +169,8 @@ params = {
         "Initialization-Approach"   : initialize_using_random,
         "Selection-Approach"        : parent_selection,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : cycle_crossover,
-        "Mutation-Approach"         : swap_mutation,
+        "Crossover-Approach"        : single_arithmetic_crossover,
+        "Mutation-Approach"         : multiple_real_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
@@ -224,7 +221,7 @@ def one_combination():
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
-            problem_instance=tsp_problem_instance,
+            problem_instance=pip_problem_instance,
             params=params,
             run=run,
             log_name=log_name,
@@ -240,7 +237,7 @@ def one_combination():
         if run == 1:
             overall_best_solution = deepcopy(ga.best_solution)
         else:
-            if ga.best_solution.fitness < overall_best_solution.fitness:
+            if ga.best_solution.fitness > overall_best_solution.fitness:
                 overall_best_solution = deepcopy(ga.best_solution)
 
         print('overall_best_solution: ', overall_best_solution.representation)
