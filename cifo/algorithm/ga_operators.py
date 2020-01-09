@@ -5,9 +5,8 @@ import math
 import heapq
 
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import EncodingDataType, LinearSolution, Encoding
+from cifo.problem.solution import EncodingDataType, LinearSolution
 from cifo.problem.population import Population
-from cifo.problem.problem_template import ProblemTemplate
 
 
 ###################################################################################################
@@ -185,7 +184,6 @@ def initialize_using_sa(problem, population_size):
 
     return population
 
-
 # -------------------------------------------------------------------------------------------------
 # Initialization using Greedy Method
 # -------------------------------------------------------------------------------------------------
@@ -219,9 +217,8 @@ def initialize_using_greedy(problem, population_size):
         solution_list=solution_list
     )
 
-
-
     return population
+
 
 ###################################################################################################
 # SELECTION APPROACHES
@@ -288,6 +285,7 @@ def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVE
 
         while index2 == index1:
             index2 = _select_index_max(population=population)
+
     elif objective == ProblemObjective.Minimization:
         index1 = _select_index_min(population=population)
         index2 = index1
@@ -701,6 +699,82 @@ def multiple_crossover(problem, solution1, solution2):
         return heuristic_crossover(problem, solution1, solution2)
 #TODO: talk about this . Look at crossovers performance
 
+# -------------------------------------------------------------------------------------------------
+# Single Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def single_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    crosspoint = randint(0, (len(solution1.representation)-1))
+    alpha = uniform(0, 1)
+
+    offspring1.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + \
+                                            (1-alpha)*offspring2.representation[crosspoint]
+    offspring2.representation[crosspoint] = alpha*offspring1.representation[crosspoint] + \
+                                            (1-alpha)*offspring2.representation[crosspoint]
+
+    offspring1.representation = list(map(lambda x: x/sum(offspring1.representation), offspring1.representation))
+    offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
+
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Simple Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def simple_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    crosspoint = randint(0, (len(solution1.representation)-1))
+    alpha = uniform(0, 1)
+
+    for i in range(crosspoint, len(solution1.representation)):
+        offspring1.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+        offspring2.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+
+    offspring1.representation = list(map(lambda x: x / sum(offspring1.representation), offspring1.representation))
+    offspring2.representation = list(map(lambda x: x / sum(offspring2.representation), offspring2.representation))
+
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Whole Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def whole_arithmetic_crossover(problem, solution1, solution2):
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    alpha = uniform(0, 1)
+
+    for i in range(0, len(solution1.representation)):
+        offspring1.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+        offspring2.representation[i] = alpha*offspring1.representation[i] + (1-alpha)*offspring2.representation[i]
+
+    offspring1.representation = np.array(offspring1.representation)
+    offspring2.representation = np.array(offspring2.representation)
+
+    return offspring1, offspring2
+
+# -------------------------------------------------------------------------------------------------
+# Multiple Arithmetic Crossover
+# -------------------------------------------------------------------------------------------------
+def multiple_arithmetic_crossover(problem, solution1, solution2):
+    prob = uniform(0, 1)
+
+    if prob < (1/3):
+        return single_arithmetic_crossover(problem, solution1, solution2)
+    elif (1/3) <= prob < (2/3):
+        return simple_arithmetic_crossover(problem, solution1, solution2)
+    else:
+        return whole_arithmetic_crossover(problem, solution1, solution2)
+
 
 ###################################################################################################
 # MUTATION APPROACHES
@@ -731,6 +805,37 @@ def single_point_mutation(problem, solution):
             print('(!) Error: singlepoint mutation encoding.data issues)')
 
     # return solution           
+
+# -------------------------------------------------------------------------------------------------
+# Multiple Real Mutation
+# -----------------------------------------------------------------------------------------------
+def multiple_real_mutation(problem, solution):
+    index = sample(range(0, len(solution.representation)), 2)
+
+    param = random()
+
+    if param < 0.3:
+        solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
+                                                                               solution.representation[index[0]]
+
+    elif param < 0.6:
+        avg_num = math.floor(random() * (len(solution.representation) - 1))
+        l = sample(range(0, (len(solution.representation) - 1)), avg_num)
+        sum = 0
+        for i in l:
+            sum += solution.representation[i]
+        for i in l:
+            solution.representation[i] = sum / avg_num
+
+    else:
+        rand_num = round(random(), 1)
+        solution.representation[index[0]], solution.representation[index[1]] = \
+            round(rand_num * (solution.representation[index[0]] + solution.representation[index[1]]), 2), round(
+            (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
+
+    solution.representation = np.array(solution.representation)
+
+    return solution
 
 # -------------------------------------------------------------------------------------------------
 # Swap mutation
@@ -803,11 +908,9 @@ def greedy_mutation(problem, solution):
     distance_array = np.array(heapq.nsmallest(3, distances[element]))
 
     # get the index (item name) of the second smallest distance between mutpoint1 and all the other cities
-    #closest_city = distances[element].index(heapq.nsmallest(2, distances[element])[1])
     closest_city = np.argwhere(distances[element] == distance_array[1])[0][0]
 
     if closest_city == 0:  # the closest city can not be our first city on the matrix
-        #closest_city = distances[element].index(heapq.nsmallest(3, distances[element])[2])
         closest_city = np.argwhere(distances[element] == distance_array[2])[0][0]
 
     mutpoint2 = np.argwhere(solution.representation == closest_city)[0][0]
