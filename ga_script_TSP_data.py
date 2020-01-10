@@ -221,30 +221,30 @@ parent_selection = roulettewheel_selection
 
 # dictionaries to create test directories
 valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedyI",
-              initialize_using_multiple: "mixI"} #, initialize_using_sa: "sa"
+              initialize_using_multiple: "mixIB"} #, initialize_using_sa: "sa"
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
 valid_Xover = {cycle_crossover: "cycle", pmx_crossover: "pmx",  order1_crossover: "order1", heuristic_crossover: "heur",
-               multiple_crossover: "mixC"}
+               multiple_crossover: "mixCB"}
                 # singlepoint_crossover: "singP" should not be used
 valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
-                  scramble_mutation: "scramble",  greedy_mutation: "greedyM", multiple_mutation: "mixM"}
+                  scramble_mutation: "scramble",  greedy_mutation: "greedyM", multiple_mutation: "mixMB"}
                     # single_point_mutation: "singP" should not be used
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 #Parameters to gridsearch in a run
-test_init = [initialize_using_multiple, initialize_using_hc, initialize_using_greedy, initialize_using_random]
-test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [multiple_crossover, heuristic_crossover, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
-test_mutation = [multiple_mutation, greedy_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation] # single_point_mutation should not be used
+test_init = [ initialize_using_hc, initialize_using_multiple]#,, initialize_using_greedy, initialize_using_random]
+test_select = [tournament_selection]#roulettewheel_selection, , rank_selection]
+test_xover = [multiple_crossover, heuristic_crossover]#, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
+test_mutation = [multiple_mutation, inversion_mutation]#,greedy_mutation, swap_mutation, insert_mutation,  scramble_mutation] # single_point_mutation should not be used
 test_replacement = [elitism_replacement] #standard_replacement
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.9, 0.1]
-test_mut_prob = [0.9, 0.1]
+test_xover_prob = [0.95,0.9,0.1,0.05]
+test_mut_prob = [0.95, 0.9, 0.1, 0.05]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_tournament_size = [2, 5, 10]
+test_tournament_size = [ 10,15]
 #test_tournament_size = [2] # simples
 
 
@@ -308,7 +308,7 @@ def one_combination():
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
     overall_best_solution = None
-    number_of_runs = 30
+    number_of_runs = 50
     for run in range(1, number_of_runs + 1):
         # Genetic Algorithm
         ga = GeneticAlgorithm(
