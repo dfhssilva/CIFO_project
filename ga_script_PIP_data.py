@@ -3,16 +3,17 @@
 
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
 from cifo.custom_problem.portfolio_investment_problem import (
-    PortfolioInvestmentProblem, pip_decision_variables_example
+    PortfolioInvestmentProblem, input_space_red_pip
 )
 from cifo.problem.objective import ProblemObjective
 from cifo.algorithm.ga_operators import (
     initialize_using_random,
     roulettewheel_selection, rank_selection, tournament_selection,
-    single_arithmetic_crossover, simple_arithmetic_crossover, whole_arithmetic_crossover, multiple_arithmetic_crossover,
-    multiple_real_mutation,
+    pip_crossover,
+    swap_mutation, insert_mutation, inversion_mutation, scramble_mutation,
     elitism_replacement, standard_replacement 
-)    
+)
+
 from cifo.util.terminal import Terminal, FontColor
 from cifo.util.observer import LocalSearchObserver
 from random import randint
@@ -97,7 +98,7 @@ def plot_performance_chart(df):
 # Decision Variables
 
 closing_prices = read_excel(r".\data\sp_12_weeks.xlsx")  # importing data example
-#closing_prices = closing_prices.iloc[:, :50]
+#closing_prices = closing_prices.iloc[:, :10]
 
 def get_dv_pip(prices):
     est_ret = np.log(prices.values[1:] / prices.values[:-1])  # returns for each period in column
@@ -105,24 +106,10 @@ def get_dv_pip(prices):
     cov_ret = np.cov(est_ret, rowvar=False)  # estimated covariance matrix over time interval
     return exp_ret, cov_ret
 
-exp, cov = get_dv_pip(closing_prices)
-
-pip_decision_variables = {
-    "Expected_Returns": exp,  # The closing prices for each period
-    "Covariance_Returns": cov,
-    "Risk_Free_Return": 1.53  # US Treasury Bonds according to Bloomberg on 08/01/2020, 18:08
-}
-
 pip_constraints = {
     "Risk-Tolerance": 1,
     "Budget": 100000
 }
-
-# Problem Instance
-pip_problem_instance = PortfolioInvestmentProblem(
-    decision_variables=pip_decision_variables,
-    constraints=pip_constraints
-)
 
 # Configuration
 #--------------------------------------------------------------------------------------------------
@@ -135,10 +122,10 @@ valid_Init = {initialize_using_random: "rand"}
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
-valid_Xover = {single_arithmetic_crossover: "single", simple_arithmetic_crossover: "simple",
-               whole_arithmetic_crossover: "whole", multiple_arithmetic_crossover: "mixC"}
+valid_Xover = {pip_crossover: "cross"}
 
-valid_Mutation = {multiple_real_mutation: "mixM"}
+valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mutation: "invert",
+                  scramble_mutation: "scramble"}
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
@@ -146,8 +133,8 @@ valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 #Parameters to gridsearch in a run
 test_init = [initialize_using_random]
 test_select = [roulettewheel_selection, tournament_selection, rank_selection]
-test_xover = [single_arithmetic_crossover, simple_arithmetic_crossover, whole_arithmetic_crossover, multiple_arithmetic_crossover]
-test_mutation = [multiple_real_mutation]
+test_xover = [pip_crossover]
+test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation]
 test_replacement = [standard_replacement, elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_xover_prob = [0.1]
@@ -167,15 +154,43 @@ params = {
         "Number-of-Generations"     : 1000,
         "Crossover-Probability"     : 0.8,
         "Mutation-Probability"      : 0.8,
+        "Precision"                 : 0.01,
+        "Portfolio-Size"            : 30,
         # operators / approaches
         "Initialization-Approach"   : initialize_using_random,
         "Selection-Approach"        : parent_selection,
         "Tournament-Size"           : 5,
-        "Crossover-Approach"        : single_arithmetic_crossover,
-        "Mutation-Approach"         : multiple_real_mutation,
+        "Crossover-Approach"        : pip_crossover,
+        "Mutation-Approach"         : swap_mutation,
         "Replacement-Approach"      : elitism_replacement
     }
 
+
+pip_encoding_rule = {
+    "Size"          : params["Portfolio-Size"],  # It must be defined by the size of DV (Number of products)
+    "Is ordered"    : False,
+    "Can repeat"    : True,
+    "Data"          : [0, 0],
+    "Data Type"     : "",
+    "Precision"     : 1/params["Precision"]
+}
+
+final_prices = input_space_red_pip(pip_encoding_rule["Size"], closing_prices)
+
+exp, cov = get_dv_pip(final_prices)
+
+pip_decision_variables = {
+    "Expected_Returns": exp,  # The closing prices for each period
+    "Covariance_Returns": cov,
+    "Risk_Free_Return": 1.53  # US Treasury Bonds according to Bloomberg on 08/01/2020, 18:08
+}
+
+# Problem Instance
+pip_problem_instance = PortfolioInvestmentProblem(
+    decision_variables=pip_decision_variables,
+    constraints=pip_constraints,
+    encoding_rule=pip_encoding_rule
+)
 
 def one_combination():
     """
@@ -184,7 +199,6 @@ def one_combination():
     Creates the resume file from all the runs for a set of parameters
 
     """
-
     log_base_dir="./log/"       #Base dir for log of initial runs
     if not path.exists(log_base_dir):
         mkdir(log_base_dir)
@@ -216,6 +230,7 @@ def one_combination():
         print (f"Run {log_name}.xlsx already made, skipping")
         return
 
+
     # Run the same configuration many times (get distribution)
     #--------------------------------------------------------------------------------------------------
     overall_best_solution = None
@@ -244,6 +259,8 @@ def one_combination():
 
         print('overall_best_solution: ', overall_best_solution.representation)
         print('overall_best_solution fitness: ', overall_best_solution.fitness)
+        #TODO: print('overall_best_solution expected return: ', overall_best_solution.exp_return)
+        #TODO: print('overall_best_solution expected return: ', overall_best_solution.risk)
 
     # Consolidate the runs
     #--------------------------------------------------------------------------------------------------

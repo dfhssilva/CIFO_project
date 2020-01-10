@@ -12,18 +12,17 @@ pip_encoding_rule = {
     "Is ordered": False,
     "Can repeat": True,
     "Data": [0, 0],
-    "Data Type": ""
+    "Data Type": "",
+    "Precision": 1/0.01
 }
 
 closing_prices = read_excel(r".\data\sp_12_weeks.xlsx")  # importing data example
-
 
 def get_dv_pip(prices):
     est_ret = np.log(prices.values[1:] / prices.values[:-1])  # returns for each period in column
     exp_ret = np.sum(est_ret, axis=0)  # expected return over time interval
     cov_ret = np.cov(est_ret, rowvar=False)  # estimated covariance matrix over time interval
     return exp_ret, cov_ret
-
 
 exp, cov = get_dv_pip(closing_prices)
 # pip_decision_variables_example = {
@@ -84,7 +83,8 @@ class PortfolioInvestmentProblem(ProblemTemplate):
             self._budget = constraints["Budget"]
 
         # the encoding will be a string with as many elements as stocks
-        encoding_rule["Size"] = self._exp_returns.shape[0]
+        if encoding_rule["Size"] == -1:  # if the user doesn't give a limit of stocks for the portfolio
+            encoding_rule["Size"] = self._exp_returns.shape[0]
 
         # encoding data doesn't need to be defined (just like in knapsack)
 
@@ -105,12 +105,30 @@ class PortfolioInvestmentProblem(ProblemTemplate):
     # ----------------------------------------------------------------------------------------------
     def build_solution(self, method='Random'):
         """
-        We generate a random solution ensuring that the sum of the weights equals to 1
+        We generate a random solution ensuring that the sum of the weights equals to 100
         """
         if method == 'Random':  # shuffles the list and then instantiates it as a Linear Solution
-            solution_representation = np.random.gamma(1, 2, self._encoding.size)
-            solution_representation = solution_representation/solution_representation.sum()
-            #TODO: implement other initialization
+            solution_representation = np.zeros(self._encoding.size, dtype=int)
+
+            indexes_visited = []
+            sum = 0
+            while sum < self._encoding.precision:
+                index = randint(0, (self._encoding.size-1))
+
+                while index in indexes_visited:
+                    index = randint(0, (self._encoding.size - 1))
+
+                element = randint(0, (self._encoding.precision-sum))
+
+                solution_representation[index] = element
+                sum += element
+                indexes_visited.append(index)
+
+                if len(indexes_visited) == (self._encoding.size-1):
+                    if solution_representation.sum() != self._encoding.precision:
+                        index = randint(0, (self._encoding.size - 1))
+                        solution_representation[index] = solution_representation[index] + (self._encoding.precision-sum)
+                    break
 
             solution = PIP_Solution(
                 representation = solution_representation,
@@ -132,16 +150,11 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         """
         #if (solution.sharpe_ratio < self._risk_tol) | (solution.representation.sum() != 1):
 
-        # when building the solution sometimes the sum equals to 0.99999 or 1.0000001, if we only check when different
-        # from 1, most of the times the solution won't be admissible
-        # if (solution.representation.sum() < 0.99) | (solution.representation.sum() > 1.01):
-        #     #print('Solution: ', solution.representation)
-        #     #print('Sum representation: ', solution.representation.sum())
-        #     print('ERROR: the solution is not admissible!')
-        #     return False
-        # else:
-        #     return True
-        return True
+        if solution.representation.sum() != self.encoding.precision:
+            print('ERROR: the solution is not admissible!')
+            return False
+        else:
+            return True
 
     # Evaluate_solution()
     # -------------------------------------------------------------------------------------------------------------
@@ -156,6 +169,36 @@ class PortfolioInvestmentProblem(ProblemTemplate):
 
         return solution
 
+
+
+###################################################################################################
+# INPUT SPACE REDUCTION PIP
+###################################################################################################
+def input_space_red_pip(size, data):
+    ex_return, covariance = get_dv_pip(data)
+    risk = np.sqrt(np.diag(covariance))
+    corr = data.corr(method='pearson')
+    ratio = ex_return/risk
+
+    indexes = np.argsort(ratio)
+
+    keep = list(indexes[-size:])
+    keep4ever = []
+
+    for i in keep:
+        if len(keep4ever) == (size-1):
+            keep4ever.append(i)
+            break
+        else:
+            keep4ever.append(i)
+            keep4ever.append(list(corr.iloc[:, (i-1)]).index(corr.iloc[:, (i-1)].min()))
+
+            if len(keep4ever) == size:
+                break
+
+    df = data.iloc[:, keep4ever]
+
+    return df
 
 # -------------------------------------------------------------------------------------------------
 # OPTIONAL - it's only needed if you will implement Local Search Methods
