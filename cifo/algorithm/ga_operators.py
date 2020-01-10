@@ -104,11 +104,11 @@ def initialize_using_multiple(problem, population_size):
 
     i = 0
     # generate a population of admissible solutions (individuals)
-    if population_size >= 4:
+    if population_size >= 10:
         while i in range(0, population_size):
-            if i > 4:
+            if i > 10:
                 s = problem.build_solution(method='Random')
-            elif i < 2:
+            elif i < 5:
                 s = problem.build_solution(method='Greedy')
             else:
                 s = problem.build_solution(method='Hill Climbing')
@@ -691,9 +691,9 @@ def heuristic_crossover(problem, solution1, solution2):
 def multiple_crossover(problem, solution1, solution2):
     prob = uniform(0, 1)
 
-    if prob < (1/3):
+    if prob < (0.1):
         return pmx_crossover(problem, solution1, solution2)
-    elif (1/3) <= prob < (2/3):
+    elif (0.1) <= prob < (0.2):
         return order1_crossover(problem, solution1, solution2)
     else:
         return heuristic_crossover(problem, solution1, solution2)
@@ -930,12 +930,12 @@ def greedy_mutation(problem, solution):
 def multiple_mutation(problem, solution):
     prob = uniform(0, 1)
 
-    if prob < (1 / 3):
+    if prob < (0.1):
         return greedy_mutation(problem, solution)
-    elif (1 / 3) <= prob < (2 / 3):
-        return swap_mutation(problem, solution)
-    else:
+    elif (0.1) <= prob < (0.2):
         return scramble_mutation(problem, solution)
+    else:
+        return inversion_mutation(problem, solution)
 
 # TODO: talk about this . Look at mutations performance
 
