@@ -132,13 +132,13 @@ valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
 #Parameters to gridsearch in a run
 test_init = [initialize_using_random]
-test_select = [roulettewheel_selection, tournament_selection, rank_selection]
+test_select = [roulettewheel_selection]
 test_xover = [pip_crossover]
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation]
-test_replacement = [standard_replacement, elitism_replacement]
+test_replacement = [elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.9, 0.1]
-test_mut_prob = [0.9, 0.1]
+test_xover_prob = [0.1]
+test_mut_prob = [0.9]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples

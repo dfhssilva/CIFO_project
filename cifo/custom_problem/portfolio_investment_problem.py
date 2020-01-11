@@ -205,6 +205,7 @@ def input_space_red_pip(size, data):
                 if len(keep4ever) == size:
                     break
 
+    print('Indexes of the Stocks: ', keep4ever)
     df = data.iloc[:, keep4ever]
 
     return df
