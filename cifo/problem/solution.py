@@ -116,6 +116,7 @@ class Encoding():
             "Can repeat"   : <BOOLEAN>,
             "Data"         : <LIST>
             "Data Type"    : <STRING: "Choices" or "Interval">
+            "Precision"    : <INTEGER>                                  # JUST FOR PIP!!
         }
 
         """
@@ -124,17 +125,23 @@ class Encoding():
             self._size = encoding_rule["Size"]
         
         self._is_ordered = False
-        if "Is ordered"  in encoding_rule: 
+        if "Is ordered" in encoding_rule:
             self._is_ordered = encoding_rule["Is ordered"]
         
         self._can_repeat = True
-        if "Can repeat" in encoding_rule: self._can_repeat = encoding_rule["Can repeat"]
+        if "Can repeat" in encoding_rule:
+            self._can_repeat = encoding_rule["Can repeat"]
         
         self._encoding_data = []
-        if "Data" in encoding_rule: self._encoding_data = encoding_rule["Data"]
+        if "Data" in encoding_rule:
+            self._encoding_data = encoding_rule["Data"]
         
         self._encoding_type = ""
-        if "Data Type" in encoding_rule: self._encoding_type = encoding_rule["Data Type"]
+        if "Data Type" in encoding_rule:
+            self._encoding_type = encoding_rule["Data Type"]
+
+        if "Precision" in encoding_rule:
+            self._precision = encoding_rule["Precision"]
 
     #----------------------------------------------------------------------------------------------
     @property
@@ -181,6 +188,10 @@ class Encoding():
         """
         return self._encoding_type
 
+    @property
+    def precision(self):
+        return self._precision
+
 # -------------------------------------------------------------------------------------------------
 # Encoding Data Type
 # -------------------------------------------------------------------------------------------------   
@@ -206,8 +217,9 @@ class PIP_Solution(LinearSolution):
         )
 
         self._exp_return = self._representation @ problem._exp_returns  # Portfolio Expected Return formula
-        self._std_return = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)    # Portfolio Variance formula
+        self._std_return = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)    # Portfolio Standard Deviation formula
         self._sharpe_ratio = (self._exp_return - problem._risk_free_return) / self._std_return
+        #TODO: self._risk =
 
     @property
     def exp_return(self):
