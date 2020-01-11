@@ -1,5 +1,5 @@
 # Personalized
-/visualizations/runs/*
+/log_aws/*
 /log/*
 /data/*
 /cifo_proj/*
