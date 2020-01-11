@@ -19,7 +19,7 @@ pip_encoding_rule = {
 closing_prices = read_excel(r".\data\sp_12_weeks.xlsx")  # importing data example
 
 def get_dv_pip(prices):
-    est_ret = np.log(prices.values[1:] / prices.values[:-1])  # returns for each period in column
+    est_ret = np.log(prices.values[1:] / prices.values[:-1])*100  # returns for each period in column
     exp_ret = np.sum(est_ret, axis=0)  # expected return over time interval
     cov_ret = np.cov(est_ret, rowvar=False)  # estimated covariance matrix over time interval
     return exp_ret, cov_ret
@@ -166,8 +166,9 @@ class PortfolioInvestmentProblem(ProblemTemplate):
         solution we have to update the expected return, standard deviation and the sharpe ratio in order to get the
         new fitness.
         """
-        solution._exp_return = solution.representation @ self._exp_returns  # Portfolio Expected Return formula
-        solution._risk = np.sqrt(solution.representation.T @ self._cov_returns @ solution.representation)  # Portfolio Standard Deviation formula
+        weights = solution.representation / self.encoding.precision
+        solution._exp_return = weights @ self._exp_returns  # Portfolio Expected Return formula
+        solution._risk = np.sqrt(weights.T @ self._cov_returns @ weights)  # Portfolio Standard Deviation formula
         solution._sharpe_ratio = (solution._exp_return - self._risk_free_return) / solution._risk
 
         solution._fitness = solution.sharpe_ratio

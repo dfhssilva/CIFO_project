@@ -216,9 +216,10 @@ class PIP_Solution(LinearSolution):
             encoding_rule = encoding_rule
         )
 
+        weights = self._representation / problem.encoding.precision
         self._risk_free = problem._risk_free_return
-        self._exp_return = self._representation @ problem._exp_returns  # Portfolio Expected Return formula
-        self._risk = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)  # Portfolio Standard Deviation formula
+        self._exp_return = weights @ problem._exp_returns  # Portfolio Expected Return formula
+        self._risk = np.sqrt(weights.T @ problem._cov_returns @ weights)  # Portfolio Standard Deviation formula
         self._sharpe_ratio = (self._exp_return - self._risk_free) / self._risk
 
     @property
