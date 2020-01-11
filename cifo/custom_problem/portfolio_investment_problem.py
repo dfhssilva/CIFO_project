@@ -191,15 +191,18 @@ def input_space_red_pip(size, data):
     keep4ever = []
 
     for i in keep:
-        if len(keep4ever) == (size-1):
-            keep4ever.append(i)
-            break
-        else:
-            keep4ever.append(i)
-            keep4ever.append(list(corr.iloc[:, (i-1)]).index(corr.iloc[:, (i-1)].min()))
-
-            if len(keep4ever) == size:
+        if i not in keep4ever:
+            if len(keep4ever) == (size-1):
+                keep4ever.append(i)
                 break
+            else:
+                keep4ever.append(i)
+                correlated = list(corr.iloc[:, (i-1)]).index(corr.iloc[:, (i-1)].min())
+                if correlated not in keep4ever:
+                    keep4ever.append(correlated)
+
+                if len(keep4ever) == size:
+                    break
 
     df = data.iloc[:, keep4ever]
 
