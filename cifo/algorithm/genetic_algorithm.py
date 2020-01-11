@@ -166,7 +166,7 @@ class GeneticAlgorithm:
                     offspring2.id = [self._generation, i]
                     i += 1
 
-                #in our opinion the id's should be added after applying crossover and/or mutation, but we will not
+                # in our opinion the id's should be added after applying crossover and/or mutation, but we will not
                 # change because it is not relevant
 
                 # add the offsprings in the new population (New Generation)

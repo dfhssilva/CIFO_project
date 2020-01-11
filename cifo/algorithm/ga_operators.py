@@ -697,7 +697,6 @@ def multiple_crossover(problem, solution1, solution2):
         return order1_crossover(problem, solution1, solution2)
     else:
         return heuristic_crossover(problem, solution1, solution2)
-#TODO: talk about this . Look at crossovers performance
 
 # -------------------------------------------------------------------------------------------------
 # Single Arithmetic Crossover
@@ -775,6 +774,42 @@ def multiple_arithmetic_crossover(problem, solution1, solution2):
     else:
         return whole_arithmetic_crossover(problem, solution1, solution2)
 
+# -------------------------------------------------------------------------------------------------
+# PIP crossover
+# -------------------------------------------------------------------------------------------------
+def pip_crossover(problem, solution1, solution2):
+    singlepoint = randint(0, len(solution1.representation)-1)
+
+    offspring1 = deepcopy(solution1)
+    offspring2 = deepcopy(solution2)
+
+    for i in range(singlepoint, len(solution2.representation)):
+        offspring1.representation[i] = solution2.representation[i]
+        offspring2.representation[i] = solution1.representation[i]
+
+    while offspring1.representation.sum() != offspring1.encoding.precision:
+        if offspring1.representation.sum() < offspring1.encoding.precision:
+            index = randint(0, (len(offspring1.representation)-1))
+            offspring1.representation[index] = offspring1.representation[index] +\
+                                               (offspring1.encoding.precision - offspring1.representation.sum())
+
+        elif offspring1.representation.sum() > offspring1.encoding.precision:
+            nonzero = np.nonzero(offspring1.representation)
+            index = np.random.choice(nonzero[0], 1)[0]
+            offspring1.representation[index] = 0
+
+    while offspring2.representation.sum() != offspring2.encoding.precision:
+        if offspring2.representation.sum() < offspring2.encoding.precision:
+            index = randint(0, (len(offspring2.representation)-1))
+            offspring2.representation[index] = offspring2.representation[index] +\
+                                               (offspring2.encoding.precision - offspring2.representation.sum())
+
+        elif offspring2.representation.sum() > offspring2.encoding.precision:
+            nonzero = np.nonzero(offspring2.representation)
+            index = np.random.choice(nonzero[0], 1)[0]
+            offspring2.representation[index] = 0
+
+    return offspring1, offspring2
 
 ###################################################################################################
 # MUTATION APPROACHES
@@ -937,7 +972,6 @@ def multiple_mutation(problem, solution):
     else:
         return inversion_mutation(problem, solution)
 
-# TODO: talk about this . Look at mutations performance
 
 ###################################################################################################
 # REPLACEMENT APPROACHES
@@ -990,3 +1024,5 @@ def get_two_diff_order_index(start=0, stop=1, order=True, diff=True):
             second, first = first, second
 
     return first, second
+
+
