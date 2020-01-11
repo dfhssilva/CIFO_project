@@ -66,13 +66,13 @@ def plot_configs(df_plot, desired_configs, interest=None):
 
 # -------------------------------------------------- RUN SECTION -------------------------------------------------------
 # Getting file names and config names
-run_dir = "./visualizations/runs/"
+run_dir = "./log_all/"
 # run_dir = r"D:/Documents/University/7_semestre/CIFO/CIFO_project/log_all/"
 df_all = get_data(run_dir)
 
 # Plotting the configs
-desired_configs = ["I-mixIB_S-tourn_C-heur_M-mixMB_R-elit_CP-0.1_MP-0.1_PS-20_TS-10_G-1000",
-                   "I-mixIB_S-tourn_C-heur_M-invert_R-elit_CP-0.1_MP-0.9_PS-20_TS-15_G-1000",
-                   "I-mixIB_S-tourn_C-heur_M-mixMB_R-elit_CP-0.1_MP-0.9_PS-20_TS-10_G-1000",
-                   "I-mixIB_S-tourn_C-heur_M-mixMB_R-elit_CP-0.1_MP-0.9_PS-20_TS-15_G-1000"]
+desired_configs = ["I-hc_S-tourn_C-heur_M-mixMB_R-elit_CP-0.05_MP-0.9_PS-20_TS-15_G-1000",
+                   "I-mixIB_S-tourn_C-mixCB_M-mixMB_R-elit_CP-0.05_MP-0.9_PS-20_TS-15_G-1000",
+                   "I-mixIB_S-tourn_C-mixCB_M-mixMB_R-elit_CP-0.1_MP-0.95_PS-20_TS-10_G-1000",
+                   "I-mixIB_S-tourn_C-heur_M-mixMB_R-elit_CP-0.1_MP-0.9_PS-20_TS-10_G-1000"]
 plot_configs(df_all, desired_configs)
