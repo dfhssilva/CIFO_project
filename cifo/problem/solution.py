@@ -25,6 +25,7 @@ Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 import numpy as np
 from copy import deepcopy
 from cifo.problem.objective import ProblemObjective
+
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 # C O D E
 # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -38,7 +39,7 @@ class LinearSolution:
     """
     # Constructor
     #----------------------------------------------------------------------------------------------    
-    def __init__(self, representation, encoding_rule, is_single_objective=True, id=[0,0]):
+    def __init__(self, representation, encoding_rule, is_single_objective=True, id=[0, 0]):
         self._id                    = id
         self._representation        = representation
         self._encoding_rule         = encoding_rule

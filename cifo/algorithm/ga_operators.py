@@ -224,9 +224,9 @@ def initialize_using_greedy(problem, population_size):
 # SELECTION APPROACHES
 ###################################################################################################
 # -------------------------------------------------------------------------------------------------
-# roulettewheel_selection function
+# Roulettewheel_Selection Function
 # -------------------------------------------------------------------------------------------------
-def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVEIS USOS para os params, MULTIPLE ROULETTE!!!!!!!!!!!!!!!
+def roulettewheel_selection(population, objective, params):
     """
     Main idea: better individuals get higher chance
     The chances are proportional to the fitness
@@ -300,7 +300,7 @@ def roulettewheel_selection(population, objective, params): # INVESTIGAR POSSIVE
 
 
 # -------------------------------------------------------------------------------------------------
-# rank_selection function
+# Rank Selection Function
 # -------------------------------------------------------------------------------------------------
 def rank_selection(population, objective, params):
     """
@@ -345,7 +345,7 @@ def rank_selection(population, objective, params):
     return population.get(undo_triangular_number(index1)), population.get(undo_triangular_number(index2))
 
 # -------------------------------------------------------------------------------------------------
-# function tournament_selection
+# Tournament Selection Function
 # -------------------------------------------------------------------------------------------------
 def tournament_selection(population, objective, params):
     """
@@ -514,60 +514,6 @@ def cycle_crossover(problem, solution1, solution2):
 
     return offspring1, offspring2
 
-#TODO: check cycle crossover np and complete or delete
-def cycle_crossover_np(problem, solution1, solution2):
-    cycle = 1   # number of cycles
-
-    # only changes when the cycle is even (considering it starts at 1)
-    sol1 = np.asarray(solution1.representation)
-    sol2 = np.asarray(solution1.representation)
-    offspring1_np = np.copy(sol1)  # solution1.clone()
-    offspring2_np = np.copy(sol2)  # .clone()
-    my_len = len(sol1)
-    index_visited = []  # list of visited indexes during the cycles
-
-    while len(index_visited) < my_len:  # the loop only ends when all the indexes were visited
-        for i in range(0, my_len):  # get the smallest index of the solution not visited
-            if i not in index_visited:
-                idx = i
-                index_visited.append(idx)
-                break
-
-        if cycle % 2 == 0:    # when the cycle is even
-            while True:
-                offspring1_np[idx] = sol2[idx]    # save de swaped elements
-                offspring2_np[idx] = sol1[idx]
-
-                # get the respective index of the solution 1 for the element in solution 2
-                idx = np.where(sol1 == sol2[idx])[0][0]
-                #idx = solution1.representation.index(solution2.representation[idx])
-
-                if idx not in index_visited:    # if the index was already visited, the cycle ends
-                    index_visited.append(idx)   # if not, append to the list of visited indexes
-                else:
-                    cycle += 1      # go to the next cycle
-                    break
-
-        else:       # when the cycle is odd
-            while True:
-                # get the respective index of the solution 1 for the element in solution 2
-                idx = np.where(sol1 == sol2[idx])[0][0]
-                #idx = solution1.representation.index(solution2.representation[idx])
-
-                if idx not in index_visited:    # if the index was already visited, the cycle ends
-                    index_visited.append(idx)   # if not, append to the list of visited indexes
-                else:
-                    cycle += 1      # go to the next cycle
-                    break
-
-    offspring1 = LinearSolution(
-        representation= offspring1_np,
-
-        )
-
-
-    return offspring1, offspring2
-
 # -------------------------------------------------------------------------------------------------
 # Order1 Crossover
 # -------------------------------------------------------------------------------------------------
@@ -576,8 +522,8 @@ def order1_crossover(problem, solution1, solution2):
     offspring1 = deepcopy(solution1)
     offspring2 = deepcopy(solution2)
 
-    # choose the random crossover points
-    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))  # get two different, ordered, indexes
+    # get two different, ordered, indexes
+    crosspoint1, crosspoint2 = get_two_diff_order_index(0, (len(solution1.representation) - 1))
 
     # indexes of the elements not in the middle
     sub = [*range((crosspoint2+1), len(offspring1.representation))]+[*range(0, crosspoint1)]
@@ -842,37 +788,6 @@ def single_point_mutation(problem, solution):
     # return solution           
 
 # -------------------------------------------------------------------------------------------------
-# Multiple Real Mutation
-# -----------------------------------------------------------------------------------------------
-def multiple_real_mutation(problem, solution):
-    index = sample(range(0, len(solution.representation)), 2)
-
-    param = random()
-
-    if param < 0.3:
-        solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
-                                                                               solution.representation[index[0]]
-
-    elif param < 0.6:
-        avg_num = math.floor(random() * (len(solution.representation) - 1))
-        l = sample(range(0, (len(solution.representation) - 1)), avg_num)
-        sum = 0
-        for i in l:
-            sum += solution.representation[i]
-        for i in l:
-            solution.representation[i] = sum / avg_num
-
-    else:
-        rand_num = round(random(), 1)
-        solution.representation[index[0]], solution.representation[index[1]] = \
-            round(rand_num * (solution.representation[index[0]] + solution.representation[index[1]]), 2), round(
-            (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
-
-    solution.representation = np.array(solution.representation)
-
-    return solution
-
-# -------------------------------------------------------------------------------------------------
 # Swap mutation
 # -----------------------------------------------------------------------------------------------
 def swap_mutation(problem, solution):
@@ -972,6 +887,36 @@ def multiple_mutation(problem, solution):
     else:
         return inversion_mutation(problem, solution)
 
+# -------------------------------------------------------------------------------------------------
+# Multiple Real Mutation
+# -----------------------------------------------------------------------------------------------
+def multiple_real_mutation(problem, solution):
+    index = sample(range(0, len(solution.representation)), 2)
+
+    param = random()
+
+    if param < 0.3:
+        solution.representation[index[0]], solution.representation[index[1]] = solution.representation[index[1]], \
+                                                                               solution.representation[index[0]]
+
+    elif param < 0.6:
+        avg_num = math.floor(random() * (len(solution.representation) - 1))
+        l = sample(range(0, (len(solution.representation) - 1)), avg_num)
+        sum = 0
+        for i in l:
+            sum += solution.representation[i]
+        for i in l:
+            solution.representation[i] = sum / avg_num
+
+    else:
+        rand_num = round(random(), 1)
+        solution.representation[index[0]], solution.representation[index[1]] = \
+            round(rand_num * (solution.representation[index[0]] + solution.representation[index[1]]), 2), round(
+            (1 - rand_num) * (solution.representation[index[0]] + solution.representation[index[1]]), 2)
+
+    solution.representation = np.array(solution.representation)
+
+    return solution
 
 ###################################################################################################
 # REPLACEMENT APPROACHES

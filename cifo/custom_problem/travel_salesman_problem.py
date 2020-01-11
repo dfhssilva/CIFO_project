@@ -1,12 +1,10 @@
 from copy import deepcopy
-from random import choice, randint, shuffle, sample
 import numpy as np
-import itertools
 import heapq
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import LinearSolution, Encoding
+from cifo.problem.solution import LinearSolution
 from cifo.algorithm.hill_climbing import HillClimbing
 
 tsp_encoding_rule = {
@@ -223,7 +221,6 @@ class TravelSalesmanProblem(ProblemTemplate):
         solution._is_fitness_calculated = True
 
         return solution
-
 
 # -------------------------------------------------------------------------------------------------
 # OPTIONAL - it is only needed if you will implement Local Search Methods

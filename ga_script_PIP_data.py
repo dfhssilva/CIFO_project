@@ -25,73 +25,6 @@ from os.path import isfile, join
 from pandas import pandas as pd
 from pandas import read_excel
 
-def plot_performance_chart(df):
-    import plotly.graph_objects as go
-    import plotly.express as px
-    from plotly.subplots import make_subplots
-
-    x = df["Generation"] 
-    x_rev = x[::-1]
-    y1 = df["Fitness_Mean"] 
-    y1_upper = df["Fitness_Lower"]
-    y1_lower = df["Fitness_Upper"]
-
-    # line
-    trace1 = go.Scatter(
-        x = x,
-        y = y1,
-        line=dict(color='rgb(0,100,80)'),
-        mode='lines',
-        name='Fair',
-    )
-
-    trace2 = go.Scatter(
-        x = x,
-        y = y1_upper,
-        fill='tozerox',
-        fillcolor='rgba(0,100,80,0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        showlegend=False,
-        name='Fair',
-    )
-
-    trace3 = go.Scatter(
-        x = x,
-        y = y1_lower,
-        fill='tozerox',
-        fillcolor='rgba(0,100,80,0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        showlegend=False,
-        name='Fair',
-    )
-
-    data = [trace1]
-    
-    layout = go.Layout(
-        paper_bgcolor='rgb(255,255,255)',
-        plot_bgcolor='rgb(229,229,229)',
-        xaxis=dict(
-            gridcolor='rgb(255,255,255)',
-            range=[1,10],
-            showgrid=True,
-            showline=False,
-            showticklabels=True,
-            tickcolor='rgb(127,127,127)',
-            ticks='outside',
-            zeroline=False
-        ),
-        yaxis=dict(
-            gridcolor='rgb(255,255,255)',
-            showgrid=True,
-            showline=False,
-            showticklabels=True,
-            tickcolor='rgb(127,127,127)',
-            ticks='outside',
-            zeroline=False
-        ),
-    )
-    fig = go.Figure(data=data, layout=layout)
-    fig.show()
 
 # Problem
 #--------------------------------------------------------------------------------------------------
@@ -113,8 +46,6 @@ pip_constraints = {
 
 # Configuration
 #--------------------------------------------------------------------------------------------------
-# parent selection object
-# parent_selection = TournamentSelection()
 parent_selection = roulettewheel_selection
 
 # dictionaries to create test directories
@@ -136,16 +67,12 @@ test_select = [roulettewheel_selection]
 test_xover = [pip_crossover]
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation]
 test_replacement = [elitism_replacement]
-#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_xover_prob = [0.1]
 test_mut_prob = [0.9]
-#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
-#test_tournament_size = [2] # simples
 
 
-#initial params
-
+# Initial params
 params = {
         # params
         "Population-Size"           : 40,
@@ -175,7 +102,7 @@ pip_encoding_rule = {
 
 final_prices = input_space_red_pip(pip_encoding_rule["Size"], closing_prices)
 print('Given the chosen parameters, the search space is composed by ',  pip_encoding_rule['Precision'], '^',
-      pip_encoding_rule["Size"], ' = \n', pip_encoding_rule['Precision']**pip_encoding_rule["Size"])
+      pip_encoding_rule["Size"], ' = ', pip_encoding_rule['Precision']**pip_encoding_rule["Size"])
 
 exp, cov = get_dv_pip(final_prices)
 
@@ -197,12 +124,11 @@ def one_combination():
     Actually runs the algorithm with one set of parameters.
     Names the resume file from parameters of search
     Creates the resume file from all the runs for a set of parameters
-
     """
-    log_base_dir="./log/"       #Base dir for log of initial runs
+    log_base_dir="./log/"       # Base dir for log of initial runs
     if not path.exists(log_base_dir):
         mkdir(log_base_dir)
-    all_dir = "./log_all/"      #Base dir for resume the resume files
+    all_dir = "./log_all/"      # Base dir for resume the resume files
     if not path.exists(all_dir):
         mkdir(all_dir)
 
@@ -320,9 +246,6 @@ def one_combination():
                        (overall_best_solution.exp_return - overall_best_solution.risk_free)]],
                      columns=["Representation", "Fitness, Sharpe Ratio", "Expected Return", "Risk", "Above Risk Free"]).\
             to_excel(writer, sheet_name='Overall_Best_Solution')
-
-
-#plot_performance_chart(df)
 
 # -------------------------------------------------------------------------------------------------
 # RUNS Through the Several list of possible parameters

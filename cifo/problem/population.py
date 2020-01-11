@@ -5,7 +5,7 @@ from cifo.problem.objective import ProblemObjective
 # -------------------------------------------------------------------------------------------------
 class Population:
     """
-    Population - 
+    Population
     """
     # ---------------------------------------------------------------------------------------------
     def __init__(self, problem, maximum_size, solution_list):

@@ -1,11 +1,10 @@
-from copy import deepcopy
-from random import choice, randint
+from random import randint
 import numpy as np
 from pandas import read_excel
 
 from cifo.problem.problem_template import ProblemTemplate
 from cifo.problem.objective import ProblemObjective
-from cifo.problem.solution import LinearSolution, Encoding, PIP_Solution
+from cifo.problem.solution import PIP_Solution
 
 pip_encoding_rule = {
     "Size": -1,  # It must be defined by the size of DV (Number of products)
