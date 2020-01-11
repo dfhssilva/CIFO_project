@@ -315,7 +315,7 @@ def one_combination():
     # Exporting summary of configuration with best solution
     with pd.ExcelWriter(all_dir + f"{log_name}.xlsx") as writer:
         df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
-        pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness,
+        pd.DataFrame([[list(overall_best_solution.representation), overall_best_solution.fitness,
                        overall_best_solution.exp_return, overall_best_solution.risk,
                        (overall_best_solution.exp_return - overall_best_solution.risk_free)]],
                      columns=["Representation", "Fitness, Sharpe Ratio", "Expected Return", "Risk", "Above Risk Free"]).\
