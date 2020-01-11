@@ -100,11 +100,11 @@ class TravelSalesmanProblem(ProblemTemplate):
             - 'Random' (default method)
             - 'Greedy'
         """
-        if method == 'Random':  # shuffles the list and then instanciates it as a Linear Solution
+        if method == 'Random':  # shuffles the list and then instantiates it as a Linear Solution
             encoding_data = self._encoding.encoding_data
 
             solution_representation = encoding_data.copy()
-            np.random.shuffle(solution_representation)  # inplace suffle
+            np.random.shuffle(solution_representation)  # inplace shuffle
 
             solution = LinearSolution(
                 representation=solution_representation,
