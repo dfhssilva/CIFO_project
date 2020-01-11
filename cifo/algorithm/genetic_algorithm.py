@@ -16,7 +16,6 @@ Author: Fernando A J Peres - fperes@novaims.unl.pt - (2019) version L4.0
 """
 # -------------------------------------------------------------------------------------------------
 
-# import
 from random import random
 from copy import deepcopy
 
@@ -82,7 +81,7 @@ class GeneticAlgorithm:
     """
     # Constructor
     # ---------------------------------------------------------------------------------------------
-    def __init__(self, problem_instance, params = default_params, run = 0, log_name = "temp", log_dir="./log/"):
+    def __init__(self, problem_instance, params=default_params, run=0, log_name="temp", log_dir="./log/"):
         self._text              = ""
         self._generation        = 0
         self._run               = run

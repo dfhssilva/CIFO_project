@@ -32,7 +32,7 @@ class ProblemTemplate:
     """
     # Constructor
     #-------------------------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables, constraints = {}, encoding_rule = {}):
+    def __init__(self, decision_variables, constraints={}, encoding_rule={}):
         """
         The constructor of the Problem Template. 
         """

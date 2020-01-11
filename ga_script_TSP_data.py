@@ -1,20 +1,18 @@
 from cifo.algorithm.genetic_algorithm import GeneticAlgorithm
-from cifo.algorithm.hill_climbing import HillClimbing
 from cifo.custom_problem.travel_salesman_problem import (
-    TravelSalesmanProblem, tsp_decision_variables_example, tsp_get_neighbors
+    TravelSalesmanProblem
 )
-from cifo.problem.objective import ProblemObjective
+
 from cifo.algorithm.ga_operators import (
-    initialize_using_random, initialize_using_hc, initialize_using_sa, initialize_using_greedy, initialize_using_multiple,
+    initialize_using_random, initialize_using_hc, initialize_using_greedy, initialize_using_multiple,
     roulettewheel_selection, rank_selection, tournament_selection,
-    singlepoint_crossover, cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover,
-    single_point_mutation, swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation,
+    cycle_crossover, pmx_crossover, order1_crossover, heuristic_crossover, multiple_crossover,
+    swap_mutation, insert_mutation, inversion_mutation, scramble_mutation, greedy_mutation,
     multiple_mutation,
     elitism_replacement, standard_replacement 
 )    
-from cifo.util.terminal import Terminal, FontColor
+
 from cifo.util.observer import LocalSearchObserver
-from random import randint
 import numpy as np
 from copy import deepcopy
 
@@ -22,92 +20,9 @@ from os import listdir, path, mkdir
 from os.path import isfile, join
 from pandas import pandas as pd
 
-def plot_performance_chart(df):
-    import plotly.graph_objects as go
-    import plotly.express as px
-    from plotly.subplots import make_subplots
-
-    x = df["Generation"] 
-    x_rev = x[::-1]
-    y1 = df["Fitness_Mean"] 
-    y1_upper = df["Fitness_Lower"]
-    y1_lower = df["Fitness_Upper"]
-
-    # line
-    trace1 = go.Scatter(
-        x = x,
-        y = y1,
-        line=dict(color='rgb(0,100,80)'),
-        mode='lines',
-        name='Fair',
-    )
-
-    trace2 = go.Scatter(
-        x = x,
-        y = y1_upper,
-        fill='tozerox',
-        fillcolor='rgba(0,100,80,0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        showlegend=False,
-        name='Fair',
-    )
-
-    trace3 = go.Scatter(
-        x = x,
-        y = y1_lower,
-        fill='tozerox',
-        fillcolor='rgba(0,100,80,0.2)',
-        line=dict(color='rgba(255,255,255,0)'),
-        showlegend=False,
-        name='Fair',
-    )
-
-    data = [trace1]
-    
-    layout = go.Layout(
-        paper_bgcolor='rgb(255,255,255)',
-        plot_bgcolor='rgb(229,229,229)',
-        xaxis=dict(
-            gridcolor='rgb(255,255,255)',
-            range=[1,10],
-            showgrid=True,
-            showline=False,
-            showticklabels=True,
-            tickcolor='rgb(127,127,127)',
-            ticks='outside',
-            zeroline=False
-        ),
-        yaxis=dict(
-            gridcolor='rgb(255,255,255)',
-            showgrid=True,
-            showline=False,
-            showticklabels=True,
-            tickcolor='rgb(127,127,127)',
-            ticks='outside',
-            zeroline=False
-        ),
-    )
-    fig = go.Figure(data=data, layout=layout)
-    fig.show()
-
 # Problem
 #--------------------------------------------------------------------------------------------------
 # Decision Variables
-input1 =[
-        [0, 2451, 713, 1018, 1631, 1374, 2408, 213, 2571, 875, 1420, 2145, 1972],
-        [2451, 0, 1745, 1524, 831, 1240, 959, 2596, 403, 1589, 1374, 357, 579],
-        [713, 1745, 0, 355, 920, 803, 1737, 851, 1858, 262, 940, 1453, 1260],
-        [1018, 1524, 355, 0, 700, 862, 1395, 1123, 1584, 466, 1056, 1280, 987],
-        [1631, 831, 920, 700, 0, 663, 1021, 1769, 949, 796, 879, 586, 371],
-        [1374, 1240, 803, 862, 663, 0, 1681, 1551, 1765, 547, 225, 887, 999],
-        [2408, 959, 1737, 1395, 1021, 1681, 0, 2493, 678, 1724, 1891, 1114, 701],
-        [213, 2596, 851, 1123, 1769, 1551, 2493, 0, 2699, 1038, 1605, 2300, 2099],
-        [2571, 403, 1858, 1584, 949, 1765, 678, 2699, 0, 1744, 1645, 653, 600],
-        [875, 1589, 262, 466, 796, 547, 1724, 1038, 1744, 0, 679, 1272, 1162],
-        [1420, 1374, 940, 1056, 879, 225, 1891, 1605, 1645, 679, 0, 1017, 1200],
-        [2145, 357, 1453, 1280, 586, 887, 1114, 2300, 653, 1272, 1017, 0, 504],
-        [1972, 579, 1260, 987, 371, 999, 701, 2099, 600, 1162, 1200, 504, 0],
-    ]
 input = [
     [0,36.96584005,51.47535512,81.37883643,67.09706382,96.25912034,33.37095504,49.05139087,82.42814829,17.53944615,28.60425589,51.23577205,81.61379496,51.51224221,49.22279957,42.77989519,52.41229411,8.559339301,29.73906448,81.02061035,47.6395033,57.71653277,58.75682446,62.03784071,31.25151882,50.1453012,24.63358841,18.94551955,30.25790504,85.21792873,36.85186187,56.53666255,62.03497797,37.68030795,16.01323158,63.58061167,63.59738826,62.15986186,23.10591688,37.37057763,8.517827435,58.29133094,69.49677904,87.08357383,34.45822295,25.69816455,34.67118709,66.44842139,85.07076451,23.63220219,17.29653852,32.6772139,71.67238993,31.40561027,74.5859657,13.37462792,74.65274849,68.78350664,28.32893632,16.45723427,40.79505789,32.14446993,22.8157847,61.17311404,67.85584464,50.50121842,17.32224642,69.64537022,8.58156977,67.23338249,38.25387274,72.79577656,45.89074932,62.00721071,21.98649411,45.34735754,23.43343436,64.20771523,40.49933354,33.55673111,49.24624472,80.86344475,47.42370856,61.25720927,57.6628477,77.27561713,51.02315985,74.39466341,48.992992,55.93722702],
     [36.96584005,0,61.91619178,85.79358509,56.34475438,68.71598221,4.09671684,36.54433609,93.72104677,44.14412909,26.24710648,19.03207804,64.5753318,27.03707842,25.97304705,6.288581842,24.73396593,45.43488009,16.97199729,53.72595597,62.78665591,62.66049676,29.58502223,68.28070695,61.67825794,38.42329848,60.23006801,37.50720546,54.44740046,55.15306618,73.80628982,47.35539658,66.44844157,73.28046004,52.53609876,42.98509658,56.44437672,45.2803504,59.30269394,31.97786358,45.30930669,27.20468134,63.6108007,55.78010425,70.4261779,15.74337821,47.21292078,74.88684535,92.9748268,16.96133125,31.60291136,5.074596635,85.38521764,54.70583033,61.30430838,47.80276173,69.84275638,76.85850099,65.22136526,46.8267315,22.40937611,57.95619821,14.16705865,38.74170375,47.70704542,62.00538466,43.02981561,36.79869334,36.12941277,45.68338293,28.53063986,47.58183111,67.32112581,65.51898315,56.29357404,67.25267976,59.14111513,28.71109276,28.38619482,36.2971628,12.36567547,89.48057197,69.15888966,32.97194384,70.14129461,88.05203116,67.93350969,78.96061085,46.92748861,30.70635332],
@@ -216,13 +131,11 @@ tsp_problem_instance = TravelSalesmanProblem(
 
 # Configuration
 #--------------------------------------------------------------------------------------------------
-# parent selection object
-# parent_selection = TournamentSelection()
 parent_selection = roulettewheel_selection
 
-# dictionaries to create test directories
+# Dictionaries to create test directories
 valid_Init = {initialize_using_random: "rand", initialize_using_hc: "hc", initialize_using_greedy: "greedyI",
-              initialize_using_multiple: "mixIB"} #, initialize_using_sa: "sa"
+              initialize_using_multiple: "mixIB"}
 
 valid_Select = {roulettewheel_selection: "rol", tournament_selection: "tourn", rank_selection: "rank"}
 
@@ -235,23 +148,20 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-#Parameters to grid search in a run
+# Parameters to grid search in a run
 test_init = [initialize_using_multiple, initialize_using_hc,  initialize_using_greedy, initialize_using_random]
 test_select = [tournament_selection, roulettewheel_selection, rank_selection]
-test_xover = [heuristic_crossover, multiple_crossover,  cycle_crossover, pmx_crossover, order1_crossover]# singlepoint_crossover should not be used
+test_xover = [heuristic_crossover, multiple_crossover,  cycle_crossover, pmx_crossover, order1_crossover]
 test_mutation = [multiple_mutation, inversion_mutation, multiple_mutation, greedy_mutation, swap_mutation,
-                 insert_mutation, scramble_mutation] # single_point_mutation should not be used
+                 insert_mutation, scramble_mutation]
 test_replacement = [elitism_replacement, standard_replacement]
 
 test_xover_prob = [0.1, 0.9, 0.95, 0.05]
-test_mut_prob = [0.95, 0,9, 0.1, 0.05]
+test_mut_prob = [0.95, 0.9, 0.1, 0.05]
 
 test_tournament_size = [15, 10, 5]
 
-
-
-#initial params
-
+# Initial params
 params = {
         # params
         "Population-Size"           : 20,
@@ -273,13 +183,11 @@ def one_combination():
     Actually runs the algorithm with one set of parameters.
     Names the resume file from parameters of search
     Creates the resume file from all the runs for a set of parameters
-
     """
-
-    log_base_dir="./log/"       #Base dir for log of initial runs
+    log_base_dir="./log/"       # Base dir for log of initial runs
     if not path.exists(log_base_dir):
         mkdir(log_base_dir)
-    all_dir = "./log_all/"      #Base dir for resume the resume files
+    all_dir = "./log_all/"      # Base dir for resume the resume files
     if not path.exists(all_dir):
         mkdir(all_dir)
 
@@ -390,9 +298,6 @@ def one_combination():
         df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
         pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness]],
                      columns=["Representation", "Fitness"]).to_excel(writer, sheet_name='Overall_Best_Solution')
-
-
-#plot_performance_chart(df)
 
 # -------------------------------------------------------------------------------------------------
 # RUNS Through the Several list of possible parameters

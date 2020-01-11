@@ -253,7 +253,7 @@ class HillClimbing:
                     best_neighbor = deepcopy(neighbor)
 
         self._neighbor = best_neighbor
-        #print('neighbor fitness: ' + str(self._neighbor.fitness))
+
     # _select for minimization
     #----------------------------------------------------------------------------------------------    
     def _select_minimization(self):
