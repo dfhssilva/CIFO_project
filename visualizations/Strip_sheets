@@ -1,0 +1,16 @@
+import os
+import pandas as pd
+
+path = ("C:/Runs/")
+targetdir = (path + "New_Files/") #target dir
+
+if not os.path.exists(targetdir):
+    os.makedirs(targetdir)
+
+for root,dir,files in os.walk(path, topdown=False): #all the files to split
+    xlsfiles=[f for f in files]                     #We can add selection condition here
+
+for f in xlsfiles:
+    df = pd.read_excel(path+f)
+    with pd.ExcelWriter(targetdir + f) as writer:
+        df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
