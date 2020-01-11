@@ -49,10 +49,10 @@ pip_constraints_example = {
 class PortfolioInvestmentProblem(ProblemTemplate):
     """
     """
-
     # Constructor
     # ----------------------------------------------------------------------------------------------
-    def __init__(self, decision_variables, constraints, encoding_rule=pip_encoding_rule):
+    def __init__(self, decision_variables=pip_decision_variables_example, constraints=pip_constraints_example,
+                 encoding_rule=pip_encoding_rule):
         """
         """
         # optimize the access to the decision variables
@@ -162,13 +162,18 @@ class PortfolioInvestmentProblem(ProblemTemplate):
     def evaluate_solution(self, solution, feedback=None):  # << This method does not need to be extended, it already
         # automated solutions evaluation, for Single-Objective and for Multi-Objective
         """
-        Our objective is to maximize the sharpe ratio so the fitness is the sharpe ratio
+        Our objective is to maximize the sharpe ratio so the fitness is the sharpe ratio. Besides that for each new
+        solution we have to update the expected return, standard deviation and the sharpe ratio in order to get the
+        new fitness.
         """
+        solution._exp_return = solution.representation @ self._exp_returns  # Portfolio Expected Return formula
+        solution._risk = np.sqrt(solution.representation.T @ self._cov_returns @ solution.representation)  # Portfolio Standard Deviation formula
+        solution._sharpe_ratio = (solution._exp_return - self._risk_free_return) / solution._risk
+
         solution._fitness = solution.sharpe_ratio
         solution._is_fitness_calculated = True
 
         return solution
-
 
 
 ###################################################################################################
@@ -200,9 +205,3 @@ def input_space_red_pip(size, data):
 
     return df
 
-# -------------------------------------------------------------------------------------------------
-# OPTIONAL - it's only needed if you will implement Local Search Methods
-#            (Hill Climbing and Simulated Annealing)
-# -------------------------------------------------------------------------------------------------
-def pip_bitflip_get_neighbors(solution, problem, neighborhood_size=0):
-    pass

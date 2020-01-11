@@ -206,7 +206,7 @@ class EncodingDataType:
 # -------------------------------------------------------------------------------------------------
 class PIP_Solution(LinearSolution):
     """
-    Portfolios
+    Portfolios Solutions
     """
     # Constructor
     # ----------------------------------------------------------------------------------------------
@@ -216,19 +216,23 @@ class PIP_Solution(LinearSolution):
             encoding_rule = encoding_rule
         )
 
+        self._risk_free = problem._risk_free_return
         self._exp_return = self._representation @ problem._exp_returns  # Portfolio Expected Return formula
-        self._std_return = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)    # Portfolio Standard Deviation formula
-        self._sharpe_ratio = (self._exp_return - problem._risk_free_return) / self._std_return
-        #TODO: self._risk =
+        self._risk = np.sqrt(self._representation.T @ problem._cov_returns @ self._representation)  # Portfolio Standard Deviation formula
+        self._sharpe_ratio = (self._exp_return - self._risk_free) / self._risk
 
     @property
     def exp_return(self):
         return self._exp_return
 
     @property
-    def std_return(self):
-        return self._std_return
+    def risk(self):
+        return self._risk
 
     @property
     def sharpe_ratio(self):
         return self._sharpe_ratio
+
+    @property
+    def risk_free(self):
+        return self._risk_free

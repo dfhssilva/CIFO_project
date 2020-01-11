@@ -697,7 +697,6 @@ def multiple_crossover(problem, solution1, solution2):
         return order1_crossover(problem, solution1, solution2)
     else:
         return heuristic_crossover(problem, solution1, solution2)
-#TODO: talk about this . Look at crossovers performance
 
 # -------------------------------------------------------------------------------------------------
 # Single Arithmetic Crossover
@@ -973,7 +972,6 @@ def multiple_mutation(problem, solution):
     else:
         return inversion_mutation(problem, solution)
 
-# TODO: talk about this . Look at mutations performance
 
 ###################################################################################################
 # REPLACEMENT APPROACHES
