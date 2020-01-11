@@ -203,7 +203,8 @@ input = [
 
 tsp_decision_variables = {
     "Distances" : np.array(input), #<< Number, Mandatory
-    "Item-Name" : [i for i in range(1, len(input[0]))] # << String, Optional, The names of the items, can be used to present the solution.
+    "Item-Name" : [i for i in range(1, len(input[0]))]
+        # << String, Optional, The names of the items, can be used to present the solution.
         # It starts at 1 reserving the 0 for the static city
         # We are setting the departure point, so we only have to arrange the n-1 remaining cities
 }
@@ -234,18 +235,19 @@ valid_Mutation = {swap_mutation: "swap", insert_mutation: "insert", inversion_mu
 
 valid_Replacement = {elitism_replacement: "elit", standard_replacement: "std"}
 
-#Parameters to gridsearch in a run
-test_init = [ initialize_using_hc, initialize_using_multiple]#,, initialize_using_greedy, initialize_using_random]
-test_select = [tournament_selection]#roulettewheel_selection, , rank_selection]
-test_xover = [multiple_crossover, heuristic_crossover]#, cycle_crossover, pmx_crossover, order1_crossover] # singlepoint_crossover should not be used
-test_mutation = [multiple_mutation, inversion_mutation]#,greedy_mutation, swap_mutation, insert_mutation,  scramble_mutation] # single_point_mutation should not be used
-test_replacement = [elitism_replacement] #standard_replacement
-#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.95,0.9,0.1,0.05]
-test_mut_prob = [0.95, 0.9, 0.1, 0.05]
-#test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_tournament_size = [ 10,15]
-#test_tournament_size = [2] # simples
+#Parameters to grid search in a run
+test_init = [initialize_using_multiple, initialize_using_hc,  initialize_using_greedy, initialize_using_random]
+test_select = [tournament_selection, roulettewheel_selection, rank_selection]
+test_xover = [heuristic_crossover, multiple_crossover,  cycle_crossover, pmx_crossover, order1_crossover]# singlepoint_crossover should not be used
+test_mutation = [multiple_mutation, inversion_mutation, multiple_mutation, greedy_mutation, swap_mutation,
+                 insert_mutation, scramble_mutation] # single_point_mutation should not be used
+test_replacement = [elitism_replacement, standard_replacement]
+
+test_xover_prob = [0.1, 0.9, 0.95, 0.05]
+test_mut_prob = [0.95, 0,9, 0.1, 0.05]
+
+test_tournament_size = [15, 10, 5]
+
 
 
 #initial params
@@ -416,7 +418,7 @@ for init in range(len(test_init)):
                             else:
                                 one_combination()
 
-#[sum(sublist) for sublist in itertools.izip(*myListOfLists)]
+
 
 
 

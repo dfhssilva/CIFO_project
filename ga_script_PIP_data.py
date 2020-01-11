@@ -137,10 +137,8 @@ test_xover = [pip_crossover]
 test_mutation = [swap_mutation, insert_mutation, inversion_mutation, scramble_mutation]
 test_replacement = [standard_replacement, elitism_replacement]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
-test_xover_prob = [0.1]
-test_mut_prob = [0.1]
-# test_xover_prob = [0.9, 0.1]
-# test_mut_prob = [0.9, 0.1]
+test_xover_prob = [0.9, 0.1]
+test_mut_prob = [0.9, 0.1]
 #test_xover_prob = [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
 test_tournament_size = [2, 5, 10]
 #test_tournament_size = [2] # simples
@@ -176,6 +174,8 @@ pip_encoding_rule = {
 }
 
 final_prices = input_space_red_pip(pip_encoding_rule["Size"], closing_prices)
+print('Given the chosen parameters, the search space is composed by ',  pip_encoding_rule['Precision'], '^',
+      pip_encoding_rule["Size"], ' = \n', pip_encoding_rule['Precision']**pip_encoding_rule["Size"])
 
 exp, cov = get_dv_pip(final_prices)
 
@@ -258,9 +258,10 @@ def one_combination():
                 overall_best_solution = deepcopy(ga.best_solution)
 
         print('overall_best_solution: ', overall_best_solution.representation)
-        print('overall_best_solution fitness: ', overall_best_solution.fitness)
-        #TODO: print('overall_best_solution expected return: ', overall_best_solution.exp_return)
-        #TODO: print('overall_best_solution expected return: ', overall_best_solution.risk)
+        print('overall_best_solution fitness, sharpe ratio: ', overall_best_solution.fitness)
+        print('overall_best_solution expected return: ', overall_best_solution.exp_return, ', ',
+              overall_best_solution.exp_return - overall_best_solution.risk_free, 'above risk free return')
+        print('overall_best_solution risk: ', overall_best_solution.risk)
 
     # Consolidate the runs
     #--------------------------------------------------------------------------------------------------
@@ -314,8 +315,11 @@ def one_combination():
     # Exporting summary of configuration with best solution
     with pd.ExcelWriter(all_dir + f"{log_name}.xlsx") as writer:
         df.to_excel(writer, sheet_name='Fitness', index=False, encoding='utf-8')
-        pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness]],
-                     columns=["Representation", "Fitness"]).to_excel(writer, sheet_name='Overall_Best_Solution')
+        pd.DataFrame([[overall_best_solution.representation, overall_best_solution.fitness,
+                       overall_best_solution.exp_return, overall_best_solution.risk,
+                       (overall_best_solution.exp_return - overall_best_solution.risk_free)]],
+                     columns=["Representation", "Fitness, Sharpe Ratio", "Expected Return", "Risk", "Above Risk Free"]).\
+            to_excel(writer, sheet_name='Overall_Best_Solution')
 
 
 #plot_performance_chart(df)
