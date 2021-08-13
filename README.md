@@ -10,4 +10,4 @@ The code produced satisfies the OOP paradigm, which means that different instanc
 
 For the application of Genetic Algorithms to the TSP, we developed 4 Initialization approaches, 3 Selection approaches, 5 Crossover operators, 6 Mutation operators and 2 Replacement approaches. We ran over 2300 possible configurations by combining these approaches/ operators. We employed AWS instances to run some of these configurations.
 
-The report which accompanies the code can be consulted at: http://bit.ly/tsp_pip.
+The report which accompanies the code can be consulted at: https://tinyurl.com/cifo-tsp-pip.
